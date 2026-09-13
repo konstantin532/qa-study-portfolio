@@ -248,3 +248,93 @@ body.context-dialog-visible {
     animation-duration: 0.01ms !important;
   }
 }
+
+
+/* === STAGE 1: MODAL GEOMETRY AND SINGLE INNER SCROLL OWNER === */
+/* Scope is intentionally limited to modal elements mounted in #modals.
+   #context-panel is a separate component and is not changed at this stage. */
+#modals.modals-container {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: var(--z-modal, 1000) !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  overflow: visible !important;
+  pointer-events: none;
+}
+
+#modals.modals-container > .modal {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  margin: 0 !important;
+  padding: clamp(16px, 3vw, 32px) !important;
+  box-sizing: border-box !important;
+  place-items: center !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  pointer-events: auto;
+  transform: none !important;
+}
+
+#modals.modals-container > .modal:not([hidden]) {
+  display: grid !important;
+}
+
+#modals.modals-container > .modal[hidden] {
+  display: none !important;
+}
+
+#modals.modals-container > .modal > .modal-dialog,
+#modals.modals-container > .modal > .modal-content {
+  position: relative !important;
+  inset: auto !important;
+  margin: 0 !important;
+  width: min(100%, var(--modal-max-width, 760px)) !important;
+  max-height: calc(100dvh - 2 * clamp(16px, 3vw, 32px)) !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  transform: none !important;
+}
+
+#modals.modals-container .modal-dialog,
+#modals.modals-container .modal-content {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+#modals.modals-container .modal-content {
+  max-height: calc(100dvh - 2 * clamp(16px, 3vw, 32px)) !important;
+}
+
+#modals.modals-container .modal-header,
+#modals.modals-container .modal-actions,
+#modals.modals-container .modal-footer {
+  flex: 0 0 auto;
+}
+
+#modals.modals-container .modal-body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+@supports not (height: 100dvh) {
+  #modals.modals-container,
+  #modals.modals-container > .modal {
+    height: 100vh !important;
+  }
+
+  #modals.modals-container > .modal > .modal-dialog,
+  #modals.modals-container > .modal > .modal-content,
+  #modals.modals-container .modal-content {
+    max-height: calc(100vh - 2 * clamp(16px, 3vw, 32px)) !important;
+  }
+}
+/* === END STAGE 1 === */
