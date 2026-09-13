@@ -1,257 +1,147 @@
-/* base-reset-vars.css — CSS-переменные, reset, базовые стили элементов, утилиты */
-
-/* ============ ЧАСТЬ 1: CSS-ПЕРЕМЕННЫЕ ============ */
-
 :root {
-  /* Цвета — светлая тема */
-  --bg-page: #f0f4f8;
-  --bg-card: #ffffff;
-  --accent: #0ea5b7;
-  --accent-hover: #0d94a5;
-  --accent-secondary: #3b82f6;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --border-color: #e2e8f0;
-  --shadow-color: rgba(30, 41, 59, 0.08);
-  --danger: #dc2626;
-  --danger-hover: #b91c1c;
-  --success: #16a34a;
-  --success-hover: #15803d;
-  --warning: #f59e0b;
-  --warning-hover: #d97706;
-  --info: #3b82f6;
+  /* Backgrounds */
+  --color-bg-page: #f4f5f7;
+  --color-surface-1: #ffffff;
+  --color-surface-2: #f0f1f3;
+  --color-surface-hover: #e8eaed;
 
-  /* Алиасы */
-  --surface: var(--bg-card);
-  --surface-hover: #f1f5f9;
-  --surface-active: #e2e8f0;
-  --border: var(--border-color);
-  --shadow-sm: 0 1px 3px var(--shadow-color);
-  --shadow-md: 0 4px 12px var(--shadow-color);
-  --shadow-lg: 0 8px 24px var(--shadow-color);
+  /* Text */
+  --color-text-primary: #1a1d23;
+  --color-text-secondary: #6b7280;
+  --color-text-tertiary: #9ca3af;
+  --color-text-white: #f9fafb;
 
-  /* Размеры layout */
+  /* Borders */
+  --color-border: #e0e2e6;
+  --color-border-strong: #c5c8cd;
+
+  /* Accents — Art Deco Luxury */
+  --color-accent: #b8831b;
+  --color-accent-hover: #9c6f15;
+  --color-accent-soft: rgba(184, 131, 27, 0.1);
+  --color-accent-emerald: #047857;
+  --color-accent-emerald-hover: #036447;
+
+  /* States */
+  --color-success: #16a34a;
+  --color-success-soft: rgba(22, 163, 74, 0.1);
+  --color-warning: #d97706;
+  --color-warning-soft: rgba(217, 119, 6, 0.1);
+  --color-danger: #dc2626;
+  --color-danger-soft: rgba(220, 38, 38, 0.1);
+  --color-info: #2563eb;
+  --color-info-soft: rgba(37, 99, 235, 0.1);
+
+  /* Aliases for backward compatibility */
+  --bg-page: var(--color-bg-page);
+  --bg-card: var(--color-surface-1);
+  --surface: var(--color-surface-2);
+  --surface-hover: var(--color-surface-hover);
+  --border: var(--color-border);
+  --border-color: var(--color-border);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --accent: var(--color-accent);
+  --accent-hover: var(--color-accent-hover);
+
+  /* Layout */
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 64px;
-  --header-height: 56px;
-  --context-panel-width: 320px;
-  --content-max-width: 1200px;
-  --modal-max-width: 500px;
-  --modal-lg-max-width: 700px;
-
-  /* Скругления */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
-  --radius-full: 9999px;
-
-  /* Переходы */
-  --transition-fast: 150ms ease;
-  --transition-base: 200ms ease;
-  --transition-slow: 250ms ease;
-
-  /* Шрифты */
-  --font-ui: "Segoe UI Variable", "Segoe UI", Tahoma, Arial, sans-serif;
-  --font-heading: Bahnschrift, "Bahnschrift SemiBold", "Segoe UI Variable", "Segoe UI", Arial, sans-serif;
-  --font-mono: "Cascadia Mono", "Cascadia Code", Consolas, "Courier New", monospace;
-
-  /* Размеры шрифтов */
-  --fs-xs: 11px;
-  --fs-sm: 12px;
-  --fs-base: 14px;
-  --fs-md: 15px;
-  --fs-lg: 16px;
-  --fs-xl: 18px;
-  --fs-2xl: 20px;
-  --fs-3xl: 24px;
-  --fs-4xl: 32px;
-  --fs-5xl: 48px;
-
-  /* Межстрочный интервал */
-  --lh-tight: 1.2;
-  --lh-base: 1.5;
-  --lh-relaxed: 1.625;
-  --lh-loose: 2;
-
-  /* Font-weight */
-  --fw-normal: 400;
-  --fw-medium: 500;
-  --fw-semibold: 600;
-  --fw-bold: 700;
-
-  /* Spacing */
-  --space-0: 0;
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
-  --space-20: 80px;
+  --header-height: 60px;
+  --context-panel-width: 360px;
+  --content-max-width: 1600px;
+  --page-read-width: 860px;
 
   /* Z-index */
-  --z-base: 1;
-  --z-dropdown: 50;
   --z-sticky: 100;
-  --z-sidebar: 100;
-  --z-header: 50;
-  --z-modal: 200;
-  --z-toast: 300;
-  --z-tooltip: 1000;
-  --z-max: 9999;
+  --z-dropdown: 200;
+  --z-drawer: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
 
-  /* Палитра тегов */
-  --tag-color-1: #ef4444;
-  --tag-color-2: #f97316;
-  --tag-color-3: #f59e0b;
-  --tag-color-4: #eab308;
-  --tag-color-5: #84cc16;
-  --tag-color-6: #22c55e;
-  --tag-color-7: #14b8a6;
-  --tag-color-8: #0ea5b7;
-  --tag-color-9: #3b82f6;
-  --tag-color-10: #8b5cf6;
+  /* Typography */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-family-mono: "SF Mono", "Cascadia Code", "Consolas", monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 18px;
+  --font-size-xl: 22px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 34px;
+  --line-height-tight: 1.3;
+  --line-height-base: 1.5;
+  --line-height-relaxed: 1.65;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
-  /* Фоны тегов */
-  --tag-bg-1: rgba(239, 68, 68, 0.12);
-  --tag-bg-2: rgba(249, 115, 22, 0.12);
-  --tag-bg-3: rgba(245, 158, 11, 0.12);
-  --tag-bg-4: rgba(234, 179, 8, 0.12);
-  --tag-bg-5: rgba(132, 204, 22, 0.12);
-  --tag-bg-6: rgba(34, 197, 94, 0.12);
-  --tag-bg-7: rgba(20, 184, 166, 0.12);
-  --tag-bg-8: rgba(14, 165, 183, 0.12);
-  --tag-bg-9: rgba(59, 130, 246, 0.12);
-  --tag-bg-10: rgba(139, 92, 246, 0.12);
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
 
-  /* Текст тегов */
-  --tag-text-1: #b91c1c;
-  --tag-text-2: #c2410c;
-  --tag-text-3: #b45309;
-  --tag-text-4: #a16207;
-  --tag-text-5: #4d7c0f;
-  --tag-text-6: #15803d;
-  --tag-text-7: #0f766e;
-  --tag-text-8: #0e7490;
-  --tag-text-9: #1d4ed8;
-  --tag-text-10: #6d28d9;
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.14);
+
+  /* Transitions */
+  --transition-fast: 0.12s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 2. Тёмная тема — [data-theme="dark"] */
 [data-theme="dark"] {
-  --bg-page: #1a2332;
-  --bg-card: #243447;
-  --accent: #2dd4bf;
-  --accent-hover: #14b8a6;
-  --accent-secondary: #60a5fa;
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --border-color: #334155;
-  --shadow-color: rgba(0, 0, 0, 0.3);
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
-  --success: #22c55e;
-  --success-hover: #16a34a;
-  --warning: #fbbf24;
-  --warning-hover: #f59e0b;
-  --info: #60a5fa;
-
-  /* Алиасы — тёмная тема */
-  --surface: var(--bg-card);
-  --surface-hover: #2d3f54;
-  --surface-active: #3b4d63;
-  --border: var(--border-color);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
-
-  /* Фоны тегов — тёмная тема */
-  --tag-bg-1: rgba(239, 68, 68, 0.2);
-  --tag-bg-2: rgba(249, 115, 22, 0.2);
-  --tag-bg-3: rgba(245, 158, 11, 0.2);
-  --tag-bg-4: rgba(234, 179, 8, 0.2);
-  --tag-bg-5: rgba(132, 204, 22, 0.2);
-  --tag-bg-6: rgba(34, 197, 94, 0.2);
-  --tag-bg-7: rgba(20, 184, 166, 0.2);
-  --tag-bg-8: rgba(45, 212, 191, 0.2);
-  --tag-bg-9: rgba(96, 165, 250, 0.2);
-  --tag-bg-10: rgba(139, 92, 246, 0.2);
-
-  /* Текст тегов — тёмная тема */
-  --tag-text-1: #fca5a5;
-  --tag-text-2: #fdba74;
-  --tag-text-3: #fcd34d;
-  --tag-text-4: #fde047;
-  --tag-text-5: #bef264;
-  --tag-text-6: #86efac;
-  --tag-text-7: #5eead4;
-  --tag-text-8: #5eead4;
-  --tag-text-9: #93c5fd;
-  --tag-text-10: #c4b5fd;
+  --color-bg-page: #0f1115;
+  --color-surface-1: #1a1d24;
+  --color-surface-2: #232730;
+  --color-surface-hover: #2c313c;
+  --color-text-primary: #e4e6ea;
+  --color-text-secondary: #9ca3af;
+  --color-text-tertiary: #6b7280;
+  --color-border: #2c313c;
+  --color-border-strong: #3a4050;
+  --color-accent: #d4a437;
+  --color-accent-hover: #e0b347;
+  --color-accent-soft: rgba(212, 164, 55, 0.12);
+  --color-accent-emerald: #10b981;
+  --color-accent-emerald-hover: #059669;
+  --color-success-soft: rgba(22, 163, 74, 0.15);
+  --color-warning-soft: rgba(217, 119, 6, 0.15);
+  --color-danger-soft: rgba(220, 38, 38, 0.15);
+  --color-info-soft: rgba(37, 99, 235, 0.15);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --bg-page: var(--color-bg-page);
+  --bg-card: var(--color-surface-1);
+  --surface: var(--color-surface-2);
+  --surface-hover: var(--color-surface-hover);
+  --border: var(--color-border);
+  --border-color: var(--color-border);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --accent: var(--color-accent);
+  --accent-hover: var(--color-accent-hover);
 }
 
-/* 3. Автоматическая тёмная тема */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg-page: #1a2332;
-    --bg-card: #243447;
-    --accent: #2dd4bf;
-    --accent-hover: #14b8a6;
-    --accent-secondary: #60a5fa;
-    --text-primary: #e2e8f0;
-    --text-secondary: #94a3b8;
-    --border-color: #334155;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --danger: #ef4444;
-    --danger-hover: #dc2626;
-    --success: #22c55e;
-    --success-hover: #16a34a;
-    --warning: #fbbf24;
-    --warning-hover: #f59e0b;
-    --info: #60a5fa;
-
-    --surface: var(--bg-card);
-    --surface-hover: #2d3f54;
-    --surface-active: #3b4d63;
-    --border: var(--border-color);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
-
-    --tag-bg-1: rgba(239, 68, 68, 0.2);
-    --tag-bg-2: rgba(249, 115, 22, 0.2);
-    --tag-bg-3: rgba(245, 158, 11, 0.2);
-    --tag-bg-4: rgba(234, 179, 8, 0.2);
-    --tag-bg-5: rgba(132, 204, 22, 0.2);
-    --tag-bg-6: rgba(34, 197, 94, 0.2);
-    --tag-bg-7: rgba(20, 184, 166, 0.2);
-    --tag-bg-8: rgba(45, 212, 191, 0.2);
-    --tag-bg-9: rgba(96, 165, 250, 0.2);
-    --tag-bg-10: rgba(139, 92, 246, 0.2);
-
-    --tag-text-1: #fca5a5;
-    --tag-text-2: #fdba74;
-    --tag-text-3: #fcd34d;
-    --tag-text-4: #fde047;
-    --tag-text-5: #bef264;
-    --tag-text-6: #86efac;
-    --tag-text-7: #5eead4;
-    --tag-text-8: #5eead4;
-    --tag-text-9: #93c5fd;
-    --tag-text-10: #c4b5fd;
-  }
-}
-
-
-/* ============ ЧАСТЬ 2: CSS RESET ============ */
-
-/* 4. Universal reset */
 *,
 *::before,
 *::after {
@@ -263,815 +153,68 @@
   padding: 0;
 }
 
-/* 5. html */
 html {
-  font-size: 16px;
+  font-size: var(--font-size-base);
   -webkit-text-size-adjust: 100%;
-  -moz-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-  scroll-behavior: smooth;
 }
 
-/* 6. body */
 body {
-  font-family: var(--font-ui);
-  font-size: var(--fs-base);
-  line-height: var(--lh-base);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
   color: var(--text-primary);
-  background: var(--bg-page);
-  min-height: 100vh;
+  background-color: var(--bg-page);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  overflow-x: hidden;
 }
 
-/* 7. Заголовки h1–h6 */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  font-weight: var(--fw-bold);
-  line-height: var(--lh-tight);
-  color: var(--text-primary);
-}
-
-h1 { font-size: var(--fs-3xl); }
-h2 { font-size: var(--fs-2xl); }
-h3 { font-size: var(--fs-xl); }
-h4 { font-size: var(--fs-lg); }
-h5 { font-size: var(--fs-md); }
-h6 { font-size: var(--fs-base); }
-
-/* 8. p */
-p {
-  margin: 0;
-  line-height: var(--lh-base);
-}
-
-/* 9. a */
 a {
-  color: var(--accent);
+  color: inherit;
   text-decoration: none;
-  transition: color var(--transition-fast);
 }
 
-a:hover {
-  text-decoration: underline;
-}
-
-a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* 10. ul, ol */
 ul, ol {
   list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
-/* 11. img, picture, video, canvas, svg */
-img, picture, video, canvas, svg {
-  display: block;
+img, svg {
   max-width: 100%;
-  height: auto;
+  display: block;
 }
 
-/* 12. input, button, textarea, select — наследование шрифта */
-input, button, textarea, select {
-  font: inherit;
-  font-family: inherit;
-  font-size: inherit;
-  color: inherit;
-  letter-spacing: inherit;
+svg {
+  fill: currentColor;
 }
 
-/* 13. button */
 button {
+  font: inherit;
+  color: inherit;
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
+}
+
+input, textarea, select {
+  font: inherit;
   color: inherit;
 }
 
-button:disabled {
-  cursor: not-allowed;
-}
-
-/* 14. table */
 table {
   border-collapse: collapse;
-  border-spacing: 0;
   width: 100%;
 }
 
-/* 15. th, td */
-th, td {
-  text-align: left;
-  padding: 0;
-}
-
-/* 16. fieldset */
-fieldset {
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* 17. legend */
-legend {
-  padding: 0;
-  font-weight: var(--fw-semibold);
-}
-
-/* 18. form */
-form {
-  margin: 0;
-}
-
-/* 19. hr */
-hr {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: var(--space-4) 0;
-}
-
-/* 20. pre, code, kbd, samp */
-pre, code, kbd, samp {
-  font-family: var(--font-mono);
-  font-size: 0.9em;
-}
-
-/* 21. pre */
-pre {
-  overflow-x: auto;
-  white-space: pre;
-  margin: 0;
-}
-
-/* 22. blockquote */
-blockquote {
-  margin: 0;
-  padding: 0;
-  border: none;
-}
-
-/* 23. abbr[title] */
-abbr[title] {
-  border-bottom: 1px dotted var(--text-secondary);
-  cursor: help;
-  text-decoration: none;
-}
-
-/* 24. mark */
-mark {
-  background: rgba(245, 158, 11, 0.2);
-  color: var(--text-primary);
-  border-radius: 2px;
-  padding: 0 2px;
-}
-
-/* 25. small */
-small {
-  font-size: var(--fs-sm);
-}
-
-/* 26. sub, sup */
-sub, sup {
-  font-size: 0.75em;
-  line-height: 0;
-  position: relative;
-  vertical-align: baseline;
-}
-
-sub {
-  bottom: -0.25em;
-}
-
-sup {
-  top: -0.5em;
-}
-
-/* 27. strong, b */
-strong, b {
-  font-weight: var(--fw-semibold);
-}
-
-/* 28. em, i */
-em, i {
-  font-style: italic;
-}
-
-/* 29. dl, dt, dd */
-dl, dt, dd {
-  margin: 0;
-  padding: 0;
-}
-
-/* 30. figure, figcaption */
-figure, figcaption {
-  margin: 0;
-  padding: 0;
-}
-
-/* 31. [hidden] */
 [hidden] {
   display: none !important;
 }
 
-/* 32. template */
-template {
-  display: none;
-}
-
-
-/* ============ ЧАСТЬ 3: ПРОДВИНУТЫЙ RESET ФОРМ И БАЗОВЫЕ СТИЛИ ============ */
-
-/* 33. input, select, textarea — базовые стили */
-input,
-select,
-textarea {
-  font-family: var(--font-ui);
-  font-size: var(--fs-base);
-  line-height: var(--lh-base);
-  color: var(--text-primary);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 8px 12px;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-  width: 100%;
-  outline: none;
-  min-height: 44px;
-  box-sizing: border-box;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(14, 165, 183, 0.1);
-}
-
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -1px;
-}
-
-input:disabled,
-select:disabled,
-textarea:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: var(--bg-page);
-}
-
-input[readonly],
-select[readonly],
-textarea[readonly] {
-  cursor: default;
-  background: var(--bg-page);
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: var(--text-secondary);
-  opacity: 0.5;
-}
-
-@media (max-width: 479px) {
-  input,
-  select,
-  textarea {
-    font-size: 16px;
-  }
-}
-
-/* 34. textarea */
-textarea {
-  resize: vertical;
-  min-height: 80px;
-  line-height: 1.5;
-}
-
-/* 35. select */
-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  padding-right: 32px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 16px;
-  cursor: pointer;
-}
-
-[data-theme="dark"] select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  }
-}
-
-select option {
-  padding: 8px;
-  color: var(--text-primary);
-  background: var(--surface);
-}
-
-/* 36. input[type="checkbox"], input[type="radio"] */
-input[type="checkbox"],
-input[type="radio"] {
-  width: 20px;
-  height: 20px;
-  min-height: 20px;
-  accent-color: var(--accent);
-  cursor: pointer;
-  margin: 0;
-  vertical-align: middle;
-}
-
-/* 37. input[type="range"] */
-input[type="range"] {
-  width: 100%;
-  height: 8px;
-  background: var(--border);
-  border-radius: 4px;
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-  border: none;
-  padding: 0;
-  min-height: 8px;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  border: none;
-}
-
-input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border: none;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-}
-
-/* 38. input[type="color"] */
-input[type="color"] {
-  width: 40px;
-  height: 40px;
-  min-height: 40px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  padding: 2px;
-  background: var(--surface);
-}
-
-/* 39. input[type="file"] */
-input[type="file"] {
-  font-size: var(--fs-sm);
-  color: var(--text-secondary);
-  padding: 8px;
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-}
-
-input[type="file"]::file-selector-button {
-  padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface-hover);
-  color: var(--text-primary);
-  cursor: pointer;
-  font-size: var(--fs-sm);
-  margin-right: 8px;
-  font-family: var(--font-ui);
-  transition: background var(--transition-fast);
-}
-
-input[type="file"]::file-selector-button:hover {
-  background: var(--surface-active);
-}
-
-/* 40. input[type="search"]::-webkit-search-cancel-button */
-input[type="search"]::-webkit-search-cancel-button {
-  appearance: none;
-  cursor: pointer;
-}
-
-/* 41. input[type="search"]::-webkit-search-decoration */
-input[type="search"]::-webkit-search-decoration {
-  display: none;
-}
-
-/* 42. label */
-label {
-  display: inline-block;
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-medium);
-  color: var(--text-primary);
-  cursor: pointer;
-}
-
-/* 43. fieldset — расширенный reset */
-fieldset {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-/* 44. button — расширенные базовые стили */
-button {
-  font-family: var(--font-ui);
-  font-size: var(--fs-base);
-  font-weight: var(--fw-medium);
-  line-height: 1.4;
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  padding: 8px 16px;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-  color: var(--text-primary);
-  background: transparent;
-}
-
-button:hover {
-  filter: brightness(1.05);
-}
-
-button:active {
-  transform: scale(0.97);
-}
-
-button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* 45. [contenteditable] */
-[contenteditable] {
-  outline: none;
-}
-
-[contenteditable]:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-[contenteditable]:empty::before {
-  content: attr(data-placeholder);
-  color: var(--text-secondary);
-  opacity: 0.5;
-  font-style: italic;
-}
-
-/* 46. dialog */
-dialog {
-  border: none;
-  padding: 0;
-  background: transparent;
-  max-width: none;
-  max-height: none;
-}
-
-/* 47. ::selection */
 ::selection {
-  background: rgba(14, 165, 183, 0.2);
+  background: var(--color-accent-soft);
   color: var(--text-primary);
 }
 
-[data-theme="dark"] ::selection {
-  background: rgba(45, 212, 191, 0.25);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) ::selection {
-    background: rgba(45, 212, 191, 0.25);
-  }
-}
-
-/* 48. ::placeholder */
-::placeholder {
-  color: var(--text-secondary);
-  opacity: 0.5;
-}
-
-/* 49. ::-webkit-scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-/* 50. ::-webkit-scrollbar-track */
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* 51. ::-webkit-scrollbar-thumb */
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
-  border: 2px solid transparent;
-  background-clip: content-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
-  background-clip: content-box;
-}
-
-/* 52. Firefox scrollbar */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-}
-
-
-/* ============ ЧАСТЬ 4: A11Y, УТИЛИТЫ, MEDIA ============ */
-
-/* 53. .skip-link */
-.skip-link {
-  position: absolute;
-  top: -100px;
-  left: 8px;
-  z-index: var(--z-max);
-  background: var(--accent);
-  color: var(--bg-card);
-  padding: 8px 16px;
-  border-radius: var(--radius-md);
-  font-size: var(--fs-base);
-  font-weight: var(--fw-medium);
-  transition: top var(--transition-fast);
-  text-decoration: none;
-}
-
-.skip-link:focus {
-  top: 8px;
-}
-
-/* 54. .sr-only */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* 55. .sr-only-focusable */
-.sr-only-focusable {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.sr-only-focusable:focus,
-.sr-only-focusable:focus-visible {
-  position: static;
-  width: auto;
-  height: auto;
-  margin: 0;
-  overflow: visible;
-  clip: auto;
-  white-space: normal;
-}
-
-/* 56. .not-visible */
-.not-visible {
-  display: none;
-}
-
-/* 57. :focus-visible — глобальный стиль фокуса */
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-}
-
-/* 58. :focus:not(:focus-visible) — убираем outline для mouse-фокуса */
-:focus:not(:focus-visible) {
-  outline: none;
-}
-
-/* 59. .truncate */
-.truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* 60. .clamp-2 */
-.clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* 61. .clamp-3 */
-.clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* 62. Утилитарные классы */
-.text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
-.text-primary { color: var(--text-primary); }
-.text-secondary { color: var(--text-secondary); }
-.text-accent { color: var(--accent); }
-.text-danger { color: var(--danger); }
-.text-success { color: var(--success); }
-.text-warning { color: var(--warning); }
-
-.font-mono { font-family: var(--font-mono); }
-.font-heading { font-family: var(--font-heading); }
-.font-bold { font-weight: var(--fw-bold); }
-.font-semibold { font-weight: var(--fw-semibold); }
-.font-medium { font-weight: var(--fw-medium); }
-.font-normal { font-weight: var(--fw-normal); }
-
-.tabular-nums {
-  font-variant-numeric: tabular-nums lining-nums;
-  font-feature-settings: "tnum" 1, "lnum" 1;
-}
-
-.uppercase { text-transform: uppercase; }
-.lowercase { text-transform: lowercase; }
-.capitalize { text-transform: capitalize; }
-.nowrap { white-space: nowrap; }
-.break-word { word-wrap: break-word; overflow-wrap: break-word; }
-
-.cursor-pointer { cursor: pointer; }
-.cursor-not-allowed { cursor: not-allowed; }
-.user-select-none { user-select: none; }
-
-.overflow-hidden { overflow: hidden; }
-.overflow-auto { overflow: auto; }
-.overflow-x-auto { overflow-x: auto; }
-.overflow-y-auto { overflow-y: auto; }
-
-.position-relative { position: relative; }
-.position-absolute { position: absolute; }
-.position-fixed { position: fixed; }
-.position-sticky { position: sticky; }
-
-.w-full { width: 100%; }
-.h-full { height: 100%; }
-.min-h-0 { min-height: 0; }
-.min-w-0 { min-width: 0; }
-
-.flex { display: flex; }
-.inline-flex { display: inline-flex; }
-.flex-col { flex-direction: column; }
-.flex-row { flex-direction: row; }
-.flex-wrap { flex-wrap: wrap; }
-.flex-1 { flex: 1; }
-.flex-shrink-0 { flex-shrink: 0; }
-.flex-grow-1 { flex-grow: 1; }
-.items-center { align-items: center; }
-.items-start { align-items: flex-start; }
-.items-end { align-items: flex-end; }
-.justify-center { justify-content: center; }
-.justify-between { justify-content: space-between; }
-.justify-start { justify-content: flex-start; }
-.justify-end { justify-content: flex-end; }
-
-.gap-1 { gap: var(--space-1); }
-.gap-2 { gap: var(--space-2); }
-.gap-3 { gap: var(--space-3); }
-.gap-4 { gap: var(--space-4); }
-.gap-6 { gap: var(--space-6); }
-
-.mt-0 { margin-top: 0; }
-.mt-2 { margin-top: var(--space-2); }
-.mt-4 { margin-top: var(--space-4); }
-.mt-8 { margin-top: var(--space-8); }
-.mb-0 { margin-bottom: 0; }
-.mb-2 { margin-bottom: var(--space-2); }
-.mb-4 { margin-bottom: var(--space-4); }
-.mb-8 { margin-bottom: var(--space-8); }
-
-.p-0 { padding: 0; }
-.p-2 { padding: var(--space-2); }
-.p-4 { padding: var(--space-4); }
-.p-6 { padding: var(--space-6); }
-
-.hidden { display: none; }
-.block { display: block; }
-.inline-block { display: inline-block; }
-.grid { display: grid; }
-
-.rounded { border-radius: var(--radius-md); }
-.rounded-lg { border-radius: var(--radius-lg); }
-.rounded-xl { border-radius: var(--radius-xl); }
-.rounded-full { border-radius: var(--radius-full); }
-
-.shadow-sm { box-shadow: var(--shadow-sm); }
-.shadow-md { box-shadow: var(--shadow-md); }
-.shadow-lg { box-shadow: var(--shadow-lg); }
-
-.border { border: 1px solid var(--border); }
-.border-t { border-top: 1px solid var(--border); }
-.border-b { border-bottom: 1px solid var(--border); }
-
-.bg-card { background: var(--bg-card); }
-.bg-page { background: var(--bg-page); }
-.bg-surface { background: var(--surface); }
-
-.opacity-0 { opacity: 0; }
-.opacity-50 { opacity: 0.5; }
-.opacity-100 { opacity: 1; }
-
-.pointer-events-none { pointer-events: none; }
-.pointer-events-auto { pointer-events: auto; }
-
-/* 63. @media (prefers-reduced-motion: reduce) */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  html {
-    scroll-behavior: auto;
-  }
-}
-
-/* 64. @media (pointer: coarse) — тач-устройства */
-@media (pointer: coarse) {
-  [data-tooltip]::after,
-  [data-tooltip]::before {
-    display: none;
-  }
-
-  .btn-icon-sm {
-    min-height: 44px;
-    min-width: 44px;
-  }
-}
-
-/* 65. @media print */
-@media print {
-  .no-print {
-    display: none !important;
-  }
-
-  .print-only {
-    display: block !important;
-  }
-
-  body {
-    background: white;
-    color: black;
-  }
-}
-
-/* 66. .print-only */
-.print-only {
-  display: none;
 }
