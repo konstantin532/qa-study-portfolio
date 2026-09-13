@@ -1,51 +1,62 @@
-/** Progressive, dependency-free interface enhancements. */
+/** QA Study Portfolio — lightweight progressive UI polish. */
 (() => {
   'use strict';
-
   const root = document.documentElement;
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const progress = document.createElement('div');
-  progress.className = 'ui-scroll-progress';
-  progress.setAttribute('aria-hidden', 'true');
-  document.body.append(progress);
+  const ready = () => {
+    // A compositor-only reading-progress indicator.
+    const progress = document.createElement('div');
+    progress.className = 'ds-scroll-progress';
+    progress.setAttribute('aria-hidden', 'true');
+    document.body.append(progress);
 
-  let frame = 0;
-  const updateProgress = () => {
-    frame = 0;
-    const scrollable = Math.max(document.documentElement.scrollHeight - innerHeight, 0);
-    const value = scrollable ? Math.min(Math.max(scrollY / scrollable, 0), 1) : 0;
-    progress.style.transform = `scaleX(${value})`;
-  };
-  const requestProgressUpdate = () => {
-    if (!frame) frame = requestAnimationFrame(updateProgress);
-  };
-  addEventListener('scroll', requestProgressUpdate, { passive: true });
-  addEventListener('resize', requestProgressUpdate, { passive: true });
-  updateProgress();
+    let scheduled = false;
+    const syncScroll = () => {
+      scheduled = false;
+      const range = Math.max(1, root.scrollHeight - innerHeight);
+      root.style.setProperty('--ds-scroll', Math.min(1, scrollY / range).toFixed(4));
+      document.body.classList.toggle('is-scrolled', scrollY > 12);
+    };
+    const requestSync = () => {
+      if (!scheduled) {
+        scheduled = true;
+        requestAnimationFrame(syncScroll);
+      }
+    };
+    addEventListener('scroll', requestSync, { passive: true });
+    addEventListener('resize', requestSync, { passive: true });
+    syncScroll();
 
-  if (!reduceMotion.matches && 'IntersectionObserver' in window) {
-    const candidates = document.querySelectorAll(
-      '.content-section, .dashboard-card, .stat-card, .module-card, .lesson-card, .task-card, .chart-card'
-    );
-    if (candidates.length) {
-      root.classList.add('ui-enhanced');
-      const observer = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          entry.target.classList.add('ui-visible');
-          observer.unobserve(entry.target);
-        }
-      }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
-      candidates.forEach((element) => {
-        element.classList.add('ui-reveal');
-        observer.observe(element);
+    // Reveal existing content progressively; no markup or business logic changes.
+    const candidates = [...document.querySelectorAll(
+      '.card, .stat-card, .progress-card, .chart-card, .lesson-card, .task-card, .workspace-card, main section'
+    )].filter((item) => !item.closest('[hidden], .modal'));
+
+    if (!reducedMotion && 'IntersectionObserver' in window) {
+      root.classList.add('ds-motion-ready');
+      candidates.forEach((item, index) => {
+        item.dataset.dsReveal = '';
+        item.style.setProperty('--ds-order', String(index % 7));
       });
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+      candidates.forEach((item) => observer.observe(item));
     }
-  }
 
-  // Add a safe title to icon-only controls that already expose an accessible name.
-  document.querySelectorAll('button[aria-label]:not([title])').forEach((button) => {
-    button.title = button.getAttribute('aria-label');
-  });
+    // Input modality allows precise focus styling without hiding keyboard focus.
+    addEventListener('keydown', (event) => {
+      if (event.key === 'Tab') root.dataset.input = 'keyboard';
+    }, { passive: true });
+    addEventListener('pointerdown', () => { root.dataset.input = 'pointer'; }, { passive: true });
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready, { once: true });
+  else ready();
 })();
