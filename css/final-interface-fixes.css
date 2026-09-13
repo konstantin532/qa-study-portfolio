@@ -1,0 +1,340 @@
+/*
+ * Final interface fixes
+ * Keeps the project on vanilla HTML/CSS/JS.
+ * Loaded last on purpose: this file repairs legacy cascade conflicts.
+ */
+
+:root {
+  --app-content-max: 90rem;
+  --dialog-width: 60rem;
+  --dialog-edge: clamp(0.75rem, 2.5vw, 2rem);
+  --dialog-radius: 1rem;
+  --dialog-overlay: rgb(3 6 10 / 76%);
+  --dialog-shadow: 0 1.5rem 5rem rgb(0 0 0 / 48%);
+  --motion-fast: 160ms;
+  --motion-normal: 240ms;
+  --motion-ease: cubic-bezier(.2, .8, .2, 1);
+}
+
+/* The page itself never scrolls; the workspace owns the scrollbar. */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+#app-wrapper,
+.app-wrapper {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#main-content,
+.main-content {
+  min-width: 0;
+  min-height: 0;
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+
+#main-content > :where(section, article, div):not(.toast-container) {
+  max-width: var(--app-content-max);
+  margin-inline: auto;
+}
+
+/* Never let legacy text-field rules turn checkboxes into full-width bars. */
+input[type="checkbox"],
+input[type="radio"] {
+  inline-size: 1.125rem !important;
+  block-size: 1.125rem !important;
+  min-inline-size: 1.125rem !important;
+  min-block-size: 1.125rem !important;
+  max-inline-size: 1.125rem !important;
+  max-block-size: 1.125rem !important;
+  flex: 0 0 1.125rem !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* Repair the roadmap list if legacy CSS has won the cascade. */
+:where(.roadmap-lessons, .lesson-list, .module-lessons) {
+  display: grid !important;
+  gap: 0.625rem;
+  margin: 1rem 0 0;
+  padding: 1rem 0 0;
+  list-style: none !important;
+}
+
+:where(.roadmap-lessons, .lesson-list, .module-lessons) > li {
+  list-style: none !important;
+}
+
+:where(.roadmap-lesson, .lesson-item) {
+  display: grid !important;
+  grid-template-columns: 1.125rem minmax(0, 1fr) max-content !important;
+  align-items: center;
+  gap: 0.75rem !important;
+  min-width: 0;
+  padding: 0.75rem 0.875rem !important;
+}
+
+:where(.lesson-title, .roadmap-lesson-name, .lesson-name) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+:where(.lesson-duration, .roadmap-lesson-duration) {
+  white-space: nowrap;
+}
+
+/*
+ * Context is not a footer. It is the shared preview/editor container used by
+ * cards and actions. While open, present it as a centered modal dialog.
+ */
+#context-panel.context-panel {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 4000 !important;
+  display: none !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: var(--dialog-edge) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  transform: none !important;
+  isolation: isolate;
+}
+
+#context-panel.context-panel.open,
+#context-panel.context-panel.active,
+#context-panel.context-panel.is-open,
+#context-panel.context-panel[aria-hidden="false"],
+#main-container.context-panel-open #context-panel.context-panel,
+body.context-panel-open #context-panel.context-panel,
+body.context-open #context-panel.context-panel,
+.app-wrapper.context-panel-open #context-panel.context-panel {
+  display: grid !important;
+  place-items: center;
+}
+
+.context-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--dialog-overlay);
+  backdrop-filter: blur(0.2rem);
+  cursor: default;
+}
+
+.context-dialog-surface {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: min(100%, var(--dialog-width));
+  max-height: min(88vh, 56rem);
+  max-height: min(88dvh, 56rem);
+  min-height: 0;
+  border: 1px solid var(--border-color, rgb(255 255 255 / 14%));
+  border-radius: var(--dialog-radius);
+  background: var(--surface, var(--color-surface, #1b2026));
+  box-shadow: var(--dialog-shadow);
+  overflow: hidden;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: context-dialog-in var(--motion-normal) var(--motion-ease) both;
+}
+
+#context-panel .context-panel-header {
+  position: relative !important;
+  inset: auto !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0.875rem 1rem !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--border-color, rgb(255 255 255 / 14%)) !important;
+  border-radius: 0 !important;
+  background: var(--surface-elevated, var(--surface, #20262d)) !important;
+}
+
+#context-panel .context-panel-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+#context-panel .context-panel-close {
+  flex: 0 0 auto;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+}
+
+#context-panel .context-panel-content {
+  width: 100% !important;
+  min-width: 0;
+  min-height: 0;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: clamp(1rem, 2vw, 1.5rem) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  background: var(--background, var(--color-bg, #101316)) !important;
+}
+
+#context-panel .context-panel-content > :first-child { margin-top: 0; }
+#context-panel .context-panel-content > :last-child { margin-bottom: 0; }
+#context-panel :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  width: 100%;
+  max-width: 100%;
+}
+#context-panel textarea { resize: vertical; }
+
+body.context-dialog-visible {
+  overflow: hidden !important;
+}
+
+@keyframes context-dialog-in {
+  from { opacity: 0; transform: translateY(0.75rem) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 40rem) {
+  #context-panel.context-panel { padding: 0 !important; }
+  .context-dialog-surface {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+  #context-panel .context-panel-content { padding: 1rem !important; }
+  :where(.roadmap-lesson, .lesson-item) {
+    grid-template-columns: 1.125rem minmax(0, 1fr) !important;
+  }
+  :where(.lesson-duration, .roadmap-lesson-duration) {
+    grid-column: 2;
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .context-dialog-surface { animation: none !important; }
+  #context-panel, #context-panel * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+
+/* === STAGE 1: MODAL GEOMETRY AND SINGLE INNER SCROLL OWNER === */
+/* Scope is intentionally limited to modal elements mounted in #modals.
+   #context-panel is a separate component and is not changed at this stage. */
+#modals.modals-container {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: var(--z-modal, 1000) !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  overflow: visible !important;
+  pointer-events: none;
+}
+
+#modals.modals-container > .modal {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  margin: 0 !important;
+  padding: clamp(16px, 3vw, 32px) !important;
+  box-sizing: border-box !important;
+  place-items: center !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  pointer-events: auto;
+  transform: none !important;
+}
+
+#modals.modals-container > .modal:not([hidden]) {
+  display: grid !important;
+}
+
+#modals.modals-container > .modal[hidden] {
+  display: none !important;
+}
+
+#modals.modals-container > .modal > .modal-dialog,
+#modals.modals-container > .modal > .modal-content {
+  position: relative !important;
+  inset: auto !important;
+  margin: 0 !important;
+  width: min(100%, var(--modal-max-width, 760px)) !important;
+  max-height: calc(100dvh - 2 * clamp(16px, 3vw, 32px)) !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  transform: none !important;
+}
+
+#modals.modals-container .modal-dialog,
+#modals.modals-container .modal-content {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+#modals.modals-container .modal-content {
+  max-height: calc(100dvh - 2 * clamp(16px, 3vw, 32px)) !important;
+}
+
+#modals.modals-container .modal-header,
+#modals.modals-container .modal-actions,
+#modals.modals-container .modal-footer {
+  flex: 0 0 auto;
+}
+
+#modals.modals-container .modal-body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+@supports not (height: 100dvh) {
+  #modals.modals-container,
+  #modals.modals-container > .modal {
+    height: 100vh !important;
+  }
+
+  #modals.modals-container > .modal > .modal-dialog,
+  #modals.modals-container > .modal > .modal-content,
+  #modals.modals-container .modal-content {
+    max-height: calc(100vh - 2 * clamp(16px, 3vw, 32px)) !important;
+  }
+}
+/* === END STAGE 1 === */

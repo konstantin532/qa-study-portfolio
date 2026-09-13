@@ -1,0 +1,503 @@
+/* =========================================================
+   QA Study Portfolio — UI recovery hotfix
+   Подключать ПОСЛЕ responsive.css.
+   Не меняет id, data-атрибуты, маршрутизацию или JS API.
+   ========================================================= */
+
+/* 1. Центрирование динамических страниц без обязательного .page-container */
+.workspace,
+#main-content.workspace {
+  padding-inline: max(
+    var(--space-4, 1rem),
+    calc((100% - var(--content-max-width, 1480px)) / 2 + var(--space-4, 1rem))
+  );
+}
+
+.page-header,
+.page-title-row,
+.section-header {
+  min-width: 0;
+  margin-bottom: var(--space-5, 1.25rem);
+}
+
+.page-header + *,
+.page-subtitle + * {
+  margin-top: var(--space-4, 1rem);
+}
+
+section + section,
+.page-section + .page-section {
+  margin-top: clamp(1.5rem, 2.2vw, 2.5rem);
+}
+
+/* 2. Исправление полей и растянутых checkbox/radio */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+select,
+textarea,
+.form-input:not([type="checkbox"]):not([type="radio"]),
+.form-select,
+.form-textarea {
+  min-height: var(--touch-target, 44px);
+  padding: 0.7rem 0.875rem !important;
+  color: var(--text-primary, #ece9df);
+  background: var(--bg-card, #1a1f24);
+  border: 1px solid var(--border, #313940);
+  border-radius: var(--radius-sm, 6px);
+  line-height: 1.4;
+}
+
+textarea,
+.form-textarea {
+  min-height: 7rem;
+  padding-block: 0.75rem !important;
+}
+
+input[type="checkbox"],
+input[type="radio"],
+input.form-input[type="checkbox"],
+input.form-input[type="radio"] {
+  display: inline-grid !important;
+  place-content: center;
+  flex: 0 0 auto !important;
+  inline-size: 20px !important;
+  block-size: 20px !important;
+  min-inline-size: 20px !important;
+  min-block-size: 20px !important;
+  max-inline-size: 20px !important;
+  max-block-size: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  vertical-align: middle;
+  color: var(--color-accent, #d1a94e);
+  background: var(--bg-card, #1a1f24) !important;
+  border: 1px solid var(--color-border-strong, #4a545d) !important;
+  box-shadow: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+input[type="checkbox"] { border-radius: 5px !important; }
+input[type="radio"] { border-radius: 50% !important; }
+
+input[type="checkbox"]::before,
+input[type="radio"]::before {
+  content: "";
+  inline-size: 10px;
+  block-size: 10px;
+  background: currentColor;
+  transform: scale(0);
+  transition: transform 120ms ease;
+}
+
+input[type="checkbox"]::before {
+  clip-path: polygon(14% 44%, 0 59%, 39% 100%, 100% 22%, 84% 8%, 38% 70%);
+}
+
+input[type="radio"]::before { border-radius: 50%; }
+
+input[type="checkbox"]:checked::before,
+input[type="radio"]:checked::before { transform: scale(1); }
+
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  outline: 2px solid var(--color-accent, #d1a94e);
+  outline-offset: 3px;
+}
+
+input[type="range"] {
+  min-height: var(--touch-target, 44px);
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  accent-color: var(--color-accent, #d1a94e);
+}
+
+input[type="color"] {
+  inline-size: 52px !important;
+  block-size: 40px !important;
+  min-inline-size: 52px !important;
+  min-block-size: 40px !important;
+  padding: 4px !important;
+  border: 1px solid var(--border, #313940) !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  background: var(--bg-card, #1a1f24) !important;
+}
+
+input[type="file"] {
+  max-width: 100%;
+  padding: 0.5rem !important;
+  border: 1px dashed var(--color-border-strong, #4a545d) !important;
+  border-radius: var(--radius-md, 10px) !important;
+}
+
+label:has(> input[type="checkbox"]),
+label:has(> input[type="radio"]),
+.checkbox-label,
+.radio-label,
+.setting-toggle,
+.settings-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3, 0.75rem);
+  min-height: var(--touch-target, 44px);
+}
+
+/* 3. Toast: компактный, справа, не перекрывает страницу */
+.toast-container,
+#toast-container {
+  position: fixed !important;
+  inset: auto max(var(--space-4, 1rem), env(safe-area-inset-right))
+    max(var(--space-4, 1rem), env(safe-area-inset-bottom)) auto !important;
+  z-index: var(--z-toast, 600) !important;
+  display: grid !important;
+  gap: var(--space-2, 0.5rem) !important;
+  width: min(420px, calc(100vw - 2rem)) !important;
+  max-width: 420px !important;
+  min-width: 0 !important;
+  pointer-events: none !important;
+}
+
+.toast-container > .toast,
+#toast-container > .toast,
+.toast {
+  position: relative !important;
+  inset: auto !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.75rem;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 420px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0.875rem 1rem !important;
+  overflow: hidden;
+  color: var(--text-primary, #ece9df) !important;
+  background: var(--bg-card, #1a1f24) !important;
+  border: 1px solid var(--border, #313940) !important;
+  border-left: 3px solid var(--color-info, #72a9dc) !important;
+  border-radius: var(--radius-md, 10px) !important;
+  box-shadow: var(--shadow-lg, 0 16px 40px rgba(0,0,0,.4)) !important;
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  pointer-events: auto !important;
+  transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease !important;
+}
+
+.toast.toast-success { border-left-color: var(--color-success, #46b77b) !important; }
+.toast.toast-warning { border-left-color: var(--color-warning, #dda449) !important; }
+.toast.toast-error { border-left-color: var(--color-danger, #e17171) !important; }
+.toast.is-closing {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateX(24px) !important;
+}
+
+.toast-title,
+.toast-message,
+.toast-content { min-width: 0; overflow-wrap: anywhere; }
+.toast-close,
+[data-toast-close] {
+  inline-size: 32px !important;
+  block-size: 32px !important;
+  min-inline-size: 32px !important;
+  min-block-size: 32px !important;
+  margin: -0.35rem -0.35rem -0.35rem 0;
+  color: var(--text-secondary, #a8adb0);
+  border-radius: var(--radius-sm, 6px);
+}
+
+/* 4. Общая сетка динамических карточек */
+:where(.action-grid, .quick-actions, .artifact-grid, .artifacts-grid,
+       .portfolio-grid, .resources-grid, .resource-grid,
+       .templates-grid, .glossary-grid) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-4, 1rem);
+  min-width: 0;
+}
+
+:where(.action-card, .quick-action, .artifact-card, .artifact-item,
+       .portfolio-item, .resource-card, .template-card,
+       .glossary-card, .glossary-item, .term-card) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--space-5, 1.25rem);
+  color: var(--text-primary, #ece9df);
+  background: var(--bg-card, #1a1f24);
+  border: 1px solid var(--border, #313940);
+  border-radius: var(--radius-md, 10px);
+  box-shadow: var(--shadow-sm, 0 5px 16px rgba(0,0,0,.14));
+  overflow: hidden;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+:where(.action-card, .quick-action, .artifact-card, .artifact-item,
+       .portfolio-item, .resource-card, .template-card,
+       .glossary-card, .glossary-item, .term-card)::before {
+  content: "";
+  position: absolute;
+  inset: 0 16% auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border-accent, rgba(215,173,79,.62)), transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(.action-card, .quick-action, .artifact-card, .artifact-item,
+         .portfolio-item, .resource-card, .template-card,
+         .glossary-card, .glossary-item, .term-card):hover {
+    transform: translateY(-2px);
+    border-color: var(--color-border-strong, #4a545d);
+    box-shadow: var(--shadow-md, 0 18px 42px rgba(0,0,0,.2));
+  }
+}
+
+/* 5. Дашборд и быстрые действия */
+.quick-actions,
+.action-grid { margin-top: var(--space-4, 1rem); }
+
+.action-card,
+.quick-action {
+  min-height: 132px;
+  justify-content: space-between;
+  gap: var(--space-3, 0.75rem);
+  cursor: pointer;
+}
+
+.action-card svg,
+.quick-action svg {
+  color: var(--color-accent, #d1a94e);
+}
+
+/* 6. Артефакты */
+.artifact-filters,
+.artifacts-filter,
+.artifact-tabs,
+.artifact-type-filter,
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  margin-block: var(--space-4, 1rem);
+}
+
+.artifact-stats,
+.artifacts-stats,
+.artifact-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-3, 0.75rem);
+  margin-block: var(--space-4, 1rem);
+}
+
+.artifact-stat,
+.artifact-stat-card {
+  min-width: 0;
+  padding: var(--space-4, 1rem);
+  background: var(--color-surface-1, #1a1f24);
+  border: 1px solid var(--border, #313940);
+  border-radius: var(--radius-md, 10px);
+}
+
+.artifact-list,
+.artifacts-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  gap: var(--space-4, 1rem);
+  min-width: 0;
+}
+
+.artifact-card,
+.artifact-item {
+  gap: var(--space-3, 0.75rem);
+}
+
+.artifact-title,
+.artifact-card-title,
+.artifact-item-title {
+  margin: 0;
+  font-size: var(--font-size-lg, 1.125rem);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.artifact-meta,
+.artifact-card-meta,
+.artifact-actions,
+.artifact-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2, 0.5rem);
+}
+
+.artifact-actions { margin-top: auto; padding-top: var(--space-2, 0.5rem); }
+
+/* 7. Дорожная карта */
+.roadmap-container,
+.roadmap-list,
+.roadmap-timeline {
+  display: grid;
+  gap: var(--space-4, 1rem);
+  min-width: 0;
+}
+
+.roadmap-item,
+.roadmap-module,
+.module-card {
+  position: relative;
+  min-width: 0;
+  padding: var(--space-5, 1.25rem);
+  color: var(--text-primary, #ece9df);
+  background: var(--bg-card, #1a1f24);
+  border: 1px solid var(--border, #313940);
+  border-radius: var(--radius-md, 10px);
+  box-shadow: var(--shadow-sm, 0 5px 16px rgba(0,0,0,.14));
+  overflow: hidden;
+}
+
+.roadmap-item.current,
+.roadmap-module.current { border-color: var(--color-accent, #d1a94e); }
+.roadmap-item.locked,
+.roadmap-module.locked { opacity: 0.72; }
+
+.roadmap-module-header,
+.module-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4, 1rem);
+  min-width: 0;
+}
+
+.roadmap-lessons,
+.lesson-list,
+.module-lessons {
+  display: grid;
+  gap: var(--space-2, 0.5rem);
+  margin-top: var(--space-4, 1rem);
+  padding-top: var(--space-4, 1rem);
+  border-top: 1px solid var(--border, #313940);
+}
+
+.roadmap-lesson,
+.lesson-item {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3, 0.75rem);
+  min-width: 0;
+  padding: 0.75rem;
+  background: var(--color-surface-2, #21272d);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 6px);
+}
+
+.roadmap-lesson:hover,
+.lesson-item:hover { border-color: var(--border, #313940); }
+
+.lesson-title,
+.roadmap-lesson-name { min-width: 0; overflow-wrap: anywhere; }
+.lesson-duration,
+.roadmap-lesson-duration { color: var(--text-secondary, #a8adb0); white-space: nowrap; }
+
+/* 8. Ресурсы — более аккуратная иерархия */
+.resource-card { gap: var(--space-3, 0.75rem); min-height: 190px; }
+.resource-card-title {
+  font-size: var(--font-size-lg, 1.125rem);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.resource-card-content,
+.resource-card-desc { color: var(--text-secondary, #a8adb0); }
+.resource-card-meta,
+.resource-card-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2, 0.5rem);
+}
+.resource-card-actions { margin-top: auto; padding-top: var(--space-2, 0.5rem); }
+
+/* 9. Глоссарий — разделение терминов */
+.glossary-index,
+.glossary-categories,
+.glossary-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2, 0.5rem);
+  margin-block: var(--space-4, 1rem);
+}
+
+.glossary-list,
+.glossary-terms {
+  display: grid;
+  gap: var(--space-3, 0.75rem);
+  min-width: 0;
+}
+
+.glossary-term,
+.glossary-item,
+.term-card {
+  gap: var(--space-2, 0.5rem);
+}
+
+.glossary-term-name,
+.term-title {
+  font-size: var(--font-size-lg, 1.125rem);
+  font-weight: 700;
+}
+
+.glossary-term-def,
+.term-definition { color: var(--text-secondary, #a8adb0); line-height: 1.65; }
+.glossary-term-example,
+.term-example {
+  padding: 0.75rem 0.875rem;
+  background: var(--color-surface-2, #21272d);
+  border-left: 2px solid var(--color-emerald, #36b48e);
+  border-radius: 0 var(--radius-sm, 6px) var(--radius-sm, 6px) 0;
+}
+
+/* 10. Мобильная корректировка */
+@media (max-width: 767px) {
+  .workspace,
+  #main-content.workspace {
+    padding-inline: max(var(--space-4, 1rem), env(safe-area-inset-left)) !important;
+  }
+
+  .toast-container,
+  #toast-container {
+    inset: auto var(--space-3, 0.75rem)
+      max(var(--space-3, 0.75rem), env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  .toast-container > .toast,
+  #toast-container > .toast,
+  .toast { max-width: none !important; }
+
+  .roadmap-lesson,
+  .lesson-item {
+    grid-template-columns: 22px minmax(0, 1fr);
+  }
+
+  .lesson-duration,
+  .roadmap-lesson-duration {
+    grid-column: 2;
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  input[type="checkbox"]::before,
+  input[type="radio"]::before { transition-duration: 0.01ms !important; }
+}

@@ -1,0 +1,10 @@
+{
+  "checks": {
+    "index_has_design_css": true,
+    "index_has_polish_js": true,
+    "css_braces_balanced": true,
+    "js_braces_balanced": true,
+    "all_local_refs_exist": true
+  },
+  "missing": []
+}
