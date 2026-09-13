@@ -4,78 +4,205 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="description" content="QA Study Portfolio — учебный кабинет QA-инженера">
-  <meta name="theme-color" content="#0ea5b8" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0d9488" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f3f1eb" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#101316" media="(prefers-color-scheme: dark)">
   <title>QA Study Portfolio</title>
   <link rel="icon" type="image/svg+xml" href="assets/app-icon.svg">
   <link rel="apple-touch-icon" href="assets/app-icon.svg">
 
   <style>
-    html, body { overflow-x: hidden; }
-    body {
-      margin: 0;
-      background: #f8fafc;
-      color: #1e293b;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-    [data-theme="dark"] body { background: #0f172a; color: #e2e8f0; }
+  html,
+  body {
+    overflow-x: hidden;
+  }
 
-    .preloader {
-      position: fixed; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      background: #f8fafc; z-index: 9999;
-      transition: opacity 0.3s; gap: 16px;
-    }
-    [data-theme="dark"] .preloader { background: #0f172a; }
-    .preloader.hidden { opacity: 0; pointer-events: none; }
-    .preloader svg { color: #0ea5b8; }
-    .preloader-title { font-size: 20px; font-weight: 600; }
-    .preloader-spinner {
-      width: 40px; height: 40px;
-      border: 3px solid #e2e8f0; border-top-color: #0ea5b8;
-      border-radius: 50%; animation: preloader-spin 0.8s linear infinite;
-    }
-    [data-theme="dark"] .preloader svg { color: #2dd4bf; }
-    [data-theme="dark"] .preloader-spinner { border-color: #334155; border-top-color: #2dd4bf; }
-    @keyframes preloader-spin { to { transform: rotate(360deg); } }
+  body {
+    margin: 0;
+    color: #20242a;
+    background: #f3f1eb;
+    font-family:
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      Helvetica,
+      Arial,
+      sans-serif;
+  }
 
+  [data-theme="dark"] body {
+    color: #ece9df;
+    background: #101316;
+  }
+
+  .preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+
+    color: #20242a;
+    background: #f3f1eb;
+
+    opacity: 1;
+    visibility: visible;
+
+    transition:
+      opacity 300ms ease,
+      visibility 300ms ease;
+  }
+
+  [data-theme="dark"] .preloader {
+    color: #ece9df;
+    background: #101316;
+  }
+
+  .preloader.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .preloader svg {
+    color: #a9781d;
+  }
+
+  [data-theme="dark"] .preloader svg {
+    color: #d1a94e;
+  }
+
+  .preloader-title {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .preloader-spinner {
+    width: 40px;
+    height: 40px;
+
+    border: 3px solid #dcd6c8;
+    border-top-color: #a9781d;
+    border-radius: 50%;
+
+    animation: preloader-spin 800ms linear infinite;
+  }
+
+  [data-theme="dark"] .preloader-spinner {
+    border-color: #313940;
+    border-top-color: #d1a94e;
+  }
+
+  @keyframes preloader-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .skip-link {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 10000;
+
+    padding: 10px 16px;
+
+    color: #ffffff;
+    background: #a9781d;
+    border-radius: 6px;
+
+    text-decoration: none;
+    transform: translateY(-150%);
+    transition: transform 150ms ease;
+  }
+
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+
+  .app-wrapper {
+    visibility: hidden;
+  }
+
+  .app-wrapper.loaded {
+    visibility: visible;
+  }
+
+  .noscript-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 100vh;
+    padding: 20px;
+
+    text-align: center;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  /*
+   * Системная тема применяется только тогда, когда JavaScript
+   * ещё не установил явное значение data-theme.
+   */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) body {
+      color: #ece9df;
+      background: #101316;
+    }
+
+    :root:not([data-theme]) .preloader {
+      color: #ece9df;
+      background: #101316;
+    }
+
+    :root:not([data-theme]) .preloader svg {
+      color: #d1a94e;
+    }
+
+    :root:not([data-theme]) .preloader-spinner {
+      border-color: #313940;
+      border-top-color: #d1a94e;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .preloader,
     .skip-link {
-      position: absolute; top: -40px; left: 0;
-      background: #0ea5b8; color: white;
-      padding: 8px 16px; z-index: 10000;
-      text-decoration: none; border-radius: 0 0 4px 0;
-    }
-    .skip-link:focus { top: 0; }
-
-    .app-wrapper { visibility: hidden; }
-    .app-wrapper.loaded { visibility: visible; }
-
-    .noscript-message {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      min-height: 100vh; padding: 20px; text-align: center;
+      transition-duration: 0.01ms;
     }
 
-    [hidden] { display: none !important; }
-
-    @media (prefers-color-scheme: dark) {
-      body { background: #0f172a; color: #e2e8f0; }
-      .preloader { background: #0f172a; }
-      .preloader svg { color: #2dd4bf; }
-      .preloader-spinner { border-color: #334155; border-top-color: #2dd4bf; }
+    .preloader-spinner {
+      animation-duration: 1ms;
+      animation-iteration-count: 1;
     }
-  </style>
+  }
+</style>
 
-  <link rel="stylesheet" href="css/base-reset-vars.css">
-  <link rel="stylesheet" href="css/base-typography-utils.css">
-  <link rel="stylesheet" href="css/base-layout-forms.css">
-  <link rel="stylesheet" href="css/base-responsive-breakpoints.css">
-  <link rel="stylesheet" href="css/base-responsive-layout.css">
-  <link rel="stylesheet" href="css/base-responsive-typography.css">
+   <!--
+<link rel="stylesheet" href="css/base-reset-vars.css">
+<link rel="stylesheet" href="css/base-typography-utils.css">
+<link rel="stylesheet" href="css/base-layout-forms.css">
+<link rel="stylesheet" href="css/base-responsive-breakpoints.css">
+<link rel="stylesheet" href="css/base-responsive-layout.css">
+<link rel="stylesheet" href="css/base-responsive-typography.css">
+-->
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/utilities.css">
   <link rel="stylesheet" href="css/responsive.css">
+  <!-- Временный восстановительный слой -->
+  <link rel="stylesheet" href="css/ui-recovery-hotfix.css">
 </head>
 <body>
   <noscript>
@@ -467,5 +594,7 @@
 <script src="js/export.js"></script>
 <script src="js/forms.js"></script>
 <script src="js/main.js"></script>
+<!-- Последним -->
+<script src="js/ui-hotfix.js"></script>
 </body>
 </html>
