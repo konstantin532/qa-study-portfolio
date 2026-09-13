@@ -9,7 +9,10 @@
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:report": "playwright show-report",
-    "check:static": "node tests/static-checks.cjs"
+    "check:static": "node tests/static-checks.cjs",
+    "check:syntax": "node tests/project-integrity.cjs",
+    "check:security": "node tests/security-check.cjs",
+    "check": "npm run check:static && npm run check:syntax && npm run check:security && npm test"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",

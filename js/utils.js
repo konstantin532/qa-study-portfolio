@@ -651,8 +651,8 @@ Utils.storage = {
     if (this._available !== null) return this._available;
     try {
       const k = '__qa_test__';
-      localStorage.setItem(k, '1');
-      localStorage.removeItem(k);
+      window.safeStorage.setRaw(k, '1');
+      window.safeStorage.remove(k);
       this._available = true;
     } catch (e) {
       this._available = false;
@@ -666,7 +666,7 @@ Utils.storage = {
       return key in this._memory ? this._memory[key] : defaultValue;
     }
     try {
-      const raw = localStorage.getItem(key);
+      const raw = window.safeStorage.getRaw(key);
       return raw === null ? defaultValue : JSON.parse(raw);
     } catch (e) {
       return defaultValue;
@@ -691,7 +691,7 @@ Utils.storage = {
       );
     }
 
-    localStorage.setItem(key, serialized);
+    window.safeStorage.setRaw(key, serialized);
     return true;
   } catch (error) {
     this._lastError = error;
@@ -709,7 +709,7 @@ Utils.storage = {
       delete this._memory[key];
       return;
     }
-    localStorage.removeItem(key);
+    window.safeStorage.remove(key);
   },
 
   // Проверка существования
@@ -717,7 +717,7 @@ Utils.storage = {
     if (!this.isAvailable()) {
       return key in this._memory;
     }
-    return localStorage.getItem(key) !== null;
+    return window.safeStorage.getRaw(key) !== null;
   },
 
   // Очистка по префиксу
@@ -726,7 +726,7 @@ Utils.storage = {
       Object.keys(this._memory).filter(k => k.startsWith(prefix)).forEach(k => delete this._memory[k]);
       return;
     }
-    Object.keys(localStorage).filter(k => k.startsWith(prefix)).forEach(k => localStorage.removeItem(k));
+    Object.keys(localStorage).filter(k => k.startsWith(prefix)).forEach(k => window.safeStorage.remove(k));
   },
 
   // Список ключей по префиксу
@@ -743,7 +743,7 @@ Utils.storage = {
       return JSON.stringify(this._memory).length;
     }
     return Object.keys(localStorage).reduce((sum, k) => {
-      return sum + (localStorage.getItem(k) || '').length + k.length;
+      return sum + (window.safeStorage.getRaw(k) || '').length + k.length;
     }, 0);
   },
 

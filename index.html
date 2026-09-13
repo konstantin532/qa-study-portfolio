@@ -591,8 +591,17 @@
 
   <div id="sidebar-overlay" class="sidebar-overlay" hidden></div>
 
-  <script src="js/utils.js"></script>
-<script src="js/debug.js"></script>
+  <script src="js/safe-storage.js"></script>
+    <script src="js/security.js"></script>
+    <script src="js/utils.js"></script>
+<script>
+      // Отладочный модуль не замедляет обычный запуск. Включение: index.html?debug=1
+      if (new URLSearchParams(window.location.search).get('debug') === '1') {
+        var debugScript = document.createElement('script');
+        debugScript.src = 'js/debug.js';
+        document.head.appendChild(debugScript);
+      }
+    </script>
 <script src="js/keyboard.js"></script>
 <script src="js/course-data.js"></script>
 <script src="js/charts.js"></script>

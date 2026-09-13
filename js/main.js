@@ -5737,6 +5737,7 @@ try {
   }
 
   function _importDataManual(data, mode) {
+    data = window.AppSecurity ? AppSecurity.cleanImportedData(data) : data;
     if (mode === 'replace') {
       Utils.storage.clear();
     }
@@ -7417,7 +7418,7 @@ try {
       if (contentEl) {
         Utils.dom.empty(contentEl);
         if (typeof content === 'string') {
-          contentEl.innerHTML = content;
+          AppSecurity.setHTML(contentEl, content);
         } else if (content && content.nodeType) {
           Utils.dom.append(contentEl, content);
         }
@@ -7488,7 +7489,7 @@ try {
       if (!contentEl) return;
       Utils.dom.empty(contentEl);
       if (typeof content === 'string') {
-        contentEl.innerHTML = content;
+        AppSecurity.setHTML(contentEl, content);
       } else if (content && content.nodeType) {
         Utils.dom.append(contentEl, content);
       }

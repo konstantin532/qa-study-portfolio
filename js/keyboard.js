@@ -737,7 +737,7 @@ var STORAGE_KEY = _i.storageKey;
     // Сохранение
     try {
       var json = JSON.stringify(data);
-      localStorage.setItem(STORAGE_KEY, json);
+      window.safeStorage.setRaw(STORAGE_KEY, json);
       _i.debug('Saved shortcuts settings: ' + data.enabled.length + ' enabled, ' + data.disabled.length + ' disabled');
     } catch (e) {
       _i.warn('Не удалось сохранить настройки шорткатов: ' + (e.message || e));
@@ -788,7 +788,7 @@ var STORAGE_KEY = _i.storageKey;
 
   function _loadFromStorage() {
     try {
-      var json = localStorage.getItem(STORAGE_KEY);
+      var json = window.safeStorage.getRaw(STORAGE_KEY);
       if (!json) return null;
 
       var data = JSON.parse(json);
@@ -859,7 +859,7 @@ var STORAGE_KEY = _i.storageKey;
     var data = { enabled: enabled, disabled: disabled };
 
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      window.safeStorage.setRaw(STORAGE_KEY, JSON.stringify(data));
       _i.debug('Saved keyboard settings to localStorage');
     } catch (e) {
       _i.warn('Не удалось сохранить настройки: ' + (e.message || e));

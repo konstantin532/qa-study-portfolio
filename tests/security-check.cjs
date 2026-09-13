@@ -1,0 +1,18 @@
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+const assert = require('assert');
+const source = fs.readFileSync(path.resolve(__dirname, '../js/security.js'), 'utf8');
+const context = { document: {}, window: null };
+context.window = context;
+vm.createContext(context);
+vm.runInContext(source, context);
+assert.strictEqual(context.AppSecurity.escapeHTML('<img onerror="x">'), '&lt;img onerror=&quot;x&quot;&gt;');
+const polluted = JSON.parse('{"ok":1,"__proto__":{"polluted":true},"items":[{"constructor":"bad","name":"safe"}]}');
+const clean = context.AppSecurity.cleanImportedData(polluted);
+assert.strictEqual(clean.ok, 1);
+assert.strictEqual(Object.prototype.hasOwnProperty.call(clean, '__proto__'), false);
+assert.strictEqual(Object.prototype.hasOwnProperty.call(clean.items[0], 'constructor'), false);
+assert.strictEqual(clean.items[0].name, 'safe');
+assert.strictEqual({}.polluted, undefined);
+console.log(JSON.stringify({ escaping: 'passed', prototypePollutionDefense: 'passed', status: 'passed' }, null, 2));
