@@ -142,19 +142,38 @@ python3 -m http.server   # если нужен Python
 <summary><b>Дерево файлов</b></summary>
 
 ```
-strelolist/
-├── index.html                 # точка входа SPA
+qa-study-portfolio/
+├── index.html  <----------------------------# точка входа SPA
+├── assets/
+│   ├── app-icon.svg
+│   ├── deco-sprite.svg
+│   └── deco-patterns.css.svg
 ├── css/
-│   ├── theme-pro.css          # дизайн-система, токены, обе темы
-│   └── main.css               # базовые стили приложения
-├── js/
-│   ├── main.js                # роутер, вьюхи, рендер
-│   ├── store.js               # состояние и localStorage
-│   ├── data/                  # модули, вопросы, словарь, шаблоны
-│   └── utils/
-│       └── motion.js          # каркас, детект темы, анимации
-├── assets/                    # лого, превью, скриншоты
-└── .github/workflows/deploy.yml
+│   ├── 01-base-reset-vars.css
+│   ├── 02-base-typography-utils.css
+│   ├── 03-base-layout-forms.css
+│   ├── 04-base-responsive-breakpoints.css
+│   ├── 05-base-responsive-layout.css
+│   ├── 06-base-responsive-typography.css
+│   ├── 07-layout.css
+│   ├── 08-components.css
+│   └── 09-print-deco.css
+│   ├── theme-pro.css   <---------------------# дизайн-система, токены, обе темы
+└── js/
+    ├── core/
+    │   └── main.js <-------------------------# роутер, вьюхи, рендер
+    ├── logic/
+    │   ├── idb.js
+    │   ├── charts.js
+    │   ├── debug.js
+    │   ├── editor.js
+    │   ├── export.js
+    │   ├── forms.js
+    │   └── keyboard.js
+    └── utils/
+        ├── utils.js
+        └── course-data.js
+        └── motion.js          # каркас, детект темы, анимации
 ```
 
 </details>
@@ -209,7 +228,7 @@ strelolist/
 
 ## Лицензия
 
-[MIT](LICENSE) © твой-ник
+[MIT](LICENSE) © konstantin532
 
 <div align="center">
 <br>
