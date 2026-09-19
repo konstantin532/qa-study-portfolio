@@ -3,7 +3,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/logo-light.svg">
-  <img src="assets/logo-light.svg" alt="qa-study-portfolio" width="88">
+  <img src="[assets/logo-light.svg](https://github.com/konstantin532/qa-study-portfolio/blob/main/assets/deco-sprite.svg)" alt="qa-study-portfolio" width="88">
 </picture>
 
 # qa-study-portfolio
