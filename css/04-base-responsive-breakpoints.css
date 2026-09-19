@@ -1,0 +1,27 @@
+/*
+ * QA Study Portfolio — Адаптивные брейкпоинты
+ * Токены отступов контейнеров на разных разрешениях.
+ * Mobile First: все @media через min-width.
+ */
+
+:root {
+  --container-padding: 16px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --container-padding: 24px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --container-padding: 32px;
+  }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --container-padding: 48px;
+  }
+}

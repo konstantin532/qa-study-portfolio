@@ -1,0 +1,38 @@
+/*
+ * QA Study Portfolio — Адаптивные отступы секций
+ * Токены вертикальных интервалов на разных разрешениях.
+ */
+
+:root {
+  --section-padding: 16px;
+  --section-gap: 16px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --section-padding: 24px;
+    --section-gap: 24px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --section-padding: 32px;
+    --section-gap: 28px;
+  }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --section-padding: 48px;
+    --section-gap: 32px;
+  }
+}
+
+#main-content > section {
+  padding-block: var(--section-padding);
+}
+
+#main-content > section + section {
+  margin-top: var(--section-gap);
+}

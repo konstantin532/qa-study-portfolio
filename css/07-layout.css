@@ -1,0 +1,632 @@
+/*
+ * QA Study Portfolio — Каркас приложения
+ * Позиционирование sidebar, header, breadcrumbs, main-content, context-panel.
+ * Два независимых класса для сайдбара: .collapsed >= 1024px, .sidebar--open < 1024px.
+ */
+
+/* ========================================================================
+   #app-wrapper — флекс-контейнер на всю высоту
+   ======================================================================== */
+
+#app-wrapper {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--surface);
+}
+
+/* ========================================================================
+   #sidebar — базовая колонка
+   ======================================================================== */
+
+#sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  background: var(--surface-navy);
+  color: var(--text-inverse);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  transition: transform var(--transition-normal);
+}
+
+/* ========================================================================
+   .main-container — центральная колонка, min-width 0 против overflow
+   ======================================================================== */
+
+.main-container {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========================================================================
+   #header
+   ======================================================================== */
+
+#header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-inline: var(--container-padding);
+  min-height: var(--header-height);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* ========================================================================
+   #breadcrumbs — схлопывание промежуточных li на узких экранах
+   ======================================================================== */
+
+#breadcrumbs {
+  padding: 8px var(--container-padding);
+}
+
+#breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 767px) {
+  #breadcrumbs li:not(:first-child):not(:last-child) {
+    display: none;
+  }
+
+  #breadcrumbs li:first-child::after {
+    content: '…';
+    margin-inline: 4px;
+  }
+}
+
+/* ========================================================================
+   #main-content
+   ======================================================================== */
+
+#main-content {
+  flex: 1;
+  padding: var(--section-padding) var(--container-padding);
+}
+
+#main-content:focus {
+  outline: none;
+}
+
+@media (min-width: 2560px) {
+  #main-content {
+    max-width: var(--container-max);
+    margin-inline: auto;
+  }
+}
+
+/* ========================================================================
+   #context-panel
+   ======================================================================== */
+
+#context-panel {
+  width: var(--context-panel-width);
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+  padding: var(--section-padding);
+  background: var(--surface);
+  overflow-y: auto;
+}
+
+/* ========================================================================
+   Мобайл < 1024px — сайдбар оверлей, контекстная панель скрыта
+   ======================================================================== */
+
+@media (max-width: 1023px) {
+  #sidebar {
+    position: fixed;
+    inset-block: 0;
+    left: 0;
+    z-index: 100;
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-lg);
+  }
+
+  #sidebar.sidebar--open {
+    transform: translateX(0);
+  }
+
+  #context-panel {
+    display: none;
+  }
+
+  .hamburger {
+    display: inline-flex;
+  }
+}
+
+/* ========================================================================
+   Десктоп >= 1024px — гамбургер скрыт, .collapsed сворачивает сайдбар
+   ======================================================================== */
+
+@media (min-width: 1024px) {
+  .hamburger {
+    display: none;
+  }
+
+  #sidebar.collapsed {
+    width: 0;
+    overflow: hidden;
+  }
+}
+
+/* ========================================================================
+   Режим презентации — скрывает навигацию
+   ======================================================================== */
+
+.presentation-mode #sidebar,
+.presentation-mode #header,
+.presentation-mode #context-panel,
+.presentation-mode #breadcrumbs {
+  display: none;
+}
+
+.presentation-mode .main-container {
+  width: 100%;
+}
+
+/* ========================================================================
+   Компактный вид — меньше отступов карточек
+   ======================================================================== */
+
+.compact-view .card {
+  padding: 10px;
+}
+
+.compact-view .card__desc {
+  display: none;
+}
+
+/* ========================================================================
+   Skip-link
+   ======================================================================== */
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  z-index: 9999;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-weight: 500;
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ========================================================================
+   Гамбургер
+   ======================================================================== */
+
+.hamburger {
+  width: var(--touch-target);
+  height: var(--touch-target);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.hamburger:hover {
+  background: var(--surface);
+}
+
+
+
+
+/*
+ * QA Study Portfolio — Каркас и страничные лейауты
+ * Замыкает каскад 01-06. Содержит весь каркас страницы и лейауты
+ * страниц. Подключается седьмым.
+ * renderSidebar / renderHeader / updateBreadcrumbs / renderMain ставят
+ * содержимое в #sidebar, #header, #breadcrumbs, #main-content.
+ */
+
+/* ========================================================================
+   РАЗДЕЛ A. КАРКАС
+   ======================================================================== */
+
+/* A1 #app-wrapper — флекс-контейнер на всю высоту.
+   Два объявления min-height: 100vh фоллбэк, 100dvh перекрывает где есть поддержка. */
+#app-wrapper {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--surface);
+}
+
+/* A2 #sidebar — боковая колонка навигации. */
+#sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  background: var(--surface-navy);
+  color: var(--text-inverse);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  transition: transform var(--transition-normal);
+  border-right: 1px solid var(--gold-line);
+}
+
+/* A3 .main-container — центральная колонка.
+   min-width 0 обязателен, иначе длинный контент растянет флекс. */
+.main-container {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* A4 #header — шапка контента. */
+#header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-inline: var(--container-padding);
+  min-height: var(--header-height);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* A5 #breadcrumbs — хлебные крошки.
+   Схлопывание промежуточных li до 767px через display none. */
+#breadcrumbs {
+  padding: 8px var(--container-padding);
+}
+
+#breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+}
+
+#breadcrumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#breadcrumbs a {
+  color: var(--text-muted);
+}
+
+#breadcrumbs a:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 767px) {
+  #breadcrumbs li:not(:first-child):not(:last-child) {
+    display: none;
+  }
+
+  #breadcrumbs li:first-child::after {
+    content: '…';
+    margin-inline: 4px;
+    color: var(--text-muted);
+  }
+}
+
+/* A6 #main-content — основная область.
+   Ограничение 1800px только отсюда, в 04-06 не дублируется. */
+#main-content {
+  flex: 1;
+  padding: var(--section-padding) var(--container-padding);
+}
+
+#main-content:focus {
+  outline: none;
+}
+
+@media (min-width: 2560px) {
+  #main-content {
+    max-width: var(--container-max);
+    margin-inline: auto;
+  }
+}
+
+/* A7 #context-panel — правая контекстная панель. */
+#context-panel {
+  width: var(--context-panel-width);
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+  padding: var(--section-padding);
+  background: var(--surface);
+  overflow-y: auto;
+}
+
+/* A8 До 1023px — сайдбар оверлей, контекстная панель скрыта. */
+@media (max-width: 1023px) {
+  #sidebar {
+    position: fixed;
+    inset-block: 0;
+    left: 0;
+    z-index: 100;
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-lg);
+  }
+
+  #sidebar.sidebar--open {
+    transform: translateX(0);
+  }
+
+  #context-panel {
+    display: none;
+  }
+
+  .hamburger {
+    display: inline-flex;
+  }
+}
+
+/* A9 От 1024px — гамбургер скрыт, .collapsed сворачивает сайдбар. */
+@media (min-width: 1024px) {
+  .hamburger {
+    display: none;
+  }
+
+  #sidebar.collapsed {
+    width: 0;
+    overflow: hidden;
+  }
+}
+
+/* A10 .presentation-mode — скрывает навигацию и шапку. */
+.presentation-mode #sidebar,
+.presentation-mode #header,
+.presentation-mode #context-panel,
+.presentation-mode #breadcrumbs {
+  display: none;
+}
+
+.presentation-mode .main-container {
+  width: 100%;
+}
+
+/* A11 .compact-view — уплотнённые карточки. */
+.compact-view .card {
+  padding: 10px;
+}
+
+.compact-view .card__desc {
+  display: none;
+}
+
+/* A12 .skip-link — первый фокусируемый элемент страницы. */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  z-index: 9999;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-weight: 500;
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* A13 .hamburger — кнопка меню до 1023px включительно. */
+.hamburger {
+  width: var(--touch-target);
+  height: var(--touch-target);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+}
+
+.hamburger:hover {
+  background: var(--surface);
+}
+
+.hamburger:active {
+  background: var(--border-light);
+}
+
+/* ========================================================================
+   РАЗДЕЛ B. СТРАНИЧНЫЕ ЛЕЙАУТЫ
+   Каждый блок используется render-функциями частей 3-4 main.js.
+   ======================================================================== */
+
+/* B1 .page-title — заголовок страницы. Ставит renderPageHeader. */
+.page-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--color-gold);
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+/* B2 .page-subtitle — подзаголовок страницы. Ставит renderPageHeader. */
+.page-subtitle {
+  color: var(--text-muted);
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  max-width: 70ch;
+  line-height: 1.5;
+}
+
+/* B3 .section-divider — разделитель секций hr. Ставит renderSection. */
+.section-divider {
+  height: 1px;
+  border: 0;
+  background: var(--gradient-hairline);
+  margin-block: 32px;
+}
+
+/* B4 .page-grid — универсальная сетка страниц. Ставит renderGrid. */
+.page-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* B5 .stats-grid — сетка статистики. Ставит renderStats / renderDashboard. */
+.stats-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* B6 .stat-card — карточка показателя. Ставит renderStats / renderDashboard. */
+.stat-card {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--color-gold);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+/* B7 .roadmap-timeline — вертикальная линия маршрута. Ставит renderRoadmap. */
+.roadmap-timeline {
+  position: relative;
+  padding-left: 32px;
+  list-style: none;
+}
+
+.roadmap-timeline::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-gold);
+}
+
+/* B8 .roadmap-item — пункт маршрута. Ставит renderRoadmap. */
+.roadmap-item {
+  position: relative;
+  padding-block: 16px;
+}
+
+/* B9 .roadmap-dot — маркер пункта, ромб через rotate. Ставит renderRoadmap.
+   Реальный элемент .roadmap-dot, а не ::before пункта. */
+.roadmap-dot {
+  position: absolute;
+  left: -32px;
+  top: 20px;
+  width: 14px;
+  height: 14px;
+  background: var(--surface-raised);
+  border: 2px solid var(--color-gold);
+  transform: rotate(45deg);
+  z-index: 1;
+}
+
+.roadmap-item.done .roadmap-dot {
+  background: var(--gradient-gold);
+  border-color: var(--color-gold);
+}
+
+/* B10 .portfolio-grid — сетка портфолио. Ставит renderPortfolio. */
+.portfolio-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+/* B11 .portfolio-item — карточка проекта. Ставит renderPortfolio. */
+.portfolio-item {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.portfolio-item:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* B12 .glossary-index — индекс букв словаря. Ставит renderGlossary. */
+.glossary-index {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* B13 .empty-state — заглушка пустого состояния. Ставит renderEmpty / fallback index.html. */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 300px;
+  padding: 64px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  position: relative;
+}
+
+.empty-state__icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  color: var(--accent);
+}
+
+.empty-state__title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+
+.empty-state__text {
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  max-width: 46ch;
+}
+
+/* B14 .editor-area — двухколоночный лейаут редактора. Ставит renderEditor. */
+.editor-area {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 1024px) {
+  .editor-area {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+}
+
+/* B15 .editor-toolbar — панель инструментов редактора. Ставит renderEditor. */
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  padding: 12px;
+}

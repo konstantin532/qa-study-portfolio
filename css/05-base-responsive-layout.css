@@ -1,0 +1,119 @@
+/*
+ * QA Study Portfolio — Адаптивная раскладка
+ * Сетки, карточки, таблицы, прогресс.
+ * Движение только через transform, не через width.
+ */
+
+/* ========================================================================
+   Сетки
+   ======================================================================== */
+
+.grid-2 {
+  display: grid;
+  gap: var(--gutter);
+}
+
+@media (min-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.grid-3 {
+  display: grid;
+  gap: var(--gutter);
+}
+
+@media (min-width: 768px) {
+  .grid-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1280px) {
+  .grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* ========================================================================
+   Карточки
+   ======================================================================== */
+
+.card {
+  background: var(--surface-raised);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  padding: 16px;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card__desc {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* ========================================================================
+   Таблицы
+   ======================================================================== */
+
+.table-container {
+  overflow-x: auto;
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-container th {
+  text-align: left;
+  white-space: nowrap;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+.table-container td {
+  border-bottom: 1px solid var(--border-light);
+  padding: 8px 12px;
+}
+
+.table-container tbody tr:hover td {
+  background: var(--surface);
+}
+
+.row-warn {
+  background: var(--color-warning-bg);
+}
+
+/* ========================================================================
+   Прогресс — анимация через transform: scaleX, не width
+   ======================================================================== */
+
+.progress {
+  height: 8px;
+  background: var(--border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--transition-normal);
+}
+
+@media (forced-colors: active) {
+  .progress-fill {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+}
