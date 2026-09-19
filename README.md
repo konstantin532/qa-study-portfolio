@@ -24,7 +24,7 @@
 
 <br>
 
-<img src="assets/hero-dark.png" alt="Интерфейс Стрелолиста" width="880">
+<img src="assets/hero-dark.png" alt="Интерфейс qa-study-portfolio" width="880">
 
 </div>
 
