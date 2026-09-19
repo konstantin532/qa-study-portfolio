@@ -116,7 +116,7 @@ flowchart TD
 
 Всё движение уважает `prefers-reduced-motion: reduce`.
 
-## Быстрый старт
+## Быстрый старт 
 
 ```bash
 git clone https://github.com/твой-ник/strelolist.git
