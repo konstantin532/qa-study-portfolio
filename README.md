@@ -1,11 +1,31 @@
-# QA Study Portfolio
+Превью `assets/preview.png` сделай 1280x720: открой Главную в темной теме, сделай скрин без DevTools. Это обложка репозитория, GitHub показывает ее в соцсетях.
 
-Интерактивное портфолио для изучения и практики QA.
+Бейджи добавь в самый верх если хочешь продвинутый вид:
+`![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)`
 
-## Запуск
+### 3. GitHub Pages - живой демо
 
-Проект не требует сборки: откройте `index.html` через локальный HTTP-сервер. Например: `python -m http.server 8000`.
+Самый важный пункт для работодателя. Без демо репозиторий мертвый.
 
-## Структура стилей
+1. `Settings -> Pages -> Build and deployment -> Source: GitHub Actions`
+2. Создай `.github/workflows/deploy.yml`:
 
-Стили подключаются слоями: токены, сброс, макет, компоненты, утилиты, адаптивность, восстановительный слой и `polish.css` с прогрессивными улучшениями интерфейса.
+```yaml
+name: Deploy to Pages
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      - uses: actions/deploy-pages@v4
