@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img">
+  <title>QA Study Portfolio</title>
+  <rect x="0" y="0" width="32" height="32" rx="6" fill="#0A1929"/>
+  <rect x="2" y="2" width="28" height="28" rx="4" fill="none" stroke="#D4AF37" stroke-width="1.5"/>
+  <polygon points="16,7 19.5,12 16,17 12.5,12" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linejoin="round"/>
+  <path d="M11 24 L16 13 L21 24" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M13.5 20 H18.5" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linecap="round"/>
+</svg>

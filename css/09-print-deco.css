@@ -1,0 +1,316 @@
+/*
+ * QA Study Portfolio — Печать
+ * Скрытие навигации, упрощение цветов, раскрытие ссылок.
+ */
+
+@media print {
+  #sidebar,
+  #header,
+  #context-panel,
+  #breadcrumbs,
+  #modals,
+  #toast-container,
+  #save-indicator,
+  .hamburger,
+  .skip-link,
+  .icon-sprite {
+    display: none !important;
+  }
+
+  #app-wrapper {
+    display: block;
+  }
+
+  .main-container {
+    width: 100%;
+  }
+
+  #main-content {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .card,
+  .empty-state,
+  .warning-block,
+  .modal__dialog {
+    box-shadow: none;
+    background: transparent;
+    border: 1px solid #999;
+  }
+
+  .progress {
+    border: 1px solid #000;
+    background: #fff;
+  }
+
+  .progress-fill {
+    background: #000;
+  }
+
+  .progress-gold {
+    background: #fff;
+  }
+
+  .progress-gold .progress-fill {
+    background: #000;
+  }
+
+  .row-warn {
+    background: #eee;
+  }
+
+  body {
+    font-family: var(--font-display);
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  h1,
+  h2,
+  h3 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+    .card,
+  .roadmap-item {
+    break-inside: avoid;
+  }
+
+  a {
+    text-decoration: underline;
+    color: #000;
+  }
+
+  a[href^="#"]::after {
+    content: '';
+  }
+
+  a[href]:not([href^="#"])::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.75em;
+  }
+
+  .empty-state {
+    min-height: auto;
+    border: none;
+  }
+
+  .empty-state::before,
+  .empty-state::after {
+    display: none;
+  }
+}
+
+
+/*
+ * QA Study Portfolio — Печать и принудительные цвета для 07-08
+ * Единственный файл с @media print и forced-colors для компонентов 07-08.
+ */
+
+@media print {
+  #sidebar,
+  #header,
+  #context-panel,
+  #breadcrumbs,
+  #modals,
+  #toast-container,
+  #save-indicator,
+  .hamburger,
+  .skip-link,
+  .icon-sprite,
+  .editor-toolbar,
+  .toggle,
+  .btn-icon {
+    display: none !important;
+  }
+
+  #app-wrapper {
+    display: block;
+  }
+
+  .main-container {
+    width: 100%;
+  }
+
+  #main-content {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .card,
+  .stat-card,
+  .portfolio-item,
+  .empty-state,
+  .warning-block,
+  .code-block,
+  .flashcard__face {
+    box-shadow: none;
+    background: transparent;
+    border: 1px solid #999;
+    color: #000;
+  }
+
+  .progress {
+    border: 1px solid #000;
+    background: #fff;
+  }
+
+  .progress-fill {
+    background: #000;
+  }
+
+  .progress-circle {
+    background: none;
+    border: 2px solid #000;
+  }
+
+  .row-warn {
+    background: #eee;
+  }
+
+  .tag,
+  .badge {
+    background: #fff;
+    color: #000;
+    border: 1px solid #000;
+  }
+
+  .code-block {
+    background: #f5f5f5;
+    color: #000;
+  }
+
+  h1,
+  h2,
+  h3 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  .card,
+  .stat-card,
+  .portfolio-item,
+  .roadmap-item,
+  .flashcard {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  body {
+    font-family: var(--font-display);
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  .page-title {
+    border-bottom-color: #000;
+  }
+
+  .section-divider {
+    background: #000;
+    height: 1px;
+  }
+
+  a {
+    text-decoration: underline;
+    color: #000;
+  }
+
+  a[href^="#"]::after {
+    content: '';
+  }
+
+  a[href]:not([href^="#"])::after {
+    content: ' (' attr(href) ')';
+    font-size: 9pt;
+    color: #555;
+  }
+
+  .empty-state {
+    min-height: auto;
+    border: none;
+    padding: 24px 0;
+  }
+
+  .empty-state::before,
+  .empty-state::after {
+    display: none;
+  }
+
+  .roadmap-timeline::before {
+    background: #000;
+  }
+
+  .roadmap-dot {
+    background: #000;
+    border-color: #000;
+  }
+
+  @page {
+    margin: 15mm;
+  }
+
+  .flashcard__inner {
+    transform: none;
+  }
+
+  .flashcard__face:last-child {
+    transform: none;
+    position: static;
+  }
+}
+
+@media (forced-colors: active) {
+  .progress-circle {
+    forced-color-adjust: none;
+    background: conic-gradient(Highlight calc(var(--progress, 0) * 1%), Canvas 0);
+  }
+
+  .toggle {
+    border: 1px solid ButtonText;
+  }
+
+  .toggle[aria-checked="true"] {
+    background: Highlight;
+  }
+
+  .toggle__thumb {
+    background: ButtonFace;
+    border: 1px solid ButtonText;
+  }
+
+  .roadmap-dot {
+    border-color: ButtonText;
+  }
+
+  .roadmap-item.done .roadmap-dot {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  .tag,
+  .badge {
+    border: 1px solid ButtonText;
+  }
+
+  .nav-item.active {
+    border-left-color: Highlight;
+  }
+
+  .cell-active {
+    outline-color: Highlight;
+  }
+}
+

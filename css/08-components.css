@@ -1,0 +1,1004 @@
+/*
+ * QA Study Portfolio — Компоненты
+ * Визуальная тема nav-item, toast, empty-state, stats-grid, roadmap,
+ * badge, progress-gold, glossary, pomodoro, cell-active, warning, editor.
+ */
+
+/* ========================================================================
+   .nav-item — пункт навигации
+   ======================================================================== */
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  min-height: var(--touch-target);
+  color: var(--text-inverse);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+  background: var(--layer-hover);
+}
+
+.nav-item.active {
+  background: var(--layer-active);
+  border-left-color: var(--color-gold);
+  font-weight: 600;
+}
+
+.nav-item__icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.nav-item__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.nav-item__desc {
+  font-size: 0.75rem;
+  color: var(--text-inverse);
+  opacity: 0.65;
+}
+
+.nav-item__badge {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--color-gold);
+  color: var(--text-on-accent);
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  min-width: 20px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767px) {
+  .nav-item__desc {
+    display: none;
+  }
+}
+
+#sidebar.collapsed .nav-item__label,
+#sidebar.collapsed .nav-item__desc {
+  display: none;
+}
+
+@media (forced-colors: active) {
+  .nav-item.active {
+    border-left-color: Highlight;
+  }
+}
+
+/* ========================================================================
+   Тосты — типы
+   ======================================================================== */
+
+.toast--info {
+  border-left-color: var(--accent);
+}
+
+.toast--success {
+  border-left-color: var(--color-success);
+}
+
+.toast--warning {
+  border-left-color: var(--color-warning);
+}
+
+.toast--danger {
+  border-left-color: var(--color-danger);
+  font-weight: 500;
+}
+
+.toast__action {
+  margin-top: 8px;
+  min-height: var(--touch-target);
+}
+
+/* ========================================================================
+   .empty-state
+   ======================================================================== */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 300px;
+  padding: 40px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  position: relative;
+}
+
+.empty-state__icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  color: var(--accent);
+}
+
+.empty-state__title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+
+.empty-state__text {
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  max-width: 46ch;
+}
+
+/* ========================================================================
+   .stats-grid
+   ======================================================================== */
+
+.stats-grid {
+  display: grid;
+  gap: var(--gutter);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+/* ========================================================================
+   .roadmap-timeline
+   ======================================================================== */
+
+.roadmap-timeline {
+  position: relative;
+  padding-left: 32px;
+}
+
+.roadmap-timeline::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+
+.roadmap-item {
+  position: relative;
+  padding-block: 16px;
+}
+
+.roadmap-dot {
+  position: absolute;
+  left: -32px;
+  top: 20px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  border: 2px solid var(--border);
+  z-index: 1;
+}
+
+.roadmap-item.done .roadmap-dot {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ========================================================================
+   .badge
+   ======================================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+/* ========================================================================
+   .progress-gold — акцентный прогресс
+   ======================================================================== */
+
+.progress-gold {
+  background: var(--surface-navy);
+}
+
+.progress-gold .progress-fill {
+  background: linear-gradient(90deg, var(--color-gold), var(--color-gold-hover));
+}
+
+/* ========================================================================
+   .glossary-letter-btn
+   ======================================================================== */
+
+.glossary-letter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  cursor: pointer;
+}
+
+.glossary-letter-btn.active {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  border-color: var(--accent);
+}
+
+.glossary-letter-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ========================================================================
+   .pomodoro-clock — табличные цифры моноширинным шрифтом
+   ======================================================================== */
+
+.pomodoro-clock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  line-height: 1;
+}
+
+/* ========================================================================
+   .cell-active — активная ячейка таблицы
+   ======================================================================== */
+
+.cell-active {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  background: var(--layer-active);
+}
+
+@media (forced-colors: active) {
+  .cell-active {
+    outline-color: Highlight;
+    background: transparent;
+  }
+}
+
+/* ========================================================================
+   .warning-block
+   ======================================================================== */
+
+.warning-block {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--color-warning-bg);
+  border-left: 4px solid var(--color-warning);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+/* ========================================================================
+   .editor-empty — placeholder через data-attribute
+   ======================================================================== */
+
+.editor-empty {
+  position: relative;
+}
+
+.editor-empty::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+
+
+/*
+ * QA Study Portfolio — Микро-компоненты и модификаторы
+ * Визуальная тема поверх каркаса 07 и базы 03/05.
+ * Все цвета через var(), литералы только для геометрии.
+ */
+
+/* ========================================================================
+   C1 .nav-item — пункт навигации в #sidebar. Ставит renderSidebar.
+   ======================================================================== */
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  min-height: var(--touch-target);
+  color: var(--text-inverse);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background: var(--layer-hover);
+}
+
+.nav-item:active {
+  opacity: 0.9;
+}
+
+.nav-item.active {
+  background: var(--layer-active);
+  border-left-color: var(--color-gold);
+  font-weight: 600;
+}
+
+.nav-item__icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.nav-item__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.nav-item__desc {
+  font-size: 0.75rem;
+  color: var(--text-inverse);
+  opacity: 0.65;
+}
+
+.nav-item__badge {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--color-gold);
+  color: var(--text-on-accent);
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  min-width: 20px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767px) {
+  .nav-item__desc {
+    display: none;
+  }
+}
+
+#sidebar.collapsed .nav-item__label,
+#sidebar.collapsed .nav-item__desc {
+  display: none;
+}
+
+/* ========================================================================
+   C2 Модификаторы кнопок. База .btn в 03. Ставят все render-функции форм.
+   ======================================================================== */
+
+.btn-primary {
+  background: var(--gradient-gold);
+  color: var(--text-on-accent);
+  font-weight: 600;
+  border-color: transparent;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-gold-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--surface);
+}
+
+.btn-secondary:active:not(:disabled) {
+  background: var(--border-light);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--color-gold);
+  color: var(--text-primary);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--gold-line-soft);
+}
+
+.btn-ghost:active:not(:disabled) {
+  background: var(--gold-line);
+}
+
+.btn-ghost:disabled {
+  opacity: 0.5;
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: var(--text-on-danger);
+  border-color: transparent;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--color-danger-hover);
+}
+
+.btn-danger:active:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-icon {
+  width: var(--touch-target);
+  height: var(--touch-target);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.btn-icon:disabled {
+  opacity: 0.5;
+}
+
+/* ========================================================================
+   C3 .input-with-icon — поле с иконкой. Ставит renderSearch / renderFilters.
+   ======================================================================== */
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon .form-input {
+  padding-left: 44px;
+}
+
+.input-with-icon__icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  color: var(--text-muted);
+}
+
+/* ========================================================================
+   C4 .tag — тег. Ставит renderTags / renderNotes.
+   ======================================================================== */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  background: var(--surface-navy);
+  color: var(--color-gold);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--gold-line-soft);
+}
+
+/* ========================================================================
+   C5 .badge — бейдж. Ставит renderBadges.
+   ======================================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--surface-navy);
+  color: var(--color-gold);
+  border: 1px solid var(--gold-line);
+}
+
+/* ========================================================================
+   C6 .toggle — переключатель. Ставит renderSettings / renderFilters.
+   ======================================================================== */
+
+.toggle {
+  width: 48px;
+  min-height: var(--touch-target);
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  background: var(--border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.toggle:hover {
+  border-color: var(--border);
+}
+
+.toggle:active {
+  opacity: 0.9;
+}
+
+.toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.toggle__thumb {
+  width: 24px;
+  height: 24px;
+  background: var(--surface-raised);
+  border-radius: 50%;
+  transform: translateX(0);
+  transition: transform var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.toggle[aria-checked="true"] {
+  background: var(--color-gold);
+}
+
+.toggle[aria-checked="true"] .toggle__thumb {
+  transform: translateX(20px);
+}
+
+/* ========================================================================
+   C7 .progress-circle — круглый прогресс. Ставит renderProgressCircle.
+   ======================================================================== */
+
+@property --progress {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+.progress-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(var(--color-gold) calc(var(--progress, 0) * 1%), var(--border) 0);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  position: relative;
+}
+
+.progress-circle::before {
+  content: '';
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+}
+
+/* ========================================================================
+   C8 .progress-gold — акцентный линейный прогресс. Ставит renderProgress.
+   ======================================================================== */
+
+.progress-gold {
+  background: var(--surface-navy);
+}
+
+.progress-gold .progress-fill {
+  background: var(--gradient-gold);
+}
+
+/* ========================================================================
+   C9 Модификаторы тостов. База .toast в 03. Ставит App.toast.
+   ======================================================================== */
+
+.toast--info {
+  border-left-color: var(--accent);
+}
+
+.toast--success {
+  border-left-color: var(--color-success);
+}
+
+.toast--warning {
+  border-left-color: var(--color-warning);
+}
+
+.toast--danger {
+  border-left-color: var(--color-danger);
+}
+
+.toast__action {
+  min-height: var(--touch-target);
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ========================================================================
+   C10 .glossary-letter-btn — буква указателя. Ставит renderGlossary.
+   ======================================================================== */
+
+.glossary-letter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.glossary-letter-btn:hover:not(:disabled) {
+  border-color: var(--color-gold);
+}
+
+.glossary-letter-btn:active:not(:disabled) {
+  background: var(--gold-line-soft);
+}
+
+.glossary-letter-btn.active {
+  background: var(--surface-navy);
+  color: var(--color-gold);
+  border-color: var(--color-gold);
+}
+
+.glossary-letter-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ========================================================================
+   C11 .flashcard — переворачиваемая карточка. Ставит renderRepetition.
+   ======================================================================== */
+
+.flashcard {
+  perspective: 1000px;
+  min-height: 200px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.flashcard__inner {
+  position: relative;
+  width: 100%;
+  min-height: 200px;
+  transform-style: preserve-3d;
+  transition: transform var(--transition-slow);
+}
+
+.flashcard__face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  background: var(--surface-raised);
+  border: 1px solid var(--gold-line);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.flashcard__face:last-child {
+  transform: rotateY(180deg);
+}
+
+.flashcard--flipped .flashcard__inner {
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flashcard__inner {
+    transition: none;
+  }
+}
+
+/* ========================================================================
+   C12 .pomodoro-clock — цифры таймера. Ставит renderPomodoro.
+   ======================================================================== */
+
+.pomodoro-clock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+/* ========================================================================
+   C13 .mindmap-node — узел карты знаний. Ставит renderMindmap.
+   ======================================================================== */
+
+.mindmap-node {
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  background: var(--surface-raised);
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.mindmap-node:hover {
+  background: var(--gold-line-soft);
+}
+
+.mindmap-node:active {
+  background: var(--gold-line);
+}
+
+/* ========================================================================
+   C14 .cell-active — активная ячейка таблицы. Ставит renderTable.
+   ======================================================================== */
+
+.cell-active {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -2px;
+  background: var(--layer-active);
+}
+
+/* ========================================================================
+   C15 .warning-block — предупреждение. Ставит renderWarning.
+   ======================================================================== */
+
+.warning-block {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--color-warning-bg);
+  border-left: 4px solid var(--color-warning);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+/* ========================================================================
+   C16 .card-hover — карточка с подъёмом при hover. Ставит renderCards.
+   ======================================================================== */
+
+.card-hover {
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-hover:focus-within {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ========================================================================
+   C17 .tooltip — тултип. Ставит renderWithTooltip.
+   Реальный элемент, анонс через aria-describedby из JS.
+   ======================================================================== */
+
+.tooltip {
+  position: relative;
+  display: inline-flex;
+}
+
+.tooltip__bubble {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  background: var(--surface-navy);
+  color: var(--color-cream);
+  font-size: 0.75rem;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.tooltip:hover .tooltip__bubble,
+.tooltip:focus-within .tooltip__bubble {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ========================================================================
+   C18 .scrollbar-custom — кастомная полоса прокрутки.
+   Контраст бегунка к дорожке >= 3:1 (золото на navy).
+   ======================================================================== */
+
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gold) var(--surface-navy);
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: var(--surface-navy);
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: var(--color-gold);
+  border-radius: var(--radius-pill);
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-hover);
+}
+
+/* ========================================================================
+   C19 .code-block — блок кода. Ставит renderCode.
+   tabindex и aria-label задаёт JS.
+   ======================================================================== */
+
+.code-block {
+  background: var(--surface-navy);
+  color: var(--color-cream);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--gold-line-soft);
+  overflow-x: auto;
+  line-height: 1.6;
+}
+
+/* ========================================================================
+   C20 .editor-empty — placeholder редактора. Ставит Editor.
+   ======================================================================== */
+
+.editor-empty {
+  position: relative;
+}
+
+.editor-empty::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+
+/* ========================================================================
+   Паттерны Art Deco. Три класса живут ТОЛЬКО в этом файле.
+   Каждый класс ставится ровно одним путём:
+     .bg-sunburst — статический #header в index.html
+     .bg-chevrons — render-функции частей 3-4 на .card и .stat-card
+     .bg-diamonds — .empty-state (статический pre-hydration и renderEmptyState)
+   Литеральный %23D4AF37 внутри data-URI — точечное исключение
+   из правила «0 литеральных цветов»: токен внутри data-URI не виден.
+   Opacity на группе <g>, не на элементе, иначе прозрачным станет весь компонент.
+   Геометрия совпадает с assets/deco-patterns.css.svg.
+   ======================================================================== */
+
+.bg-sunburst {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg stroke='%23D4AF37' stroke-width='0.7' fill='none' opacity='0.04'%3E%3Cpath d='M40 40L40 0M40 40L80 40M40 40L40 80M40 40L0 40M40 40L67 13M40 40L13 13M40 40L13 67M40 40L67 67'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+.bg-chevrons {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40'%3E%3Cg stroke='%23D4AF37' stroke-width='0.7' fill='none' opacity='0.06'%3E%3Cpath d='M10 8l8 12-8 12M40 8l8 12-8 12M70 8l8 12-8 12M30 28l8 12-8 12M60 28l8 12-8 12'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+.bg-diamonds {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg stroke='%23D4AF37' stroke-width='0.7' fill='none' opacity='0.08'%3E%3Cpath d='M20 10l10 10-10 10-10-10zM60 10l10 10-10 10-10-10zM40 50l10 10-10 10-10-10z'/%3E%3Ccircle cx='40' cy='30' r='1.5'/%3E%3Ccircle cx='20' cy='50' r='1.5'/%3E%3Ccircle cx='60' cy='50' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* ── Материалы: типографика справки ───────────────── */
+.res-body {
+  padding: 10px 26px 20px;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--text, #24292f);
+  max-width: 98ch;
+}
+.res-body > *:first-child { margin-top: 0; }
+.res-body > *:last-child { margin-bottom: 0; }
+
+.res-h {
+  margin: 22px 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--accent, #0969da);
+}
+.res-h + .res-p,
+.res-h + .res-ul { margin-top: 0; }
+
+.res-p { margin: 0 0 12px; }
+
+.res-ul {
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+.res-ul li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 7px;
+}
+.res-ul li::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: .62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent, #0969da);
+  opacity: .55;
+}
+.res-ul li:last-child { margin-bottom: 0; }
+
+.res-body strong { font-weight: 650; }
+
+.res-code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(175,184,193,.2);
+  font: 500 .88em ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  .res-code { background: rgba(110,118,129,.4); }
+}
