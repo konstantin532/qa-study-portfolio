@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
-  <path d="M16 2C8.28 2 2 8.28 2 16S8.28 30 16 30C23.72 30 30 23.72 30 16S23.72 2 16 2Z" fill="var(--color-bg-card)" stroke="var(--color-border)" stroke-width="1.5"/>
-  <path d="M14 10H18V14H14V10Z" fill="var(--color-primary)" />
-  <path d="M10 18H22V20H10V18Z" fill="var(--color-text-secondary)" />
-  <path d="M12 22H20V24H12V22Z" fill="var(--color-text-secondary)" />
-</svg>
