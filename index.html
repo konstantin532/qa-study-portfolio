@@ -1,231 +1,1151 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="system">
+<html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="QA Study Portfolio — локальный учебный кабинет QA-инженера: курс, конспекты, вопросы, практика и портфолио без сервера и без интернета">
-<meta name="theme-color" content="#0A1929">
-<title>QA Study Portfolio — Учебный кабинет QA-инженера</title>
-<link rel="icon" href="assets/app-icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/01-base-reset-vars.css">
-<link rel="stylesheet" href="css/02-base-typography-utils.css">
-<link rel="stylesheet" href="css/03-base-layout-forms.css">
-<link rel="stylesheet" href="css/04-base-responsive-breakpoints.css">
-<link rel="stylesheet" href="css/05-base-responsive-layout.css">
-<link rel="stylesheet" href="css/06-base-responsive-typography.css">
-<link rel="stylesheet" href="css/07-layout.css">
-<link rel="stylesheet" href="css/08-components.css">
-<link rel="stylesheet" href="css/09-print-deco.css" media="print">
-<link rel="stylesheet" href="css/theme-pro.css">
-<!-- patterns: data-URI backgrounds, last in cascade -->
-<link rel="stylesheet" href="assets/deco-patterns.css.svg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAISON QA — школа инженера-автоматизатора</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Marcellus&family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+/* ============ ПАЛИТРА И БАЗА ============ */
+:root{
+  --ink:#0e0c08; --ink2:#161209;
+  --gold:#c9a45c; --gold2:#e9cd8a;
+  --ivory:#f1e9d6; --mut:#948767;
+  --line:rgba(201,164,92,.24); --line2:rgba(201,164,92,.5);
+  --glass:rgba(255,255,255,.045); --bad:#c96a55;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink); color:var(--ivory);
+  font:300 16px/1.65 'Jost',sans-serif; overflow-x:hidden;
+}
+/* тонкий ромбический узор на фоне */
+body::before{
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.045;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cpath d='M32 2 62 32 32 62 2 32Z' fill='none' stroke='%23c9a45c' stroke-width='1'/%3E%3C/svg%3E");
+}
+/* рамка экрана в духе деко */
+body::after{
+  content:''; position:fixed; inset:12px; z-index:80; pointer-events:none;
+  border:1px solid rgba(201,164,92,.16);
+}
+@media(max-width:760px){body::after{display:none}}
+::selection{background:var(--gold);color:#171208}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:#0b0906}
+::-webkit-scrollbar-thumb{background:#463a21;border:2px solid #0b0906}
+::-webkit-scrollbar-thumb:hover{background:#6b5730}
+:focus-visible{outline:1px dashed var(--gold);outline-offset:3px}
+.wrap{max-width:1140px;margin:0 auto;padding:0 30px;position:relative;z-index:2}
+.ic{width:17px;height:17px;flex:none}
+.gold{color:var(--gold2)}
+.mut{color:var(--mut)}
+
+/* ============ ТИПОГРАФИКА ============ */
+h1,h2,h3,h4{font-family:'Marcellus',serif;font-weight:400;letter-spacing:.02em}
+.eyebrow{
+  font:500 11px 'Jost';letter-spacing:.34em;text-transform:uppercase;color:var(--gold);
+  display:inline-flex;align-items:center;gap:12px;
+}
+.eyebrow::before,.eyebrow::after{content:'';width:26px;height:1px;background:var(--line2)}
+.lime{font-family:'Limelight',cursive;font-weight:400}
+
+/* ============ ШАПКА ============ */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:90;height:66px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 34px;transition:.35s;
+}
+.topbar.solid{background:rgba(13,11,7,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ivory)}
+.brand .d{width:11px;height:11px;background:var(--gold);transform:rotate(45deg);flex:none}
+.brand span{font:400 16px 'Limelight';letter-spacing:.22em}
+.nav{display:flex;align-items:center;gap:30px}
+.nav button{
+  background:none;border:none;cursor:pointer;color:var(--mut);
+  font:500 11.5px 'Jost';letter-spacing:.24em;text-transform:uppercase;padding:6px 2px;
+  border-bottom:1px solid transparent;transition:.25s;
+}
+.nav button:hover,.nav button.act{color:var(--gold2);border-bottom-color:var(--gold)}
+.chip{
+  border:1px solid var(--line2);padding:7px 15px;font:500 11.5px 'Jost';
+  letter-spacing:.14em;color:var(--gold2);white-space:nowrap;
+}
+@media(max-width:640px){.topbar{padding:0 18px}.nav{gap:14px}.brand span{letter-spacing:.12em}}
+
+/* ============ КНОПКИ ============ */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none;
+  padding:14px 27px;border:1px solid var(--gold);background:transparent;color:var(--gold2);
+  font:500 12px 'Jost';letter-spacing:.24em;text-transform:uppercase;transition:.25s;
+  clip-path:polygon(11px 0,100% 0,100% calc(100% - 11px),calc(100% - 11px) 100%,0 100%,0 11px);
+}
+.btn:hover{background:rgba(201,164,92,.13);transform:translateY(-1px)}
+.btn.solid{background:var(--gold);color:#181207}
+.btn.solid:hover{background:var(--gold2)}
+.btn:disabled{opacity:.32;cursor:not-allowed;transform:none}
+.btn.sm{padding:10px 18px;font-size:10.5px}
+
+/* ============ ГЕРОЙ ============ */
+.hero{position:relative;padding:186px 30px 80px;text-align:center;overflow:hidden}
+#sun{
+  position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+  width:min(1050px,150vw);opacity:.55;pointer-events:none;z-index:0;
+}
+#sun .rays{transform-origin:500px 500px;animation:spin 190s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero .inner{position:relative;z-index:2}
+.hero h1{
+  font:400 clamp(52px,10vw,118px)/1 'Limelight';color:var(--ivory);
+  margin:22px 0 8px;letter-spacing:.04em;
+}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero .sub{max-width:560px;margin:20px auto 0;color:var(--mut);font-size:17px}
+.divider{display:flex;align-items:center;justify-content:center;gap:14px;margin:34px auto 30px}
+.divider span{width:74px;height:1px;background:var(--line2)}
+.divider i{width:9px;height:9px;background:var(--gold);transform:rotate(45deg)}
+.divider i.o{background:none;border:1px solid var(--gold)}
+.cta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+
+/* статистика — единая лента с линиями, не карточки */
+.strip{
+  display:flex;max-width:880px;margin:66px auto 0;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+.strip .cell{flex:1;padding:22px 10px;text-align:center;border-left:1px solid var(--line)}
+.strip .cell:first-child{border-left:none}
+.cell b{display:block;font:400 29px 'Marcellus';color:var(--gold2);line-height:1.2}
+.cell span{font:500 10px 'Jost';letter-spacing:.24em;text-transform:uppercase;color:var(--mut)}
+@media(max-width:640px){.strip{flex-wrap:wrap}.strip .cell{flex:1 1 45%;border-top:1px solid var(--line)}.strip .cell:nth-child(-n+2){border-top:none}.strip .cell:nth-child(3){border-left:none}}
+
+/* ============ СЕКЦИИ ============ */
+.section{padding:118px 0 40px;position:relative}
+.sec-head{display:flex;align-items:baseline;gap:24px;margin-bottom:14px}
+.sec-head .no{font:400 15px 'Limelight';color:var(--gold);letter-spacing:.3em}
+.sec-head h2{font-size:clamp(30px,4.4vw,46px)}
+.sec-sub{color:var(--mut);max-width:62ch}
+
+/* ============ ШКАЛА ОПЫТА ============ */
+.rail{position:relative;height:52px;margin:52px 0 8px}
+.rail .track{position:absolute;left:0;right:0;top:28px;height:2px;background:rgba(201,164,92,.16)}
+.rail .fill{position:absolute;left:0;top:28px;height:2px;background:var(--gold);transition:width .9s cubic-bezier(.2,.75,.2,1)}
+.rail .knob{
+  position:absolute;top:21px;width:15px;height:15px;background:var(--gold2);
+  transform:translateX(-50%) rotate(45deg);box-shadow:0 0 0 5px var(--ink);
+  transition:left .9s cubic-bezier(.2,.75,.2,1);
+}
+.tick{position:absolute;top:16px;width:1px;height:26px;background:var(--line2)}
+.tick i{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font:400 13px 'Marcellus';font-style:normal;color:var(--mut)}
+.tick em{position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);font:500 9.5px 'Jost';letter-spacing:.14em;color:var(--mut);font-style:normal;white-space:nowrap}
+.rail-cap{margin-top:38px;font-size:14px;color:var(--mut)}
+.rail-cap b{font:400 20px 'Marcellus';color:var(--gold2)}
+
+/* ============ БАШНЯ ============ */
+.tower-grid{display:grid;grid-template-columns:400px 1fr;gap:72px;margin-top:64px;align-items:start}
+@media(max-width:920px){.tower-grid{grid-template-columns:1fr;gap:40px}}
+#zigg{width:100%;max-width:360px;display:block;margin:0 auto}
+.zt{cursor:pointer}
+.tier{fill:none;stroke:var(--line2);stroke-width:1;transition:.5s}
+.zt:hover .tier{stroke:var(--gold2)}
+.zt.on .tier{fill:var(--gold);stroke:var(--gold)}
+.zt.on:hover .tier{fill:var(--gold2)}
+.tn{font:400 21px 'Marcellus';text-anchor:middle;fill:var(--mut);pointer-events:none;transition:.5s}
+.zt.on .tn{fill:#1a1409}
+.spire{fill:none;stroke:var(--line2);stroke-width:1}
+.spirel{stroke:var(--gold);stroke-width:1.5}
+.zig-cap{text-align:center;margin-top:20px;color:var(--mut);font-size:14px}
+.zig-cap b{font:400 17px 'Marcellus';color:var(--gold2)}
+
+/* реестр уровней — строки, а не карточки */
+.lvl{
+  display:grid;grid-template-columns:88px 1fr auto;gap:26px;align-items:center;
+  padding:30px 10px;border-bottom:1px solid var(--line);cursor:pointer;transition:.25s;
+}
+.lvl:first-of-type{border-top:1px solid var(--line)}
+.lvl:hover{background:rgba(201,164,92,.05)}
+.lvl .rn{font:400 46px 'Marcellus';color:var(--gold);line-height:1;transition:.4s}
+.lvl.locked{opacity:.5;cursor:default}
+.lvl.locked:hover{background:none}
+.lvl h3{font-size:21px}
+.lvl p{color:var(--mut);font-size:14.5px;margin-top:3px;max-width:56ch}
+.lvl .meta{display:flex;gap:16px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.lvl .need{font:500 10px 'Jost';letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.lbar{width:190px;height:2px;background:rgba(201,164,92,.14);position:relative}
+.lbar i{position:absolute;left:0;top:0;bottom:0;background:var(--gold);transition:width .6s}
+.lvl .cnt{font-size:12.5px;letter-spacing:.06em;color:var(--mut)}
+.lvl .side{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+.lock-ic{color:var(--mut)}
+@media(max-width:640px){
+  .lvl{grid-template-columns:56px 1fr;gap:16px}
+  .lvl .rn{font-size:32px}
+  .lvl .side{grid-column:2;flex-direction:row;align-items:center}
+  .lbar{width:120px}
+}
+
+/* ============ ПРИНЦИПЫ ============ */
+.steps{margin-top:70px}
+.step{display:flex;gap:34px;align-items:baseline;padding:26px 0;border-bottom:1px solid var(--line)}
+.step:nth-child(2){margin-left:7%}
+.step:nth-child(3){margin-left:14%}
+.step .n{font:400 40px 'Marcellus';color:var(--gold);flex:none;width:64px}
+.step h4{font-size:19px;margin-bottom:4px}
+.step p{color:var(--mut);font-size:15px;max-width:64ch}
+@media(max-width:640px){.step:nth-child(2),.step:nth-child(3){margin-left:0}}
+
+/* ============ ТЕСТ ============ */
+#view-quiz{padding:116px 30px 90px;min-height:100vh}
+.quiz-top{
+  max-width:780px;margin:0 auto 24px;display:flex;justify-content:space-between;
+  align-items:center;gap:14px;flex-wrap:wrap;
+}
+.linkback{
+  display:inline-flex;align-items:center;gap:9px;background:none;border:none;cursor:pointer;
+  color:var(--mut);font:500 11px 'Jost';letter-spacing:.22em;text-transform:uppercase;transition:.2s;
+}
+.linkback:hover{color:var(--gold2)}
+.qmark{font:500 11.5px 'Jost';letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+.panel{
+  max-width:780px;margin:0 auto;position:relative;
+  border:1px solid var(--line2);background:var(--glass);
+  backdrop-filter:blur(18px);padding:48px 52px 42px;
+}
+.panel::before,.panel::after{content:'';position:absolute;width:28px;height:28px;pointer-events:none}
+.panel::before{top:-1px;left:-1px;border-top:2px solid var(--gold);border-left:2px solid var(--gold)}
+.panel::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--gold);border-right:2px solid var(--gold)}
+@media(max-width:640px){.panel{padding:34px 22px 30px}}
+.q-eyebrow{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 10.5px 'Jost';letter-spacing:.26em;text-transform:uppercase;color:var(--gold)}
+.q-text{font-size:clamp(20px,2.6vw,26px);margin:18px 0 8px;line-height:1.4}
+.multi-note{font:500 11px 'Jost';letter-spacing:.2em;text-transform:uppercase;color:var(--gold2);margin-bottom:6px}
+.opts{margin-top:20px}
+.opts.lock .opt{pointer-events:none}
+.opt{
+  display:flex;gap:16px;align-items:flex-start;padding:14px 17px;margin-top:11px;
+  border:1px solid rgba(201,164,92,.17);cursor:pointer;transition:.2s;font-size:15.5px;line-height:1.5;
+}
+.opt:hover{border-color:var(--gold);background:rgba(201,164,92,.06)}
+.box{flex:none;width:20px;height:20px;border:1px solid var(--gold);margin-top:3px;position:relative;transition:.2s}
+.opt.sel .box::after{content:'';position:absolute;inset:4px;background:var(--gold);transform:rotate(45deg)}
+.opt.correct{border-color:var(--gold);background:rgba(201,164,92,.14)}
+.opt.correct .box{background:var(--gold)}
+.opt.wrong{border-color:var(--bad);background:rgba(201,106,85,.09)}
+.opt.dim{opacity:.38}
+.actions{display:flex;justify-content:flex-end;margin-top:26px}
+.feedback{border-top:1px solid var(--line);margin-top:26px;padding-top:22px}
+.verdict{display:flex;align-items:center;gap:10px;font:400 19px 'Marcellus'}
+.verdict.ok{color:var(--gold2)}
+.verdict.no{color:var(--bad)}
+.verdict .xp{margin-left:auto;font:500 11px 'Jost';letter-spacing:.2em;color:var(--gold);border:1px solid var(--line2);padding:5px 11px}
+.expl{color:var(--mut);font-size:15px;margin:12px 0 4px;max-width:66ch}
+.kbd-hint{max-width:780px;margin:18px auto 0;text-align:center;font-size:11.5px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase}
+/* завершение уровня */
+.done{max-width:640px;margin:40px auto;text-align:center}
+.done .orn{display:flex;justify-content:center;gap:12px;margin-bottom:22px}
+.done .orn i{width:8px;height:8px;background:var(--gold);transform:rotate(45deg)}
+.done .orn i:nth-child(2){width:12px;height:12px;border:1px solid var(--gold);background:none}
+.done h3{font-size:30px;margin-bottom:8px}
+.done .dstats{color:var(--mut);margin-bottom:30px}
+.done .row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ============ ПОРТФОЛИО ============ */
+#view-portfolio{padding:116px 30px 80px;min-height:100vh}
+.pf-actions{display:flex;gap:12px;flex-wrap:wrap}
+.cert{max-width:940px;margin:34px auto 0;border:1px solid var(--gold);padding:11px;position:relative}
+.cert-inner{border:1px solid var(--line);padding:56px 60px 44px;position:relative}
+@media(max-width:640px){.cert-inner{padding:36px 22px 30px}}
+.cdia{position:absolute;width:9px;height:9px;background:var(--gold);transform:rotate(45deg)}
+.cdia.tl{top:-5px;left:-5px}.cdia.tr{top:-5px;right:-5px}.cdia.bl{bottom:-5px;left:-5px}.cdia.br{bottom:-5px;right:-5px}
+.pf-head{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.pf-head h2{font-size:clamp(30px,4vw,42px);margin:12px 0 4px}
+.pf-date{font:500 11px 'Jost';letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
+.name-in{
+  display:block;background:transparent;border:none;border-bottom:1px solid var(--line2);
+  color:var(--gold2);font:400 27px 'Marcellus';letter-spacing:.05em;padding:8px 2px;
+  width:min(440px,100%);margin:26px 0 8px;text-align:center;
+}
+.name-in::placeholder{color:rgba(148,135,103,.5)}
+.name-in:focus{outline:none;border-bottom-color:var(--gold)}
+.name-cap{text-align:center;font:500 10px 'Jost';letter-spacing:.26em;text-transform:uppercase;color:var(--mut)}
+.pf-sum{margin:30px auto 0;max-width:64ch;text-align:center;color:var(--ivory)}
+.seal{position:absolute;top:34px;right:40px;width:132px;height:132px}
+@media(max-width:760px){.seal{position:static;margin:20px auto 0;display:block}}
+.s-out{fill:none;stroke:var(--gold);stroke-width:1.4}
+.s-in{fill:none;stroke:var(--line2);stroke-width:1}
+.s-txt{font:500 10.5px 'Jost';letter-spacing:3px;fill:var(--gold);transform-origin:80px 80px;animation:spin 70s linear infinite}
+.s-num{font:400 30px 'Marcellus';fill:var(--gold2);text-anchor:middle}
+.s-cap{font:500 9px 'Jost';letter-spacing:3px;fill:var(--mut);text-anchor:middle}
+.pf-sec{margin-top:46px}
+.pf-sec h3{font-size:21px;display:flex;align-items:center;gap:14px}
+.pf-sec h3::after{content:'';flex:1;height:1px;background:var(--line)}
+.kmap .row{display:grid;grid-template-columns:250px 1fr 70px;gap:18px;align-items:center;padding:12px 2px;border-bottom:1px dashed rgba(201,164,92,.15)}
+@media(max-width:640px){.kmap .row{grid-template-columns:1fr 90px}.kmap .row .kbar{grid-column:1/3;order:3}}
+.kname{font-size:15px}
+.kval{text-align:right;font:400 15px 'Marcellus';color:var(--gold2)}
+.kbar{height:2px;background:rgba(201,164,92,.13);position:relative}
+.kbar i{position:absolute;left:0;top:0;bottom:0;background:var(--gold);transition:width .8s}
+.kbar i::after{content:'';position:absolute;right:-4px;top:50%;width:9px;height:9px;background:var(--gold2);transform:translateY(-50%) rotate(45deg)}
+.pf-lv{display:flex;gap:22px;align-items:baseline;padding:13px 2px;border-bottom:1px dashed rgba(201,164,92,.15)}
+.pf-lv .rn{font:400 27px 'Marcellus';color:var(--gold);width:44px;flex:none}
+.pf-lv b{font:400 17px 'Marcellus'}
+.pf-lv .st{margin-left:auto;font:500 10.5px 'Jost';letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+.pf-lv .st.ok{color:var(--gold2)}
+.pf-cols{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:14px}
+@media(max-width:640px){.pf-cols{grid-template-columns:1fr}}
+.pf-cols h4{font-size:15px;letter-spacing:.1em;text-transform:uppercase;font-family:'Jost';font-weight:500;color:var(--gold2);margin-bottom:10px}
+.pf-cols ul{list-style:none}
+.pf-cols li{padding:7px 0;border-bottom:1px dashed rgba(201,164,92,.12);font-size:14.5px;color:var(--mut);display:flex;justify-content:space-between;gap:10px}
+.pf-cols li b{color:var(--ivory);font-weight:400}
+.pf-foot{margin-top:52px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.pf-sign{font:400 22px 'Marcellus';color:var(--gold2);border-bottom:1px solid var(--line2);padding:0 26px 8px}
+.pf-foot .cap{font:500 10px 'Jost';letter-spacing:.24em;text-transform:uppercase;color:var(--mut)}
+
+/* ============ ПОДВАЛ ============ */
+.foot{border-top:1px solid var(--line);margin-top:100px;padding:48px 30px 60px;text-align:center;position:relative;z-index:2}
+.foot .brand{justify-content:center;margin-bottom:14px}
+.foot p{color:var(--mut);font-size:13px}
+.linkish{background:none;border:none;cursor:pointer;color:var(--gold);font:500 11px 'Jost';letter-spacing:.2em;text-transform:uppercase;display:inline-flex;gap:8px;align-items:center;margin-top:18px}
+.linkish:hover{color:var(--gold2)}
+
+/* ============ ТОСТ И МОДАЛЫ ============ */
+#toast{
+  position:fixed;left:50%;bottom:36px;transform:translate(-50%,18px);opacity:0;z-index:220;
+  background:rgba(21,17,9,.94);border:1px solid var(--gold);padding:13px 24px;
+  font:400 13.5px 'Jost';letter-spacing:.05em;pointer-events:none;transition:.35s;max-width:88vw;text-align:center;
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(7,5,2,.74);backdrop-filter:blur(7px);opacity:0;pointer-events:none;transition:.3s;padding:20px}
+.modal.show{opacity:1;pointer-events:auto}
+.modal .mbox{
+  max-width:460px;width:100%;text-align:center;position:relative;
+  background:rgba(24,19,10,.97);border:1px solid var(--gold);padding:48px 40px 40px;
+  transform:translateY(16px);transition:.4s;
+}
+.modal.show .mbox{transform:none}
+.mbox .orn{display:flex;justify-content:center;gap:11px;margin-bottom:20px}
+.mbox .orn i{width:7px;height:7px;background:var(--gold);transform:rotate(45deg)}
+.mbox .orn i:nth-child(2){width:11px;height:11px;border:1px solid var(--gold);background:none}
+.mbox h3{font-size:27px;margin-bottom:10px}
+.mbox p{color:var(--mut);font-size:15px}
+.mbox .row{display:flex;gap:12px;justify-content:center;margin-top:28px;flex-wrap:wrap}
+
+/* ============ ПОЯВЛЕНИЕ ПРИ СКРОЛЛЕ ============ */
+.rv{opacity:0;transform:translateY(24px);transition:.75s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+
+/* ============ ПЕЧАТЬ / PDF ============ */
+@media print{
+  @page{margin:15mm}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff}
+  body::before,body::after,.topbar,.foot,#sun,.no-print,#view-home,#view-quiz{display:none!important}
+  #view-portfolio{display:block!important;padding:0!important;min-height:0}
+  #view-portfolio,#view-portfolio *{color:#241a0c}
+  #view-portfolio .gold,#view-portfolio .pf-sec h3,#view-portfolio .kval,#view-portfolio .pf-lv .rn{color:#8a6a2f}
+  #view-portfolio .mut,#view-portfolio .pf-date,#view-portfolio .pf-lv .st{color:#6b5c42}
+  .cert{border-color:#241a0c;max-width:none}
+  .cert-inner{border-color:#a8915f}
+  .name-in{color:#241a0c;border-bottom-color:#8a6a2f}
+  .kbar{background:#e6ddc8}
+  .kbar i{background:#a2793b}
+  .kbar i::after{background:#a2793b}
+  .kmap .row,.pf-lv,.pf-cols li{border-color:#ddd2b6}
+  .strip .cell b{color:#241a0c}
+  #view-portfolio svg text{fill:#241a0c}
+  #view-portfolio .s-txt{fill:#8a6a2f}
+  #view-portfolio .s-num{fill:#241a0c}
+  .cert,.pf-lv,.kmap .row{page-break-inside:avoid}
+}
+</style>
 </head>
 <body>
-<svg hidden aria-hidden="true" class="icon-sprite">
-<symbol id="icon-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></symbol>
-<symbol id="icon-today" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/></symbol>
-<symbol id="icon-roadmap" viewBox="0 0 24 24"><circle cx="5" cy="12" r="3"/><circle cx="19" cy="12" r="3"/><line x1="8" y1="12" x2="16" y2="12"/></symbol>
-<symbol id="icon-mindmap" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><line x1="12" y1="4" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="20"/></symbol>
-<symbol id="icon-course" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><line x1="8" y1="8" x2="16" y2="8"/></symbol>
-<symbol id="icon-notes" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></symbol>
-<symbol id="icon-questions" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9 a3 3 0 0 1 6 0 c0 2-2 2-2 4"/><circle cx="12" cy="18" r="1"/></symbol>
-<symbol id="icon-repetition" viewBox="0 0 24 24"><path d="M3 12 a9 9 0 0 1 9-9"/><polyline points="12,3 12,8 17,8"/><path d="M21 12 a9 9 0 0 1-9 9"/></symbol>
-<symbol id="icon-practice" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/><path d="M8 12 l3 3 l5-6"/></symbol>
-<symbol id="icon-portfolio" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12"/><path d="M8 7 V5 h8 v2"/></symbol>
-<symbol id="icon-glossary" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><line x1="7" y1="7" x2="17" y2="7"/><line x1="7" y1="11" x2="17" y2="11"/></symbol>
-<symbol id="icon-pomodoro" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><line x1="12" y1="13" x2="12" y2="8"/><line x1="12" y1="5" x2="12" y2="2"/></symbol>
-<symbol id="icon-stats" viewBox="0 0 24 24"><rect x="4" y="14" width="3" height="7"/><rect x="10" y="10" width="3" height="11"/><rect x="16" y="5" width="3" height="16"/></symbol>
-<symbol id="icon-resources" viewBox="0 0 24 24"><path d="M4 6 h16 v12 H4 Z"/><line x1="4" y1="6" x2="12" y2="13"/><line x1="20" y1="6" x2="12" y2="13"/></symbol>
-<symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2 v3 M12 19 v3 M2 12 h3 M19 12 h3"/></symbol>
-<symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/></symbol>
-<symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
-<symbol id="icon-close" viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></symbol>
-<symbol id="icon-chevron" viewBox="0 0 24 24"><polyline points="9,5 15,12 9,19"/></symbol>
-<symbol id="icon-collapse" viewBox="0 0 24 24"><polyline points="14,5 8,12 14,19"/><line x1="16" y1="5" x2="16" y2="19"/></symbol>
-<symbol id="icon-theme-light" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/></symbol>
-<symbol id="icon-theme-dark" viewBox="0 0 24 24"><path d="M12 3 a9 9 0 1 0 9 9 a7 7 0 0 1-9-9"/></symbol>
-<symbol id="icon-save" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/><rect x="7" y="4" width="8" height="6"/></symbol>
-<symbol id="icon-export" viewBox="0 0 24 24"><polyline points="12,3 12,14"/><polyline points="7,9 12,14 17,9"/><rect x="4" y="16" width="16" height="4"/></symbol>
-<symbol id="icon-import" viewBox="0 0 24 24"><polyline points="12,21 12,10"/><polyline points="7,15 12,10 17,15"/><rect x="4" y="4" width="16" height="4"/></symbol>
-<symbol id="icon-check" viewBox="0 0 24 24"><polyline points="5,13 10,18 19,7"/></symbol>
+
+<!-- набор иконок -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5 10 18 20 6" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-arr" viewBox="0 0 24 24"><path d="M4 12h15M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 12H5M11 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H4V9h16v8h-3M7 14h10v7H7z" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
 </svg>
-<a href="#main-content" class="skip-link">Перейти к содержимому</a>
-<input type="file" id="import-file-input" hidden accept="application/json,.json" aria-label="Выбрать файл резервной копии">
-<div id="app-wrapper">
-<aside id="sidebar" aria-label="Разделы приложения">
-<div class="sidebar__header">
-<a href="#dashboard" class="sidebar__logo" aria-label="На главную">QA Study Portfolio</a>
-<button type="button" class="sidebar__collapse" aria-label="Свернуть меню" aria-controls="sidebar" aria-expanded="true">
-<svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-collapse"></use></svg>
-</button>
-</div>
-<!-- FALLBACK: дублирует NAV_ITEMS / HEADER из js/core/main.js часть 1. При изменении подписей менять в обоих местах. -->
-<nav aria-label="Основная навигация">
-    <svg hidden aria-hidden="true" class="icon-sprite" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="icon-dashboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></symbol>
-  <symbol id="icon-today" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></symbol>
-  <symbol id="icon-roadmap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="12" r="3"/><path d="M9 12h6"/></symbol>
-  <symbol id="icon-mindmap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M5 5l6 5M19 5l-6 5M12 21v-6"/></symbol>
-  <symbol id="icon-course" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v10l-8 4-8-4V7z"/><path d="M12 7v10M4 7l8 4 8-4"/></symbol>
-  <symbol id="icon-notes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></symbol>
-  <symbol id="icon-questions" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 10a3 3 0 0 1 6 0c0 2-3 2-3 4"/><circle cx="12" cy="18" r="1"/></symbol>
-  <symbol id="icon-repetition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7V4M20 7h-3"/><path d="M4 17v3M4 17h3"/><path d="M20 7a8 8 0 0 0-14-3M4 17a8 8 0 0 0 14 3"/></symbol>
-  <symbol id="icon-practice" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12l3 3 5-6"/></symbol>
-  <symbol id="icon-portfolio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5h8v2"/></symbol>
-  <symbol id="icon-glossary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h8v16H4zM12 4h8v16h-8z"/><path d="M8 8h3M8 12h3"/></symbol>
-  <symbol id="icon-pomodoro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 13V8M12 5V2M9 2h6"/></symbol>
-  <symbol id="icon-stats" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M7 19v-6M12 19V9M17 19v-9"/></symbol>
-  <symbol id="icon-resources" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v12H4z"/><path d="M4 6l8 6 8-6"/></symbol>
-  <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
-  <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l6 6"/></symbol>
-  <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
-  <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></symbol>
-  <symbol id="icon-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></symbol>
-  <symbol id="icon-collapse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 6l-6 6 6 6M20 6l-6 6 6 6"/></symbol>
-  <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></symbol>
-  <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13A8 8 0 0 1 11 4a8 8 0 1 0 9 9z"/></symbol>
-  <symbol id="icon-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h12l3 3v15H5z"/><path d="M8 3v5h8V3M8 21v-7h8v7"/></symbol>
-  <symbol id="icon-export" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v10M7 8l5 5 5-5"/><path d="M4 19h16"/></symbol>
-  <symbol id="icon-import" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/></symbol>
-  <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></symbol>
-</svg>
-<a class="nav-item active" href="#dashboard" aria-current="page"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-dashboard"></use></svg><span class="nav-item__label">Главная</span><span class="nav-item__desc">Обзор прогресса</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#today"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-today"></use></svg><span class="nav-item__label">Сегодня</span><span class="nav-item__desc">Задачи на день</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#roadmap"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-roadmap"></use></svg><span class="nav-item__label">Учебный маршрут</span><span class="nav-item__desc">План по модулям</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#mindmap"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-mindmap"></use></svg><span class="nav-item__label">Карта знаний</span><span class="nav-item__desc">Связи тем</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#course"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-course"></use></svg><span class="nav-item__label">Курс</span><span class="nav-item__desc">Модули и уроки</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#notes"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-notes"></use></svg><span class="nav-item__label">Заметки</span><span class="nav-item__desc">Конспекты</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#questions"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-questions"></use></svg><span class="nav-item__label">Вопросы</span><span class="nav-item__desc">База вопросов</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#repetition"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-repetition"></use></svg><span class="nav-item__label">Повторение</span><span class="nav-item__desc">Карточки</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#practice"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-practice"></use></svg><span class="nav-item__label">Практика</span><span class="nav-item__desc">Задания</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#portfolio"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-portfolio"></use></svg><span class="nav-item__label">Портфолио</span><span class="nav-item__desc">Проекты</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#glossary"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-glossary"></use></svg><span class="nav-item__label">Словарь</span><span class="nav-item__desc">Термины</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#pomodoro"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-pomodoro"></use></svg><span class="nav-item__label">Pomodoro</span><span class="nav-item__desc">Таймер фокуса</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#stats"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-stats"></use></svg><span class="nav-item__label">Статистика</span><span class="nav-item__desc">Прогресс</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#resources"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-resources"></use></svg><span class="nav-item__label">Материалы</span><span class="nav-item__desc">Справки</span><span class="nav-item__badge" hidden>0</span></a>
-<a class="nav-item" href="#settings"><svg class="icon nav-item__icon" aria-hidden="true" focusable="false"><use href="#icon-settings"></use></svg><span class="nav-item__label">Настройки</span><span class="nav-item__desc">Система</span><span class="nav-item__badge" hidden>0</span></a>
-</nav>
-</aside>
-<div class="main-container">
-<!-- FALLBACK: дублирует NAV_ITEMS / HEADER из js/core/main.js часть 1. При изменении подписей менять в обоих местах. -->
-<header id="header" class="bg-sunburst">
-<button type="button" class="hamburger" aria-label="Меню" aria-expanded="false" aria-controls="sidebar">
-<svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-menu"></use></svg>
-</button>
-<h1>Главная</h1>
-<div class="header__actions">
-<label for="header-search" class="visually-hidden">Поиск</label>
-<input type="search" id="header-search" placeholder="Поиск">
-<button type="button" class="header__save" aria-label="Сохранить">
-<svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-save"></use></svg>
-</button>
-<button type="button" class="header__theme" aria-label="Переключить тему">
-<svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-theme-light"></use></svg>
-<svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-theme-dark"></use></svg>
-</button>
-</div>
+
+<header class="topbar" id="topbar">
+  <a class="brand" href="#" onclick="go('home');return false"><i class="d"></i><span>MAISON&nbsp;QA</span></a>
+  <nav class="nav">
+    <button id="nav-home" onclick="go('home')">Башня знаний</button>
+    <button id="nav-portfolio" onclick="go('portfolio')">Портфолио</button>
+    <span class="chip" id="chip-xp">Опыт 0%</span>
+  </nav>
 </header>
-<!-- FALLBACK: дублирует NAV_ITEMS / HEADER из js/core/main.js часть 1. При изменении подписей менять в обоих местах. -->
-<nav id="breadcrumbs" aria-label="Хлебные крошки">
-<ol>
-<li><a href="#dashboard">Главная</a></li>
-</ol>
-</nav>
-<!-- FALLBACK: дублирует NAV_ITEMS / HEADER из js/core/main.js часть 1. При изменении подписей менять в обоих местах. -->
-<main id="main-content" tabindex="-1">
-<noscript>
-<div class="empty-state">
-<h2>Включите JavaScript</h2>
-<p>Приложение работает локально, без сервера и без интернета. Для отображения курса и сохранения прогресса нужен JavaScript.</p>
-</div>
-</noscript>
-<div class="empty-state bg-diamonds">
-<h2>QA Study Portfolio</h2>
-<p>Локальный учебный кабинет. Выберите раздел для начала работы.</p>
-<ul>
-<li><a href="#dashboard">Главная — Обзор прогресса</a></li>
-<li><a href="#today">Сегодня — Задачи на день</a></li>
-<li><a href="#roadmap">Учебный маршрут — План по модулям</a></li>
-<li><a href="#mindmap">Карта знаний — Связи тем</a></li>
-<li><a href="#course">Курс — Модули и уроки</a></li>
-<li><a href="#notes">Заметки — Конспекты</a></li>
-<li><a href="#questions">Вопросы — База вопросов</a></li>
-<li><a href="#repetition">Повторение — Карточки</a></li>
-<li><a href="#practice">Практика — Задания</a></li>
-<li><a href="#portfolio">Портфолио — Проекты</a></li>
-<li><a href="#glossary">Словарь — Термины</a></li>
-<li><a href="#pomodoro">Pomodoro — Таймер фокуса</a></li>
-<li><a href="#stats">Статистика — Прогресс</a></li>
-<li><a href="#resources">Материалы — Справки</a></li>
-<li><a href="#settings">Настройки — Система</a></li>
-</ul>
-</div>
+
+<main>
+<!-- ================= ГЛАВНАЯ ================= -->
+<section id="view-home">
+  <div class="hero">
+    <svg id="sun" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="inner">
+      <span class="eyebrow">Школа инженера-автоматизатора</span>
+      <h1>MAISON <em>QA</em></h1>
+      <p class="sub">Ар-деко академия тестирования. 250 проверок знаний на пяти этажах башни —
+      система сама отслеживает, что вы уже знаете, и собирает это в портфолио, готовое к выгрузке в PDF.</p>
+      <div class="divider"><span></span><i></i><i class="o"></i><i></i><span></span></div>
+      <div class="cta">
+        <a class="btn solid" href="#tower">Начать восхождение</a>
+        <button class="btn" onclick="go('portfolio')">Моё портфолио</button>
+      </div>
+      <div class="strip" id="homeStrip">
+        <div class="cell"><b id="st-rank">Стажёр</b><span>Ранг</span></div>
+        <div class="cell"><b id="st-xp">0%</b><span>Опыт знаний</span></div>
+        <div class="cell"><b id="st-done">0/250</b><span>Освоено проверок</span></div>
+        <div class="cell"><b id="st-acc">—</b><span>Точность</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="section" id="tower">
+      <div class="sec-head rv"><span class="no">ЭТАЖ I — V</span><h2>Башня знаний</h2></div>
+      <p class="sec-sub rv">Каждый верный ответ — плюс один к опыту. Пороги в 25%, 50% и 75% открывают следующие
+      этажи; на вершине ждёт финальный экзамен мастерской. Опыт считается по 230 базовым проверкам уровней I–IV.</p>
+
+      <div class="rail rv">
+        <div class="track"></div>
+        <div class="fill" id="railFill" style="width:0%"></div>
+        <div class="knob" id="railKnob" style="left:0%"></div>
+        <span class="tick" style="left:25%"><i>II</i><em>25%</em></span>
+        <span class="tick" style="left:50%"><i>III</i><em>50%</em></span>
+        <span class="tick" style="left:75%"><i>IV</i><em>75%</em></span>
+        <span class="tick" style="left:100%"><i>V</i><em>100%</em></span>
+      </div>
+      <div class="rail-cap rv"><b id="railXp">0%</b> опыта знаний · <span id="railCnt">0 из 250</span> верных ответов</div>
+
+      <div class="tower-grid">
+        <div class="rv">
+          <div id="zigg-host"></div>
+          <div class="zig-cap">Ранг: <b id="zigRank">Стажёр QA</b></div>
+        </div>
+        <div id="ledger" class="rv"></div>
+      </div>
+
+      <div class="steps rv">
+        <div class="step"><span class="n">01</span><div><h4>Отвечайте</h4><p>Вопросы в виде чекбоксов: часть требует одного варианта, часть — нескольких. Каждый ответ разбирается с пояснением.</p></div></div>
+        <div class="step"><span class="n">02</span><div><h4>Растите</h4><p>Этаж за этажом — от базы, доступной с нуля, до мастерской автоматизации. Прогресс хранится в браузере и не теряется.</p></div></div>
+        <div class="step"><span class="n">03</span><div><h4>Собирайте портфолио</h4><p>Освоенные темы, карта знаний и ранг фиксируются автоматически — страница портфолио выгружается в аккуратный PDF.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ТЕСТ ================= -->
+<section id="view-quiz" hidden>
+  <div id="quiz-live">
+    <div class="quiz-top">
+      <button class="linkback" onclick="go('home')"><svg class="ic"><use href="#i-back"/></svg>В башню</button>
+      <span class="qmark" id="q-counter">Вопрос 1 из 10</span>
+    </div>
+    <div class="panel">
+      <div class="q-eyebrow"><span id="q-eyebrow">Уровень I</span><span id="q-topic"></span></div>
+      <h3 class="q-text" id="q-text"></h3>
+      <div class="multi-note" id="q-multi" hidden>Выберите несколько вариантов</div>
+      <div class="opts" id="opts"></div>
+      <div class="feedback" id="q-fb" hidden>
+        <div class="verdict" id="fb-verdict"></div>
+        <p class="expl" id="fb-expl"></p>
+        <div class="actions"><button class="btn solid" id="btn-next">Далее <svg class="ic"><use href="#i-arr"/></svg></button></div>
+      </div>
+      <div class="actions" id="q-actions"><button class="btn solid" id="btn-ans" disabled>Ответить</button></div>
+    </div>
+    <div class="kbd-hint">1–4 — выбор вариантов · Enter — ответить / далее</div>
+  </div>
+  <div id="quiz-done" hidden></div>
+</section>
+
+<!-- ================= ПОРТФОЛИО ================= -->
+<section id="view-portfolio" hidden>
+  <div class="wrap">
+    <div class="sec-head no-print" style="justify-content:space-between;flex-wrap:wrap">
+      <div style="display:flex;align-items:baseline;gap:24px">
+        <span class="no">СВИДЕТЕЛЬСТВО</span><h2>Портфолио знаний</h2>
+      </div>
+      <div class="pf-actions">
+        <button class="btn solid sm" id="btn-pdf"><svg class="ic"><use href="#i-print"/></svg>Скачать PDF</button>
+        <button class="btn sm" onclick="go('home')">К башне</button>
+      </div>
+    </div>
+
+    <div class="cert">
+      <i class="cdia tl"></i><i class="cdia tr"></i><i class="cdia bl"></i><i class="cdia br"></i>
+      <div class="cert-inner" id="certBody">
+        <svg class="seal" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+          <defs><path id="cir" d="M80 13 a67 67 0 1 1 -0.01 0"/></defs>
+          <circle class="s-out" cx="80" cy="80" r="77"/>
+          <circle class="s-in" cx="80" cy="80" r="56"/>
+          <text class="s-txt"><textPath href="#cir">MAISON QA · ПОРТФОЛИО ЗНАНИЙ · ШКОЛА АВТОМАТИЗАЦИИ ·</textPath></text>
+          <text class="s-num" id="sealNum" x="80" y="78">0%</text>
+          <text class="s-cap" x="80" y="99">ОПЫТ</text>
+        </svg>
+
+        <div class="pf-head">
+          <div>
+            <span class="eyebrow">MAISON QA · Аттестация</span>
+            <h2>Портфолио <span class="gold">инженера QA</span></h2>
+            <span class="pf-date" id="pf-date"></span>
+          </div>
+          <div class="chip" id="pf-rank" style="margin-top:14px">Стажёр QA</div>
+        </div>
+
+        <input class="name-in" id="pf-name" placeholder="Впишите ваше имя" maxlength="60">
+        <div class="name-cap">подпись владельца</div>
+
+        <p class="pf-sum" id="pf-sum"></p>
+
+        <div class="strip" id="pf-stats"></div>
+
+        <div class="pf-sec kmap"><h3>Карта знаний</h3><div id="pf-map"></div></div>
+        <div class="pf-sec"><h3>Этажи башни</h3><div id="pf-levels"></div></div>
+        <div class="pf-sec pf-cols">
+          <div><h4>Сильные зоны</h4><ul id="pf-strong"></ul></div>
+          <div><h4>Зоны роста</h4><ul id="pf-gaps"></ul></div>
+        </div>
+
+        <div class="pf-foot">
+          <div><div class="pf-sign" id="pf-signline">MAISON QA</div><div class="cap">проверено системой аттестации</div></div>
+          <div class="cap">250 проверок · 5 этажей · ар-деко академия тестирования</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 </main>
-<aside id="context-panel" aria-label="Контекстная панель"></aside>
+
+<footer class="foot">
+  <a class="brand" href="#" onclick="go('home');return false"><i class="d"></i><span>MAISON&nbsp;QA</span></a>
+  <p>Прогресс хранится локально в вашем браузере · вопросы в виде чекбоксов · портфолио выгружается в PDF</p>
+  <button class="linkish" onclick="askReset()"><svg class="ic"><use href="#i-reset"/></svg>Сбросить прогресс</button>
+</footer>
+
+<div id="toast"></div>
+
+<!-- модал открытия уровня -->
+<div class="modal" id="mUnlock">
+  <div class="mbox">
+    <div class="orn"><i></i><i></i><i></i></div>
+    <h3 id="mu-title"></h3>
+    <p id="mu-text"></p>
+    <div class="row">
+      <button class="btn solid" id="mu-go">К уровню</button>
+      <button class="btn" onclick="closeModal('mUnlock')">Позже</button>
+    </div>
+  </div>
 </div>
+
+<!-- модал сброса -->
+<div class="modal" id="mReset">
+  <div class="mbox">
+    <div class="orn"><i></i><i></i><i></i></div>
+    <h3>Начать с нуля?</h3>
+    <p>Весь опыт, освоенные проверки и портфолио будут удалены безвозвратно.</p>
+    <div class="row">
+      <button class="btn" onclick="closeModal('mReset')">Отмена</button>
+      <button class="btn solid" id="btn-reset-yes">Сбросить</button>
+    </div>
+  </div>
 </div>
-<div id="modals">
-<div class="modal" id="onboarding-modal" hidden role="dialog" aria-modal="true" aria-labelledby="onboarding-modal-title">
-<div class="modal__overlay"></div>
-<div class="modal__dialog">
-<h2 class="modal__title" id="onboarding-modal-title">Добро пожаловать</h2>
-<div class="modal__body"></div>
-<button type="button" class="modal__close" aria-label="Закрыть"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"></use></svg></button>
-</div>
-</div>
-<div class="modal" id="search-modal" hidden role="dialog" aria-modal="true" aria-labelledby="search-modal-title">
-<div class="modal__overlay"></div>
-<div class="modal__dialog">
-<h2 class="modal__title" id="search-modal-title">Поиск</h2>
-<div class="modal__body"></div>
-<button type="button" class="modal__close" aria-label="Закрыть"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"></use></svg></button>
-</div>
-</div>
-<div class="modal" id="confirm-modal" hidden role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
-<div class="modal__overlay"></div>
-<div class="modal__dialog">
-<h2 class="modal__title" id="confirm-modal-title">Подтверждение</h2>
-<div class="modal__body"></div>
-<button type="button" class="modal__close" aria-label="Закрыть"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"></use></svg></button>
-</div>
-</div>
-<div class="modal" id="tag-manager-modal" hidden role="dialog" aria-modal="true" aria-labelledby="tag-manager-modal-title">
-<div class="modal__overlay"></div>
-<div class="modal__dialog">
-<h2 class="modal__title" id="tag-manager-modal-title">Управление тегами</h2>
-<div class="modal__body"></div>
-<button type="button" class="modal__close" aria-label="Закрыть"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"></use></svg></button>
-</div>
-</div>
-<div class="modal" id="sharing-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sharing-modal-title">
-<div class="modal__overlay"></div>
-<div class="modal__dialog">
-<h2 class="modal__title" id="sharing-modal-title">Обмен</h2>
-<div class="modal__body"></div>
-<button type="button" class="modal__close" aria-label="Закрыть"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"></use></svg></button>
-</div>
-</div>
-<div class="modal" id="presentation-modal" hidden role="dialog" aria-modal="true" aria-labelledby="presentation-modal-title">
-<div class="modal__overlay"></div>
-<div class="modal__dialog">
-<h2 class="modal__title" id="presentation-modal-title">Презентация</h2>
-<div class="modal__body"></div>
-<button type="button" class="modal__close" aria-label="Закрыть"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"></use></svg></button>
-</div>
-</div>
-</div>
-<div id="toast-container" role="region" aria-label="Уведомления" aria-live="polite"></div>
-<div id="save-indicator" role="status" data-state="idle"><span class="save-indicator__text"></span><span class="visually-hidden"></span></div>
-<script defer src="js/utils/course-data.js"></script>
-<script defer src="js/utils/utils.js"></script>
-<script defer src="js/logic/idb.js"></script>
-<script defer src="js/logic/charts.js"></script>
-<script defer src="js/logic/debug.js"></script>
-<script defer src="js/logic/editor.js"></script>
-<script defer src="js/logic/export.js"></script>
-<script defer src="js/logic/forms.js"></script>
-<script defer src="js/logic/keyboard.js"></script>
-<script defer src="js/core/main.js"></script>
-<script src="js/utils/motion.js"></script>
+
+<script>
+/* ============================================================
+   БАЗА ВОПРОСОВ (250) — ЭТОТ БЛОК МОЖНО ЗАМЕНИТЬ
+   ------------------------------------------------------------
+   Если хотите подставить вопросы из своего course-data.js —
+   просто приведите их к этому формату:
+     { l: 1..5,              — уровень сложности
+       t: 'Тема',            — тема (для карты знаний)
+       q: 'Текст вопроса',
+       o: ['вариант', ...],  — 4+ вариантов
+       a: 2                  — индекс верного варианта (с нуля),
+       a: [0,2,3]            — или массив индексов для «выбрать несколько»
+       e: 'Пояснение'        — необязательно
+     }
+   Порядок вариантов перемешивается автоматически при загрузке.
+============================================================ */
+const RAW = [
+/* ---------- УРОВЕНЬ I · ФУНДАМЕНТ (100) ---------- */
+{l:1,t:'Основы',q:'Что такое тестирование программного обеспечения?',o:['Процесс написания кода для продукта','Процесс проверки ПО на соответствие требованиям и поиск дефектов','Процесс исправления найденных ошибок','Процесс настройки серверного окружения'],a:1,e:'Тестирование — исследование ПО, чтобы найти несоответствия между ожидаемым и фактическим поведением.'},
+{l:1,t:'Основы',q:'Чем занимается QA-инженер?',o:['Пишет продакшн-код','Проектирует интерфейсы','Обеспечивает качество: ищет дефекты и улучшает процессы','Администрирует базы данных'],a:2},
+{l:1,t:'Основы',q:'В чём разница между QA и QC?',o:['Это одно и то же','QC — контроль качества продукта, QA — обеспечение качества процессов','QA пишет код, QC — нет','QC работает только на этапе релиза'],a:1,e:'QA направлено на предотвращение дефектов через процессы, QC — на их обнаружение в готовом продукте.'},
+{l:1,t:'Основы',q:'Верификация отвечает на вопрос…',o:['«Делаем ли мы правильный продукт?»','«Правильно ли мы делаем продукт?»','«Нравится ли продукт пользователям?»','«Сколько стоит продукт?»'],a:1,e:'Верификация — соответствие требованиям; валидация — соответствие ожиданиям пользователя.'},
+{l:1,t:'Основы',q:'Валидация отвечает на вопрос…',o:['«Делаем ли мы правильный продукт?»','«Соответствует ли код стандартам?»','«Правильно ли мы делаем продукт?»','«Покрыт ли код тестами?»'],a:0},
+{l:1,t:'Основы',q:'Что такое дефект (bug)?',o:['Улучшение интерфейса','Расхождение между фактическим и ожидаемым результатом','Новая функция продукта','Ошибка в документации проекта'],a:1},
+{l:1,t:'Основы',q:'Ошибка (error) — это…',o:['Действие человека, приведшее к неверному результату','Автоматический сбой сервера','Отчёт о баге','Падение производительности'],a:0},
+{l:1,t:'Основы',q:'Отказ (failure) — это…',o:['Жалоба пользователя','Отклонение поведения системы от ожидаемого при выполнении','Опечатка в коде','Проблема в требованиях'],a:1},
+{l:1,t:'Основы',q:'Severity дефекта показывает…',o:['Срочность исправления','Степень влияния дефекта на работоспособность системы','Количество найденных багов','Стоимость исправления'],a:1},
+{l:1,t:'Основы',q:'Priority дефекта показывает…',o:['Сложность воспроизведения','Срочность исправления для бизнеса','Глубину проблемы в коде','Важность модуля'],a:1},
+{l:1,t:'Основы',q:'Опечатка в логотипе на главной странице — это…',o:['High severity, High priority','Low severity, High priority','High severity, Low priority','Low severity, Low priority'],a:1,e:'Функционально мелочь (low severity), но видна всем и портит впечатление — чинить быстро (high priority).'},
+{l:1,t:'Документация',q:'Что должно быть в полноценном баг-репорте?',o:['Шаги воспроизведения','Ожидаемый и фактический результат','Окружение и версия сборки','Размер зарплаты разработчика'],a:[0,1,2],e:'Репорт обязан позволять воспроизвести дефект: шаги, ожидание, факт, окружение.'},
+{l:1,t:'Документация',q:'Заголовок (summary) баг-репорта должен быть…',o:['Коротким: «Не работает»','Информативным: что, где и при каких условиях не работает','Как можно более общим','Номером строки в коде'],a:1},
+{l:1,t:'Основы',q:'Статус бага «Open» означает…',o:['Баг закрыт','Баг заведён и ожидает рассмотрения','Баг исправлен','Баг отложен навсегда'],a:1},
+{l:1,t:'Основы',q:'Статус «Fixed» означает…',o:['Баг невозможно исправить','Разработчик исправил баг, ожидает проверки тестировщиком','Баг продублирован','Баг не воспроизводится'],a:1},
+{l:1,t:'Основы',q:'Если после исправления баг воспроизводится снова, ставится статус…',o:['Closed','Rejected','Reopened','Deferred'],a:2},
+{l:1,t:'Основы',q:'Статус «Closed» ставится, когда…',o:['Баг проверен тестировщиком и исправление подтверждено','Разработчику лень чинить','Истёк спринт','Баг попал в бэклог'],a:0},
+{l:1,t:'Основы',q:'Статус «Cannot Reproduce» ставится, если…',o:['Баг критический','Воспроизвести дефект по описанным шагам не удаётся','Баг исправлен','Баг — дубликат'],a:1},
+{l:1,t:'Документация',q:'Что такое тест-кейс?',o:['Список модулей системы','Документ: шаги, тестовые данные и ожидаемый результат для проверки функции','Отчёт о результатах тестирования','Скрипт автотеста'],a:1},
+{l:1,t:'Документация',q:'Обязательные части тест-кейса…',o:['Название, предусловия, шаги, ожидаемый результат','Код автотеста и скриншот','Оценка трудозатрат и бюджет','Список багов'],a:0},
+{l:1,t:'Документация',q:'Чем чек-лист отличается от тест-кейса?',o:['Чек-лист — список проверок без детальных шагов','Чек-лист всегда длиннее','Тест-кейсы пишут разработчики','Разницы нет'],a:0},
+{l:1,t:'Документация',q:'Тест-план — это…',o:['Отчёт для заказчика','Документ: стратегия, объём, ресурсы и сроки тестирования','Файл с тестовыми данными','Настройки стенда'],a:1},
+{l:1,t:'SDLC',q:'SDLC расшифровывается как…',o:['Software Development Life Cycle — жизненный цикл разработки ПО','System Data Logic Control','Software Deploy Load Controller','Secure Development Limit Check'],a:0},
+{l:1,t:'SDLC',q:'Модель Waterfall — это…',o:['Итеративная разработка спринтами','Последовательные этапы: следующий начинается после завершения предыдущего','Разработка без документации','Только ручное тестирование'],a:1},
+{l:1,t:'SDLC',q:'Главное отличие Agile от Waterfall…',o:['В Agile нет тестирования','Agile предполагает короткие итерации и гибкую реакцию на изменения','Waterfall быстрее','Agile не использует требования'],a:1},
+{l:1,t:'SDLC',q:'Длительность спринта в Scrum обычно…',o:['От 1 до 4 недель','Полгода','Ровно один день','Пока не закончатся задачи'],a:0},
+{l:1,t:'SDLC',q:'Product Owner отвечает за…',o:['Написание кода','Бэклог продукта и приоритеты задач','Настройку CI','Тест-документацию'],a:1},
+{l:1,t:'SDLC',q:'Scrum-мастер — это…',o:['Руководитель, раздающий задачи','Фасилитатор процесса, помогающий команде устранять препятствия','Старший тестировщик','Заказчик продукта'],a:1},
+{l:1,t:'SDLC',q:'Daily standup — это…',o:['Ежедневная короткая встреча: что сделано, что далее, есть ли блокеры','Годовое собрание акционеров','Демонстрация продукта заказчику','Разбор багов один на один'],a:0},
+{l:1,t:'SDLC',q:'На Sprint Review (Demo) команда…',o:['Пишет автотесты','Демонстрирует результаты спринта заинтересованным лицам','Меняет состав команды','Планирует отпуск'],a:1},
+{l:1,t:'SDLC',q:'Ретроспектива — это встреча, на которой команда…',o:['Демонстрирует продукт клиенту','Анализирует процесс работы и решает, что улучшить','Планирует задачи спринта','Тестирует релиз-кандидат'],a:1},
+{l:1,t:'SDLC',q:'STLC — это…',o:['Жизненный цикл тестирования: от анализа требований до закрытия тестов','Язык программирования','Методика оценки багов','Инструмент автотестов'],a:0},
+{l:1,t:'Виды тестирования',q:'Smoke-тестирование — это…',o:['Проверка под критической нагрузкой','Быстрая поверхностная проверка основной функциональности после сборки','Тестирование безопасности','Проверка установки приложения'],a:1},
+{l:1,t:'Виды тестирования',q:'Регрессионное тестирование нужно, чтобы…',o:['Найти новые функции','Убедиться, что изменения не сломали существующую функциональность','Проверить производительность','Оценить удобство интерфейса'],a:1},
+{l:1,t:'Виды тестирования',q:'Санитарное (sanity) тестирование — это…',o:['Широкая проверка всего приложения','Узкая проверка конкретной функции после небольших правок','Проверка на вирусах','Тест на нагрузку'],a:1},
+{l:1,t:'Виды тестирования',q:'Ключевое различие smoke и sanity…',o:['Smoke — широкий и поверхностный, sanity — узкий и точечный','Разницы нет','Sanity всегда делают первым','Smoke делают пользователи'],a:0},
+{l:1,t:'Виды тестирования',q:'Функциональное тестирование проверяет…',o:['Что система делает — соответствие функций требованиям','Как быстро работает система','Устойчивость к взлому','Читаемость кода'],a:0},
+{l:1,t:'Виды тестирования',q:'Что относится к нефункциональному тестированию?',o:['Проверка производительности','Проверка удобства использования','Проверка расчёта скидок по правилам акции','Проверка корректности регистрации'],a:[0,1],e:'Нефункциональное отвечает на вопрос «как работает система», а не «что она делает».'},
+{l:1,t:'Виды тестирования',q:'UI-тестирование — это проверка…',o:['Серверной логики','Пользовательского интерфейса: элементы, вёрстка, поведение','Базы данных','API-эндпоинтов'],a:1},
+{l:1,t:'Виды тестирования',q:'Юзабилити-тестирование оценивает…',o:['Удобство и понятность продукта для пользователя','Скорость ответа сервера','Защиту данных','Объём кода'],a:0},
+{l:1,t:'Виды тестирования',q:'Приёмочное (acceptance) тестирование проводится, чтобы…',o:['Найти максимум багов','Принять решение: соответствует ли продукт ожиданиям заказчика','Загрузить сервер','Проверить сборку'],a:1},
+{l:1,t:'Виды тестирования',q:'Исследовательское (exploratory) тестирование — это…',o:['Тестирование по готовым скриптам','Одновременное изучение продукта, дизайн тестов и их выполнение','Автоматизация рутинных проверок','Проверка документации'],a:1},
+{l:1,t:'Виды тестирования',q:'Ad-hoc тестирование — это…',o:['Тестирование без плана и документации, произвольными проверками','Строгое следование тест-кейсам','Нагрузочная проверка','Тестирование API'],a:0},
+{l:1,t:'Виды тестирования',q:'Статическое тестирование выполняется…',o:['Без запуска кода: ревью, анализ требований и документов','Только на продакшене','Под нагрузкой','После релиза'],a:0},
+{l:1,t:'Виды тестирования',q:'Динамическое тестирование предполагает…',o:['Чтение кода','Запуск программы и проверку её поведения','Ревью документации','Инспекцию требований'],a:1},
+{l:1,t:'Виды тестирования',q:'Тестирование «чёрного ящика» — это…',o:['Проверка без знания внутреннего устройства системы','Тестирование исходного кода','Проверка памяти приложения','Тестирование драйверов'],a:0},
+{l:1,t:'Виды тестирования',q:'Тестирование «белого ящика» — это…',o:['Проверка только интерфейса','Проверка с доступом к внутреннему устройству и коду','Случайный перебор данных','Проверка документации'],a:1},
+{l:1,t:'Виды тестирования',q:'«Серый ящик» означает…',o:['Тестировщику доступна частичная информация о внутреннем устройстве','Тестирование при слабом освещении','Только негативные проверки','Проверку на слабом железе'],a:0},
+{l:1,t:'Виды тестирования',q:'Позитивное тестирование — это…',o:['Проверка на корректных данных ожидаемого результата','Ввод некорректных данных','Проверка ошибок сервера','Хакерские атаки'],a:0},
+{l:1,t:'Виды тестирования',q:'Негативное тестирование проверяет…',o:['Скорость работы','Поведение системы на некорректных данных и действиях','Красоту интерфейса','Документацию API'],a:1},
+{l:1,t:'Виды тестирования',q:'Альфа-тестирование проходит…',o:['Внутри компании-разработчика силами сотрудников','У случайных людей на улице','Только на продакшене','После закрытия проекта'],a:0},
+{l:1,t:'Виды тестирования',q:'Бета-тестирование — это…',o:['Внутренняя проверка разработчиками','Тестирование реальными пользователями вне компании до релиза','Проверка бэкапов','Нагрузочный тест'],a:1},
+{l:1,t:'Тест-дизайн',q:'Классы эквивалентности нужны, чтобы…',o:['Проверить все возможные значения','Сократить число тестов: значения одного класса ведут себя одинаково','Увеличить объём документации','Найти утечки памяти'],a:1},
+{l:1,t:'Тест-дизайн',q:'Анализ граничных значений основан на том, что…',o:['Ошибки чаще возникают на границах диапазонов','Границы никогда не ломаются','Середина диапазона самая опасная','Данные не важны'],a:0},
+{l:1,t:'Документация',q:'Ожидаемый результат в тест-кейсе должен быть…',o:['Конкретным и проверяемым','Любым, лишь бы поле было заполнено','Скрытым от команды','Общим: «всё работает»'],a:0},
+{l:1,t:'Основы',q:'Баг не воспроизводится. Что делать?',o:['Закрыть репорт и забыть','Добавить видео, логи, данные окружения, попробовать повторить несколько раз','Удалить тест-кейс','Писать в код разработчику'],a:1},
+{l:1,t:'Основы',q:'Какой баг обычно приоритетнее для исправления?',o:['Косметический в разделе «О нас»','Блокирующий основной сценарий оформления заказа','Опечатка в футере','Старая версия библиотеки без изменения поведения'],a:1},
+{l:1,t:'Основы',q:'Пример «High severity, Low priority»…',o:['Краш приложения при входе у всех пользователей','Краш в редко используемой настройке, обходится другими путями','Опечатка на главной','Нет пагинации в отчётах'],a:1},
+{l:1,t:'Основы',q:'Верное утверждение о тестировании…',o:['Полное тестирование доказывает отсутствие дефектов','Тестирование снижает риск, но не может доказать отсутствие багов','Тестирование гарантирует качество навсегда','Хороший тестировщик находит все баги'],a:1,e:'Один из семи принципов: исчерпывающее тестирование невозможно.'},
+{l:1,t:'Основы',q:'Принцип «раннее тестирование» говорит, что…',o:['Тестировать нужно только после релиза','Тестирование стоит начинать как можно раньше — с анализа требований','Тестирование — последний этап проекта','QA подключается к финальной сборке'],a:1},
+{l:1,t:'Основы',q:'Принцип «скопления дефектов» означает…',o:['Баги распределены равномерно','Большинство дефектов обычно сосредоточено в небольшом числе модулей','Каждый модуль содержит один баг','Баги появляются случайно'],a:1},
+{l:1,t:'Основы',q:'«Парадокс пестицида» — это когда…',o:['Повторяющиеся одни и те же тесты перестают находить новые дефекты','Багов становится больше от тестов','Тестировщики устают','Тесты ускоряются'],a:0},
+{l:1,t:'Основы',q:'Тестовое окружение (environment) — это…',o:['Конфигурация железа и ПО, на которой проводится тестирование','Команда тестировщиков','Файл с тестами','Дизайн-макет'],a:0},
+{l:1,t:'Основы',q:'Тестовые данные — это…',o:['Данные, используемые системой при выполнении тестов','Логи сервера','Код автотестов','Отчёты'],a:0},
+{l:1,t:'Клиент-сервер',q:'В клиент-серверной архитектуре…',o:['Клиент отправляет запросы, сервер возвращает ответы','Сервер отправляет запросы, клиент отвечает','Обе стороны только хранят данные','Обмена данными нет'],a:0},
+{l:1,t:'Клиент-сервер',q:'Frontend — это…',o:['Серверная логика и базы данных','Часть приложения, с которой взаимодействует пользователь','Протокол передачи данных','Инструмент деплоя'],a:1},
+{l:1,t:'Клиент-сервер',q:'Backend отвечает за…',o:['Отрисовку кнопок','Серверную логику, обработку и хранение данных','Анимации интерфейса','Шрифты и цвета'],a:1},
+{l:1,t:'Клиент-сервер',q:'API — это…',o:['Язык разметки','Интерфейс взаимодействия программ: набор правил и эндпоинтов для запросов','Название браузера','Формат картинок'],a:1},
+{l:1,t:'HTTP/API',q:'HTTP — это…',o:['Протокол передачи данных, на котором работает веб','Язык программирования','База данных','Система контроля версий'],a:0},
+{l:1,t:'HTTP/API',q:'GET-запрос используется, чтобы…',o:['Получить данные с сервера','Создать нового пользователя','Удалить ресурс','Обновить пароль'],a:0},
+{l:1,t:'HTTP/API',q:'POST-запрос обычно…',o:['Получает страницу','Отправляет данные на сервер для создания ресурса','Удаляет файлы','Меняет DNS'],a:1},
+{l:1,t:'HTTP/API',q:'Код ответа 200 означает…',o:['Запрос выполнен успешно','Ресурс не найден','Ошибка сервера','Нет доступа'],a:0},
+{l:1,t:'HTTP/API',q:'Код 404 означает…',o:['Внутренняя ошибка сервера','Запрошенный ресурс не найден','Успешное создание','Требуется авторизация'],a:1},
+{l:1,t:'HTTP/API',q:'Код 500 означает…',o:['Ошибка на стороне сервера','Опечатка в URL','Отказ в доступе','Успех'],a:0},
+{l:1,t:'HTTP/API',q:'JSON — это…',o:['Текстовый формат обмена данными: пары «ключ-значение» и массивы','Графический формат','Протокол шифрования','Язык запросов к БД'],a:0},
+{l:1,t:'Клиент-сервер',q:'URL — это…',o:['Адрес ресурса в сети','Имя пользователя','Тип базы данных','Формат видео'],a:0},
+{l:1,t:'Клиент-сервер',q:'В веб-приложении браузер выступает в роли…',o:['Сервера','Клиента','Базы данных','Прокси-сервера'],a:1},
+{l:1,t:'Клиент-сервер',q:'База данных нужна, чтобы…',o:['Рисовать интерфейс','Хранить и обрабатывать данные приложения','Шифровать трафик','Собирать аналитику браузера'],a:1},
+{l:1,t:'Документация',q:'Требования — это…',o:['Описание того, что и как должна делать система','Исходный код','Файл конфигурации','Список сотрудников'],a:0},
+{l:1,t:'Документация',q:'Требование сформулировано двусмысленно. Действие QA…',o:['Додумать самому и молча протестировать','Уточнить у аналитика или заказчика до тестирования','Проигнорировать','Создать баг на разработчика'],a:1},
+{l:1,t:'Основы',q:'QA обнаружил баг. Первое действие…',o:['Позвонить разработчику ночью','Убедиться в воспроизведении и завести баг-репорт с шагами','Исправить код самому','Написать в общий чат без деталей'],a:1},
+{l:1,t:'Основы',q:'После исправления бага необходимо…',o:['Ничего не делать','Проверить фикс (re-test) и прогнать смежную регрессию','Закрыть все старые баги','Удалить тест-кейсы'],a:1},
+{l:1,t:'Основы',q:'Найден критический баг прямо перед релизом. Как поступить?',o:['Промолчать, чтобы не срывать релиз','Немедленно сообщить команде: такой баг блокирует выпуск','Отложить молча на следующий релиз','Исправить самостоятельно'],a:1},
+{l:1,t:'Документация',q:'Acceptance criteria — это…',o:['Условия, при выполнении которых функция считается готовой и принятой','Список участников проекта','График отпусков','Технический стек'],a:0},
+{l:1,t:'Документация',q:'Definition of Done — это…',o:['Общий для команды критерий готовности задачи','Дата релиза','Название ветки','Тип баг-репорта'],a:0},
+{l:1,t:'Документация',q:'User story — это…',o:['Короткое описание потребности: «Как роль, я хочу действие, чтобы ценность»','Длинный технический документ','Журнал ошибок','Отчёт о тестировании'],a:0},
+{l:1,t:'Виды тестирования',q:'Кроссбраузерное тестирование — это…',o:['Проверка работы приложения в разных браузерах и их версиях','Тестирование на одном Chrome','Проверка API','Нагрузочный тест'],a:0},
+{l:1,t:'Виды тестирования',q:'Тестирование адаптивности проверяет…',o:['Отображение и работу на разных экранах и устройствах','Скорость интернета','Шифрование','Код бэкенда'],a:0},
+{l:1,t:'SDLC',q:'Релиз — это…',o:['Выпуск версии продукта пользователям','Создание ветки','Удаление бага','Настройка окружения'],a:0},
+{l:1,t:'SDLC',q:'Hotfix — это…',o:['Срочное исправление критической проблемы в продуктивной версии','Плановое обновление дизайна','Новая фича','Модульный тест'],a:0},
+{l:1,t:'Клиент-сервер',q:'Staging-окружение — это…',o:['Среда, максимально близкая к продакшену, для финальных проверок','Локальный компьютер разработчика','Телефон тестировщика','Продакшен-сервер'],a:0},
+{l:1,t:'Основы',q:'Логи нужны, чтобы…',o:['Записывать события системы и разбирать инциденты','Украшать интерфейс','Ускорять браузер','Хранить пароли'],a:0},
+{l:1,t:'Основы',q:'DevTools в браузере — это…',o:['Инструменты разработчика: элементы, консоль, сеть, хранилище','Текстовый редактор','Антивирус','Файловый менеджер'],a:0},
+{l:1,t:'Основы',q:'Вкладка Network в DevTools показывает…',o:['Сетевые запросы страницы: методы, статусы, время, тела','Список плагинов','Исходный код сервера','Пароли пользователя'],a:0},
+{l:1,t:'Документация',q:'В поле «Фактический результат» баг-репорта пишут…',o:['То, что получили реально при выполнении шагов','Фантазию о будущем','Код функции','Требование продукта'],a:0},
+{l:1,t:'Основы',q:'Ценность баг-репорта выше, если он…',o:['Стабильно воспроизводится и оформлен по шаблону','Написан поздно ночью','Содержит эмоции','Отправлен в чат без шагов'],a:0},
+{l:1,t:'Основы',q:'Перед заведением нового бага нужно…',o:['Проверить, не заведён ли уже похожий дефект','Удалить старые репорты','Поменять приоритеты другим багам','Переименовать спринт'],a:0},
+{l:1,t:'Основы',q:'Исправить дефект на этапе требований…',o:['Дешевле, чем после релиза','Дороже, чем на продакшене','Невозможно','Не влияет на стоимость'],a:0},
+{l:1,t:'Основы',q:'Что НЕ относится к задачам тестировщика?',o:['Написание продакшн-кода по фиче','Проверка требований','Заведение баг-репортов','Регрессионное тестирование'],a:0},
+{l:1,t:'Основы',q:'Ключевые качества сильного QA-инженера…',o:['Внимательность к деталям, аналитическое мышление и коммуникация','Знание ровно одного языка программирования','Умение обходить баги стороной','Навык быстрой печати любой ценой'],a:0},
+
+/* ---------- УРОВЕНЬ II · ТЕСТ-ДИЗАЙН И API (60) ---------- */
+{l:2,t:'Тест-дизайн',q:'Поле «Возраст» принимает целые числа от 1 до 99. Минимальный набор классов эквивалентности…',o:['Один класс: все числа','Три класса: меньше 1, от 1 до 99, больше 99','Два класса: чётные и нечётные','Девяносто девять классов'],a:1},
+{l:2,t:'Тест-дизайн',q:'Граничные значения для диапазона 1–99…',o:['0, 1, 99, 100','50 и 51','1, 50, 99','Только 1 и 99'],a:0},
+{l:2,t:'Тест-дизайн',q:'Имя пользователя: от 1 до 50 символов. Граничные проверки длины…',o:['0, 1, 2, 49, 50, 51 символов','25 и 75 символов','Только 50','1 и 100'],a:0},
+{l:2,t:'Тест-дизайн',q:'Скидка 5% при сумме от 1000 до 5000, 10% — от 5001 до 10000. Границы для проверки…',o:['999, 1000, 5000, 5001, 10000, 10001','1500 и 7500','Только 1000 и 10000','0 и 100000'],a:0},
+{l:2,t:'Тест-дизайн',q:'Таблица решений (decision table) применяется, когда…',o:['Есть комбинации условий, ведущие к разным действиям','Нужно проверить один параметр','Данные непрерывные','Нет требований'],a:0},
+{l:2,t:'Тест-дизайн',q:'Тестирование переходов состояний подходит для…',o:['Проверки цвета кнопки','Объектов с жизненным циклом: заказ «новый → оплачен → отправлен»','Проверки шрифтов','Только API'],a:1},
+{l:2,t:'Тест-дизайн',q:'Метод pairwise позволяет…',o:['Проверить все комбинации всех параметров','Покрыть все пары значений параметров значительно меньшим числом тестов','Пропустить негативные проверки','Заменить регрессию'],a:1},
+{l:2,t:'Тест-дизайн',q:'Error guessing — это…',o:['Дизайн тестов на основе опыта: где обычно бывают ошибки','Случайный набор символов','Автогенерация кода','Метод шифрования'],a:0},
+{l:2,t:'Тест-дизайн',q:'Главная цель техник тест-дизайна…',o:['Увеличить количество тестов','Найти максимум дефектов оптимальным набором тестов','Заменить требования','Ускорить разработку'],a:1},
+{l:2,t:'Тест-дизайн',q:'Поле Email. Класс НЕВАЛИДНЫХ значений…',o:['user@mail.com','строка без символа @','user+tag@mail.co','a@b.io'],a:1},
+{l:2,t:'Тест-дизайн',q:'В форме 5 чекбоксов, можно выбрать от 0 до 5. Граничные значения…',o:['0, 1, 5','2, 3, 4','Только 5','0 и 10'],a:0},
+{l:2,t:'Тест-дизайн',q:'Загрузка файла до 10 МБ. Пограничные тест-данные…',o:['9,99 МБ и 10,01 МБ','1 ГБ и 2 ГБ','Только пустой файл','Только 5 МБ'],a:0},
+{l:2,t:'Тест-дизайн',q:'Банковская карта бывает «активна» или «заблокирована». Подходящая техника…',o:['Переходы состояний / таблица решений','Анализ граничных значений','Pairwise','Ошибка: карта не тестируется'],a:0},
+{l:2,t:'Тест-дизайн',q:'Use case testing — это тестирование…',o:['По сценариям взаимодействия пользователя с системой','Только граничных значений','Памяти','Кода'],a:0},
+{l:2,t:'Тест-дизайн',q:'Диаграмма «причина-следствие» помогает…',o:['Связать комбинации входных условий с ожидаемыми результатами','Нарисовать интерфейс','Посчитать баги','Составить график отпусков'],a:0},
+{l:2,t:'Тест-дизайн',q:'При ограниченном времени тесты приоритизируют…',o:['По рискам: важность функции × вероятность отказа','По алфавиту модулей','Случайно','По возрасту кода'],a:0},
+{l:2,t:'HTTP/API',q:'Метод PUT предназначен для…',o:['Полного обновления ресурса','Удаления ресурса','Получения заголовков','Частичного обновления'],a:0},
+{l:2,t:'HTTP/API',q:'Метод PATCH отличается от PUT тем, что…',o:['PATCH изменяет только переданные поля ресурса','PATCH удаляет ресурс','PATCH работает только с XML','PATCH не возвращает статус'],a:0},
+{l:2,t:'HTTP/API',q:'Идемпотентный метод — это…',o:['Метод, у которого повторный вызов даёт тот же результат, что и первый','Самый быстрый метод','Метод с шифрованием','Метод без тела ответа'],a:0},
+{l:2,t:'HTTP/API',q:'Какой метод НЕ является идемпотентным?',o:['GET','PUT','DELETE','POST'],a:3,e:'Повторный POST может создать дубликат ресурса — поэтому он не идемпотентен.'},
+{l:2,t:'HTTP/API',q:'Метод HEAD возвращает…',o:['Только заголовки ответа без тела','Полное тело ответа','Список методов','Ничего: метода HEAD не существует'],a:0},
+{l:2,t:'HTTP/API',q:'Метод OPTIONS используется, чтобы…',o:['Узнать поддерживаемые методы ресурса (используется в CORS preflight)','Удалить опции товара','Создать опцию','Получить список товаров'],a:0},
+{l:2,t:'HTTP/API',q:'Код 201 Created возвращается, когда…',o:['Ресурс успешно создан','Ничего не найдено','Доступ запрещён','Сервер перегружен'],a:0},
+{l:2,t:'HTTP/API',q:'Код 204 No Content означает…',o:['Успешный запрос без тела ответа','Ошибку валидации','Редирект','Требуется авторизация'],a:0},
+{l:2,t:'HTTP/API',q:'400 Bad Request возникает, когда…',o:['Запрос синтаксически некорректен','Нет интернета','Сервер упал','Истёк сертификат'],a:0},
+{l:2,t:'HTTP/API',q:'401 Unauthorized означает…',o:['Пользователь не аутентифицирован','Доступ запрещён навсегда','Страница перемещена','Ошибка в БД'],a:0},
+{l:2,t:'HTTP/API',q:'403 Forbidden отличается от 401 тем, что…',o:['Пользователь аутентифицирован, но прав недостаточно','Сервер недоступен','Это редирект','Тело ответа пустое'],a:0},
+{l:2,t:'HTTP/API',q:'301 — это перенаправление…',o:['Постоянное','Временное','На страницу ошибки','В никуда'],a:0},
+{l:2,t:'HTTP/API',q:'302 отличается от 301 тем, что перемещение…',o:['Временное','Постоянное','Запрещено','Зашифровано'],a:0},
+{l:2,t:'HTTP/API',q:'422 Unprocessable Entity — это…',o:['Запрос корректен синтаксически, но данные не проходят бизнес-валидацию','Нет соединения','Ресурс удалён','Успешное создание'],a:0},
+{l:2,t:'HTTP/API',q:'429 Too Many Requests возвращается при…',o:['Превышении лимита запросов (rate limiting)','Успехе','Ошибке в JSON','Смене протокола'],a:0},
+{l:2,t:'HTTP/API',q:'502 Bad Gateway означает…',o:['Прокси/шлюз получил некорректный ответ от вышестоящего сервера','Ресурс создан','Требуется логин','Файл слишком большой'],a:0},
+{l:2,t:'HTTP/API',q:'503 Service Unavailable — это…',o:['Сервер временно недоступен: перегрузка или обслуживание','Ошибка клиента','Отсутствует страница','Отказ в доступе'],a:0},
+{l:2,t:'HTTP/API',q:'504 Gateway Timeout возникает, когда…',o:['Шлюз не дождался ответа от сервера вовремя','Пользователь нажал «назад»','Файл удалён','Токен истёк'],a:0},
+{l:2,t:'HTTP/API',q:'Заголовок Content-Type: application/json сообщает…',o:['Формат тела запроса или ответа','Версию браузера','IP-адрес','Уровень логирования'],a:0},
+{l:2,t:'HTTP/API',q:'Токен обычно передают в заголовке…',o:['Authorization: Bearer <token>','X-Cookie-Set','Body-Type','Referrer-Policy'],a:0},
+{l:2,t:'HTTP/API',q:'Заголовок Accept указывает…',o:['Желаемый формат ответа на стороне клиента','Язык программирования','Размер файла','Версию БД'],a:0},
+{l:2,t:'HTTP/API',q:'Cookies — это…',o:['Данные, которые сайт хранит в браузере и отправляет с запросами','Части сервера','Методы шифрования','Единицы нагрузки'],a:0},
+{l:2,t:'HTTP/API',q:'Сессия (session) — это…',o:['Механизм сохранения состояния: id в cookie, данные — на сервере','Файл на диске клиента','Код ответа','Метод HTTP'],a:0},
+{l:2,t:'HTTP/API',q:'JWT-токен — это…',o:['Подписанный токен с данными пользователя; серверу не нужно хранить сессию','Пароль в открытом виде','Имя файла','Тип базы данных'],a:0},
+{l:2,t:'HTTP/API',q:'HTTPS отличается от HTTP…',o:['Шифрованием трафика через TLS (по умолчанию порт 443)','Скоростью всегда в 10 раз выше','Отсутствием заголовков','Отсутствием кодов ответа'],a:0},
+{l:2,t:'HTTP/API',q:'Порядок частей URL https://site.com/api/v1/users?active=true…',o:['Протокол, домен, путь, query-параметры','Домен, протокол, тело, cookie','Путь, домен, метод, статус','Query, тело, хедер, хост'],a:0},
+{l:2,t:'HTTP/API',q:'Query-параметры отделяются от пути символом…',o:['? — а между собой разделяются &','#','/','@'],a:0},
+{l:2,t:'HTTP/API',q:'Path-параметр /users/42 отличается от query /users?id=42 тем, что…',o:['Идентифицирует ресурс иерархически в самом пути','Меняет метод запроса','Всегда зашифрован','Не виден в URL'],a:0},
+{l:2,t:'HTTP/API',q:'REST — это…',o:['Архитектурный стиль: ресурсы, HTTP-методы, отсутствие состояния','Язык программирования','Протокол шифрования','База данных'],a:0},
+{l:2,t:'HTTP/API',q:'Ограничение REST «statelessness» означает…',o:['Каждый запрос содержит всё необходимое; сервер не хранит состояние клиента','Сервер хранит всё','Запросы нельзя шифровать','Ответы не имеют кодов'],a:0},
+{l:2,t:'HTTP/API',q:'SOAP отличается от REST тем, что…',o:['Это строгий протокол, обычно с XML-конвертом, а REST — гибкий стиль поверх HTTP','SOAP всегда быстрее','REST не использует HTTP','SOAP только для мобильных'],a:0},
+{l:2,t:'HTTP/API',q:'Какие методы являются идемпотентными?',o:['GET','PUT','DELETE','POST'],a:[0,1,2]},
+{l:2,t:'HTTP/API',q:'Тело (body) GET-запроса…',o:['Как правило отсутствует','Обязательно содержит JSON','Всегда бинарное','Совпадает с ответом'],a:0},
+{l:2,t:'HTTP/API',q:'Postman — это…',o:['Инструмент ручного тестирования API: запросы, окружения, коллекции','Текстовый редактор','Фреймворк unit-тестов','Плагин для скриншотов'],a:0},
+{l:2,t:'HTTP/API',q:'Коды семейства 4xx сигнализируют…',o:['Об ошибке на стороне клиента','Об ошибке сервера','О редиректе','Об успехе'],a:0},
+{l:2,t:'HTTP/API',q:'HTTP stateless означает…',o:['Протокол не хранит состояние между запросами; его поддерживают cookies и токены','Сервер помнит всё','Запросы идут по кругу','Соединение никогда не разрывается'],a:0},
+{l:2,t:'HTTP/API',q:'Преимущество JSON перед XML…',o:['Легче и компактнее, нет закрывающих тегов','Поддерживает только числа','Не читается человеком','Работает без протокола'],a:0},
+{l:2,t:'HTTP/API',q:'HTTP/2 по сравнению с HTTP/1.1…',o:['Поддерживает мультиплексирование нескольких запросов в одном соединении','Отказался от заголовков','Не поддерживает HTTPS','Работает только на POST'],a:0},
+{l:2,t:'HTTP/API',q:'Cache-Control — это заголовок для…',o:['Управления кэшированием ответов','Авторизации','Сжатия','Редиректов'],a:0},
+{l:2,t:'HTTP/API',q:'CORS — это…',o:['Механизм разграничения кросс-доменных запросов в браузере','Метод сжатия','Протокол БД','Формат логов'],a:0},
+{l:2,t:'HTTP/API',q:'Проверить API без интерфейса можно…',o:['Через Postman или curl, анализируя коды статусов и тела ответов','Только глазами по сайту','Через реестр Windows','Только на телефоне'],a:0},
+{l:2,t:'HTTP/API',q:'В ответе поле «status: error» и код 400. Где искать причину?',o:['В теле ответа и в корректности передаваемых данных','В настройках браузера','В DNS','В маршрутизаторе'],a:0},
+{l:2,t:'HTTP/API',q:'Какие коды сообщают об ошибке на стороне сервера?',o:['500 Internal Server Error','502 Bad Gateway','404 Not Found','403 Forbidden'],a:[0,1]},
+{l:2,t:'HTTP/API',q:'Swagger (OpenAPI) — это…',o:['Спецификация и интерактивная документация API','Язык разметки','Инструмент деплоя','Система баг-трекинга'],a:0},
+
+/* ---------- УРОВЕНЬ III · ДАННЫЕ И ПРОЦЕССЫ (40) ---------- */
+{l:3,t:'SQL',q:'Команда SELECT выполняет…',o:['Выборку данных из таблиц','Удаление таблиц','Создание индексов','Обновление структуры'],a:0},
+{l:3,t:'SQL',q:'WHERE в запросе нужен для…',o:['Фильтрации строк по условию','Сортировки','Группировки','Создания таблиц'],a:0},
+{l:3,t:'SQL',q:'INNER JOIN вернёт…',o:['Только строки с совпадениями в обеих таблицах','Все строки левой таблицы','Все строки обеих таблиц','Только пустые строки'],a:0},
+{l:3,t:'SQL',q:'LEFT JOIN вернёт…',o:['Все строки левой таблицы + совпадения из правой (иначе NULL)','Только совпадения','Все строки правой таблицы','Пересечение таблиц'],a:0},
+{l:3,t:'SQL',q:'FULL OUTER JOIN вернёт…',o:['Все строки обеих таблиц с NULL там, где нет пары','Только совпадения','Половину строк','Ошибку'],a:0},
+{l:3,t:'SQL',q:'Агрегатные функции в SQL — это…',o:['COUNT, SUM, AVG, MIN, MAX','SELECT, FROM','JOIN, ON','INSERT, UPDATE'],a:0},
+{l:3,t:'SQL',q:'GROUP BY нужен, чтобы…',o:['Группировать строки для агрегатных вычислений','Сортировать по возрастанию','Соединять таблицы','Удалять дубликаты файлов'],a:0},
+{l:3,t:'SQL',q:'HAVING отличается от WHERE тем, что…',o:['Фильтрует после группировки (по агрегатам), WHERE — исходные строки','Работает всегда быстрее','Не принимает условий','Только для DELETE'],a:0},
+{l:3,t:'SQL',q:'ORDER BY price DESC отсортирует…',o:['По убыванию цены','По возрастанию цены','По алфавиту','Случайно'],a:0},
+{l:3,t:'SQL',q:'LIMIT 10 вернёт…',o:['Первые 10 строк результата','Последние 10 строк','10 таблиц','Все строки'],a:0},
+{l:3,t:'SQL',q:'NULL — это…',o:['Отсутствие значения','Ноль','Пустая строка','Пробел'],a:0},
+{l:3,t:'SQL',q:'Как проверить значение на NULL в условии?',o:['IS NULL / IS NOT NULL','= NULL','== NULL','LIKE NULL'],a:0,e:'NULL не равен ничему, даже самому себе — сравнение «= NULL» всегда ложно.'},
+{l:3,t:'SQL',q:'Первичный ключ (PRIMARY KEY) — это…',o:['Уникальный идентификатор строки таблицы','Любой столбец','Пароль от БД','Имя таблицы'],a:0},
+{l:3,t:'SQL',q:'Внешний ключ (FOREIGN KEY)…',o:['Ссылается на первичный ключ другой таблицы, обеспечивая целостность','Шифрует данные','Удаляет строки','Всегда создаёт индексы'],a:0},
+{l:3,t:'SQL',q:'DELETE vs TRUNCATE…',o:['DELETE удаляет строки (можно с WHERE), TRUNCATE быстро очищает таблицу целиком','Это синонимы','TRUNCATE удаляет саму таблицу','DELETE удаляет таблицу'],a:0},
+{l:3,t:'SQL',q:'DROP TABLE делает…',o:['Удаляет таблицу вместе со структурой','Очищает строки','Бэкапит таблицу','Блокирует таблицу'],a:0},
+{l:3,t:'SQL',q:'Нормализация БД — это…',o:['Организация данных для устранения избыточности и аномалий','Добавление индексов','Сжатие файлов','Репликация'],a:0},
+{l:3,t:'SQL',q:'Индекс в БД…',o:['Ускоряет поиск по столбцу, но замедляет вставку и обновление','Всегда ускоряет запись','Хранит пароли','Заменяет ключи'],a:0},
+{l:3,t:'SQL',q:'SELECT DISTINCT вернёт…',o:['Уникальные значения, без дубликатов','Все строки','Случайную строку','Статистику таблицы'],a:0},
+{l:3,t:'SQL',q:'LIKE %иван% найдёт…',o:['Строки, содержащие «иван» в любом месте','Только точное совпадение «иван»','Строки, начинающиеся с «иван»','Пустые строки'],a:0},
+{l:3,t:'SQL',q:'COUNT(*) и COUNT(email) различаются тем, что…',o:['COUNT(email) не учитывает строки с NULL в email','Ничем','COUNT(*) считает таблицы','COUNT(email) считает файлы'],a:0},
+{l:3,t:'Процессы',q:'Test coverage (покрытие) показывает…',o:['Какая часть требований или кода проверена тестами','Количество багов','Скорость команды','Размер базы данных'],a:0},
+{l:3,t:'SQL',q:'Транзакция — это…',o:['Группа операций, выполняемая как единое целое: либо всё, либо ничего','Один SELECT','Резервная копия','Тип индекса'],a:0},
+{l:3,t:'Процессы',q:'Показатель defect density — это…',o:['Число дефектов, отнесённое к размеру модуля (например, на 1000 строк)','Процент времени тестирования','Число автотестов','Оценка релиза'],a:0},
+{l:3,t:'Git',q:'git clone…',o:['Создаёт локальную копию удалённого репозитория','Отправляет изменения','Удаляет ветку','Меняет историю'],a:0},
+{l:3,t:'Git',q:'git pull выполняет…',o:['Загрузку изменений из удалённого репозитория и их слияние с локальной веткой','Отправку коммитов','Создание репозитория','Удаление истории'],a:0},
+{l:3,t:'Git',q:'git push…',o:['Отправляет локальные коммиты в удалённый репозиторий','Копирует репозиторий','Показывает статус','Отменяет коммит'],a:0},
+{l:3,t:'Git',q:'git commit фиксирует…',o:['Снимок подготовленных изменений в локальной истории','Файлы на сервере','Скриншоты','Только новые файлы'],a:0},
+{l:3,t:'Git',q:'Ветка (branch) нужна, чтобы…',o:['Вести независимую линию разработки, не ломая основную','Ускорять интернет','Хранить пароли','Компилировать код'],a:0},
+{l:3,t:'Git',q:'Merge conflict возникает, когда…',o:['Одни и те же строки изменены в разных ветках','Два человека посмотрели PR','Нет интернета','Репозиторий новый'],a:0},
+{l:3,t:'Git',q:'git status показывает…',o:['Состояние рабочей директории: изменённые, подготовленные, неотслеживаемые файлы','Список веток сервера','Историю всех коммитов','Ошибки компиляции'],a:0},
+{l:3,t:'Git',q:'git log…',o:['Показывает историю коммитов','Создаёт коммит','Меняет ветку','Удаляет файлы'],a:0},
+{l:3,t:'Git',q:'git stash…',o:['Временно убирает незакоммиченные изменения в сторону','Удаляет изменения навсегда','Пушит код','Клонирует репозиторий'],a:0},
+{l:3,t:'Git',q:'git revert, в отличие от git reset…',o:['Создаёт новый коммит, отменяющий изменения, — безопасно для общей истории','Удаляет историю','Меняет ветку по умолчанию','Стирает локальные файлы'],a:0},
+{l:3,t:'Git',q:'.gitignore нужен, чтобы…',o:['Исключить файлы из отслеживания: логи, зависимости, секреты','Зашифровать репозиторий','Ускорить push','Создать ветки'],a:0},
+{l:3,t:'Git',q:'Pull Request (Merge Request) — это…',o:['Предложение влить ветку с кодом-ревью и обсуждением','Команда терминала','Ошибка сборки','Автотест'],a:0},
+{l:3,t:'Git',q:'git add делает…',o:['Помещает изменения в staging area перед коммитом','Пишет код','Пушит в мастер','Создаёт issue'],a:0},
+{l:3,t:'Git',q:'git checkout -b feature…',o:['Создаёт и переключает на новую ветку','Клонирует репозиторий','Удаляет ветку','Меняет пользователя'],a:0},
+{l:3,t:'Консоль',q:'Команда pwd показывает…',o:['Текущую рабочую директорию','Пароль','Список процессов','Версию git'],a:0},
+{l:3,t:'Консоль',q:'grep нужен для…',o:['Поиска строк по шаблону в файлах или выводе','Создания папок','Запуска тестов','Шифрования'],a:0},
+
+/* ---------- УРОВЕНЬ IV · АВТОМАТИЗАЦИЯ (30) ---------- */
+{l:4,t:'Автоматизация',q:'Что автоматизировать в первую очередь?',o:['Стабильные повторяющиеся проверки: smoke, регрессия, критичные пути','Исследовательские сессии','Одноразовые проверки','Фичу без стабильных требований'],a:0},
+{l:4,t:'Автоматизация',q:'Что НЕ стоит автоматизировать?',o:['Часто меняющийся функционал и одноразовые проверки','Регрессионный набор','API-проверки','Нагрузочные сценарии'],a:0},
+{l:4,t:'Автоматизация',q:'Пирамида тестирования предполагает…',o:['Много unit-тестов, меньше API, меньше всего UI-тестов','Больше всего UI-тестов','Равные слои','Только API'],a:0},
+{l:4,t:'Автоматизация',q:'Почему UI-автотесты самые дорогие в поддержке?',o:['Медленные, зависят от вёрстки и окружения, хрупкие','Они бесплатные','Они не ломаются','Они пишутся быстрее всех'],a:0},
+{l:4,t:'Автоматизация',q:'Selenium WebDriver — это…',o:['Инструмент управления браузером: находит элементы, кликает, вводит, читает страницы','Система баг-трекинга','Библиотека БД','Протокол'],a:0},
+{l:4,t:'Автоматизация',q:'Основные стратегии локаторов…',o:['id, name, CSS-селекторы, XPath','GET, POST','TCP, UDP','JPEG, PNG'],a:0},
+{l:4,t:'Автоматизация',q:'Какой локатор предпочтительнее, если доступен?',o:['Уникальный id или data-атрибут','Абсолютный XPath','Длинная цепочка nth-child','Случайный сгенерированный класс'],a:0},
+{l:4,t:'Автоматизация',q:'CSS-селектор для элемента class="btn-primary"…',o:['.btn-primary','#btn-primary','btn-primary@','//btn-primary'],a:0},
+{l:4,t:'Автоматизация',q:'CSS-селектор по атрибуту…',o:['input[type="submit"]','input%submit%','//input[type=submit]','input->submit'],a:0},
+{l:4,t:'Автоматизация',q:'XPath для кнопки с текстом «Войти»…',o:['//button[text()="Войти"]','css=button:Войти','button#Войти','xpath:Войти'],a:0},
+{l:4,t:'Автоматизация',q:'Абсолютный XPath плох тем, что…',o:['Ломается при любом изменении структуры страницы','Он идеален и всегда надёжен','Не поддерживается Selenium','Не находит элементы никогда'],a:0},
+{l:4,t:'Автоматизация',q:'findElement vs findElements…',o:['findElement вернёт первый элемент или бросит исключение; findElements — список, возможно пустой','Это синонимы','findElements ищет только в API','findElement ищет по всем страницам'],a:0},
+{l:4,t:'Автоматизация',q:'Implicit wait — это…',o:['Глобальное ожидание появления элементов перед ошибкой','Сон на фиксированное время','Ожидание загрузки картинки','Таймаут сети'],a:0},
+{l:4,t:'Автоматизация',q:'Что относится к способам ожидания в автотестах?',o:['Implicit wait','Явный Explicit wait (WebDriverWait + expected_conditions)','Thread.sleep — жёсткая пауза','driver.getTitle'],a:[0,1,2],e:'Все три существуют, но надёжнее всего явные ожидания условий; sleep — антипаттерн.'},
+{l:4,t:'Автоматизация',q:'Почему Thread.sleep — антипаттерн?',o:['Жёсткое ожидание: либо лишняя трата времени, либо недостаточно','Работает только на Linux','Ломает селекторы','Запрещён в Python'],a:0},
+{l:4,t:'Автоматизация',q:'StaleElementReferenceException означает…',o:['Элемент устарел: DOM перерисовался, ссылка недействительна — нужно найти заново','Нет прав администратора','Браузер не запущен','Ошибка в ассерте'],a:0},
+{l:4,t:'Автоматизация',q:'NoSuchElementException обычно из-за…',o:['Неверного локатора или элемент ещё не прогрузился','Занятого порта','Неверного пароля','Множества вкладок'],a:0},
+{l:4,t:'Автоматизация',q:'driver.quit() vs driver.close()…',o:['quit завершает сессию и все окна/процессы; close закрывает только текущее окно','Это синонимы','close удаляет куки, quit — нет','quit лишь сворачивает окно'],a:0},
+{l:4,t:'Автоматизация',q:'Page Object — это…',o:['Паттерн: страница описана классом с локаторами и методами-действиями','Название браузера','Метод API','Система отчётов'],a:0},
+{l:4,t:'Автоматизация',q:'Главная выгода Page Object…',o:['Локаторы и действия в одном месте: правка в одном месте, а не во всех тестах','Тесты становятся медленнее','Кода всегда меньше','Не нужны ассерты'],a:0},
+{l:4,t:'Автоматизация',q:'Ассерт в автотесте…',o:['Проверяет ожидаемое с фактическим и «роняет» тест при расхождении','Отправляет письмо','Собирает логи','Открывает браузер'],a:0},
+{l:4,t:'Автоматизация',q:'Паттерн AAA в тесте — это…',o:['Arrange, Act, Assert — подготовка, действие, проверка','Авторизация, Админ, Аккаунт','Асинхронность, Атомарность, Аккуратность','Ничего из перечисленного'],a:0},
+{l:4,t:'Автоматизация',q:'pytest обнаруживает тесты как…',o:['Функции test_* в файлах test_*.py','Любые функции main','Классы Main','Файлы *.txt'],a:0},
+{l:4,t:'Автоматизация',q:'Fixture в pytest — это…',o:['Механизм подготовки окружения (браузер, данные), вызываемый перед тестом','Вид ассерта','Отчёт','Плагин браузера'],a:0},
+{l:4,t:'Автоматизация',q:'parametrize в pytest позволяет…',o:['Запустить один тест с разными наборами данных','Параллелить на 100 машин','Отключить логи','Собрать проект'],a:0},
+{l:4,t:'Python',q:'list и tuple в Python…',o:['list изменяемый, tuple — нет','Оба неизменяемые','tuple изменяемый, list — нет','Разницы нет'],a:0},
+{l:4,t:'Python',q:'dict в Python хранит…',o:['Пары «ключ — значение»','Только числа','Только строки','Ссылки на файлы'],a:0},
+{l:4,t:'Python',q:'Блоки кода в Python выделяются…',o:['Отступами','Фигурными скобками','Ключевым словом end','Точкой с запятой'],a:0},
+{l:4,t:'Python',q:'range(5) в цикле for даст числа…',o:['0, 1, 2, 3, 4','1, 2, 3, 4, 5','0–5 включительно','Пять случайных чисел'],a:0},
+{l:4,t:'Автоматизация',q:'Фреймворк автотестов — это…',o:['Согласованный набор библиотек и правил: запуск, отчёты, конфиги, паттерны','Один тестовый файл','Название браузера','Протокол HTTP'],a:0},
+
+/* ---------- УРОВЕНЬ V · МАСТЕРСКАЯ (20) ---------- */
+{l:5,t:'CI/CD',q:'Continuous Integration — это…',o:['Частое слияние изменений с автосборкой и прогоном тестов','Ручной деплой по пятницам','Ежегодный аудит','Только ночные сборки'],a:0},
+{l:5,t:'CI/CD',q:'Continuous Delivery означает…',o:['Изменения автоматически собираются, тестируются и готовы к выкладке в любой момент','Тесты не нужны','Деплой вручную раз в год','Хранение кода на дискетах'],a:0},
+{l:5,t:'CI/CD',q:'Pipeline в CI/CD — это…',o:['Последовательность шагов: сборка → тесты → деплой','Файл с паролями','Ветка git','Вид отчёта'],a:0},
+{l:5,t:'CI/CD',q:'Зачем автотесты в CI?',o:['Быстрая обратная связь: сломанное не доедет до продакшена','Чтобы тестировщики не работали','Для красоты','Чтобы сборка шла дольше'],a:0},
+{l:5,t:'Docker',q:'Образ (image) и контейнер (container)…',o:['Образ — шаблон, контейнер — запущенный экземпляр образа','Это синонимы','Контейнер — шаблон','Образ запускается напрямую'],a:0},
+{l:5,t:'Docker',q:'Dockerfile — это…',o:['Файл с инструкциями сборки образа','Лог контейнера','Список портов сети','Отчёт тестов'],a:0},
+{l:5,t:'Docker',q:'Польза Docker для тестирования…',o:['Воспроизводимое окружение: БД, сервисы и зависимости поднимаются одинаково у всех','Ускоряет интернет','Удаляет баги','Заменяет тест-кейсы'],a:0},
+{l:5,t:'Docker',q:'Docker Compose нужен, чтобы…',o:['Описать и запустить несколько контейнеров одной командой','Собрать образ из одного слоя','Открыть порт','Посмотреть логи'],a:0},
+{l:5,t:'Мобильное',q:'Appium — это…',o:['Фреймворк автоматизации мобильных приложений (iOS/Android) поверх WebDriver','Эмулятор Android','Магазин приложений','Язык разметки'],a:0},
+{l:5,t:'Мобильное',q:'Emulator vs real device…',o:['Эмулятор дешевле для базовых проверок; реальное устройство точнее по жестам, сети и производительности','Эмулятор всегда точнее','Реальные устройства не нужны','Разницы нет'],a:0},
+{l:5,t:'Мобильное',q:'ADB позволяет…',o:['Устанавливать APK, снимать логи и скриншоты, управлять Android-устройством с компьютера','Чинить железо','Создавать аккаунты','Перепрошивать iOS'],a:0},
+{l:5,t:'Мобильное',q:'Специфика мобильного тестирования…',o:['Прерывания (звонки, уведомления), смена сети, разные разрешения и версии ОС','Только проверка вёрстки','Отсутствие багов','Отсутствие обновлений'],a:0},
+{l:5,t:'Нагрузка',q:'Нагрузочное тестирование проверяет…',o:['Поведение системы при ожидаемой нагрузке','Взлом паролей','Вёрстку','Юнит-тесты'],a:0},
+{l:5,t:'Нагрузка',q:'Стресс-тестирование — это…',o:['Нагрузка за пределами ожидаемой для поиска точки отказа','Проверка стресса команды','Тест интерфейса','Смоук-прогон'],a:0},
+{l:5,t:'Нагрузка',q:'Что относится к видам нагрузочного тестирования?',o:['Нагрузочное (load)','Стрессовое (stress)','Долговременное (soak)','Модульное (unit)'],a:[0,1,2]},
+{l:5,t:'Нагрузка',q:'p95 времени ответа — это…',o:['95% запросов отвечают быстрее этого значения','Средняя температура по больнице','Максимум запросов в секунду','Ошибка с кодом 95'],a:0},
+{l:5,t:'Нагрузка',q:'JMeter — это…',o:['Инструмент нагрузочного тестирования: сценарии, виртуальные пользователи, отчёты','IDE','Браузер','Трекер багов'],a:0},
+{l:5,t:'Безопасность',q:'SQL-инъекция — это…',o:['Внедрение SQL-кода через пользовательский ввод; защита — параметризованные запросы','Скорость запросов','Вид JOIN-а','Тип индекса'],a:0},
+{l:5,t:'Безопасность',q:'XSS-атака — это…',o:['Внедрение вредоносного скрипта на страницу для выполнения в браузере жертвы','Шифрование данных','Проверка вёрстки','Метод кэширования'],a:0},
+{l:5,t:'Автоматизация',q:'Flaky-тест — это…',o:['Тест, который без изменений кода то проходит, то падает; лечится надёжными ожиданиями и изоляцией','Быстрый тест','Тест без ассертов','Устаревший тест'],a:0},
+{l:5,t:'Автоматизация',q:'Allure Report — это…',o:['Наглядные отчёты о прогонах: шаги, вложения, история падений','База данных','Инструмент деплоя','Браузер'],a:0}
+];
+
+/* ============================================================
+   УРОВНИ, ТЕМЫ, ЛОГИКА
+============================================================ */
+const LEVELS=[
+  {num:'I',  need:0,  title:'Фундамент',          desc:'База профессии: термины, документация, баг-лайфцикл, виды тестирования, первая встреча с HTTP.'},
+  {num:'II', need:25, title:'Тест-дизайн и API',  desc:'Техники проектирования проверок, HTTP и REST, коды ответов, заголовки, Postman.'},
+  {num:'III',need:50, title:'Данные и процессы',  desc:'SQL-запросы, Git, командная строка и метрики качества.'},
+  {num:'IV', need:75, title:'Автоматизация',      desc:'Selenium, локаторы, ожидания, Page Object, Python и pytest.'},
+  {num:'V',  need:100,title:'Мастерская',         desc:'Финальный экзамен: CI/CD, Docker, мобильное и нагрузочное тестирование, безопасность.'}
+];
+const GROUPS=[
+  ['Основы тестирования',['Основы','Виды тестирования']],
+  ['Документация и процессы',['Документация','SDLC','Процессы']],
+  ['Тест-дизайн',['Тест-дизайн']],
+  ['HTTP и API',['HTTP/API','Клиент-сервер']],
+  ['SQL и данные',['SQL']],
+  ['Git и консоль',['Git','Консоль']],
+  ['UI-автоматизация и Python',['Автоматизация','Python']],
+  ['CI/CD и инфраструктура',['CI/CD','Docker']],
+  ['Мобильное и нагрузочное',['Мобильное','Нагрузка']],
+  ['Безопасность',['Безопасность']]
+];
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmt=x=>{const v=Math.round(x*10)/10;return (v>=99.95?'100':String(v).replace('.',','));};
+
+/* детерминированное перемешивание вариантов — верные ответы не «липнут» к одной позиции */
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const Q=RAW.map((raw,i)=>{
+  const r=mulberry(i*1013+77);
+  const idx=raw.o.map((_,k)=>k);
+  for(let k=idx.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]];}
+  return {id:i,l:raw.l-1,t:raw.t,q:raw.q,o:idx.map(k=>raw.o[k]),
+          a:(Array.isArray(raw.a)?raw.a:[raw.a]).map(x=>idx.indexOf(x)),e:raw.e};
+});
+const TOTAL=Q.length, CORE=Q.filter(q=>q.l<4).length;
+
+/* ---------- состояние ---------- */
+let S; try{S=JSON.parse(localStorage.getItem('maison-qa-v1'))}catch(e){}
+if(!S||typeof S!=='object')S={m:{},c:0,w:0,name:''};
+const save=()=>localStorage.setItem('maison-qa-v1',JSON.stringify(S));
+const totalOf=l=>Q.filter(q=>q.l===l).length;
+const masteredOf=l=>Q.filter(q=>q.l===l&&S.m[q.id]).length;
+const masteredAll=()=>Object.keys(S.m).length;
+const masteredCore=()=>Q.filter(q=>q.l<5&&S.m[q.id]).length;
+const xp=()=>masteredCore()/CORE*100;
+const unlocked=l=>xp()+1e-9>=LEVELS[l].need;
+const unlockCount=()=>LEVELS.reduce((n,_,i)=>n+(unlocked(i)?1:0),0);
+const rank=()=>{const x=xp();return x>=100?'Lead QA Automation Engineer':x>=75?'Senior QA Engineer':x>=50?'QA Engineer':x>=25?'Junior QA Engineer':'Стажёр QA'};
+const acc=()=>(S.c+S.w)===0?'—':Math.round(S.c/(S.c+S.w)*100)+'%';
+
+/* ---------- навигация ---------- */
+function go(v){
+  ['home','quiz','portfolio'].forEach(id=>{$('#view-'+id).hidden=id!==v;});
+  $('#nav-home').classList.toggle('act',v==='home');
+  $('#nav-portfolio').classList.toggle('act',v==='portfolio');
+  window.scrollTo(0,0);
+  if(v==='home')renderHome();
+  if(v==='portfolio')renderPortfolio();
+}
+addEventListener('scroll',()=>$('#topbar').classList.toggle('solid',scrollY>40));
+
+/* ---------- тосты и модалы ---------- */
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800);}
+function closeModal(id){$('#'+id).classList.remove('show');}
+function showUnlock(li){
+  $('#mu-title').textContent = li===4?'Башня достроена':'Уровень '+LEVELS[li].num+' открыт';
+  $('#mu-text').textContent = li===4
+    ? 'Вы набрали 100% опыта знаний. Финальный экзамен мастерской — 20 продвинутых проверок — ожидает вас на вершине.'
+    : LEVELS[li].desc+' Этаж открыт — продолжайте восхождение.';
+  $('#mu-go').onclick=()=>{closeModal('mUnlock');startLevel(li);};
+  $('#mUnlock').classList.add('show');
+}
+function askReset(){$('#mReset').classList.add('show');}
+ $('#btn-reset-yes').onclick=()=>{localStorage.removeItem('maison-qa-v1');location.reload();};
+
+/* ---------- солнце-восход в герое ---------- */
+(function(){
+  const NS='http://www.w3.org/2000/svg', svg=$('#sun');
+  svg.setAttribute('viewBox','0 0 1000 1000');
+  const g=document.createElementNS(NS,'g');g.setAttribute('class','rays');
+  for(let i=0;i<60;i++){
+    const a=i*6*Math.PI/180, major=i%5===0;
+    const r1=178, r2=major?432:(i%2?330:288);
+    const l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',500+r1*Math.cos(a));l.setAttribute('y1',500+r1*Math.sin(a));
+    l.setAttribute('x2',500+r2*Math.cos(a));l.setAttribute('y2',500+r2*Math.sin(a));
+    l.setAttribute('stroke','#c9a45c');l.setAttribute('stroke-width',major?1.6:1);
+    l.setAttribute('opacity',major?.15:(i%2?.09:.055));
+    g.appendChild(l);
+    if(major){
+      const cx=500+(r2+18)*Math.cos(a), cy=500+(r2+18)*Math.sin(a);
+      const d=document.createElementNS(NS,'rect');
+      d.setAttribute('x',cx-4.5);d.setAttribute('y',cy-4.5);d.setAttribute('width',9);d.setAttribute('height',9);
+      d.setAttribute('transform','rotate(45 '+cx+' '+cy+')');
+      d.setAttribute('fill','#c9a45c');d.setAttribute('opacity','.2');
+      g.appendChild(d);
+    }
+  }
+  [206,252,300,354].forEach((r,k)=>{
+    const c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx',500);c.setAttribute('cy',500);c.setAttribute('r',r);
+    c.setAttribute('fill','none');c.setAttribute('stroke','#c9a45c');
+    c.setAttribute('stroke-width',1);c.setAttribute('opacity',Math.max(.03,.11-k*.025));
+    g.appendChild(c);
+  });
+  svg.appendChild(g);
+})();
+
+/* ---------- зиккурат башни ---------- */
+function buildZigg(){
+  const W=[104,150,196,242,288];let s='<svg id="zigg" viewBox="0 0 360 408" xmlns="http://www.w3.org/2000/svg">';
+  s+='<line x1="42" y1="384" x2="318" y2="384" stroke="rgba(201,164,92,.5)" stroke-width="1"/>';
+  s+='<path d="M180 16 L193 42 L167 42 Z" fill="none" stroke="rgba(201,164,92,.5)" stroke-width="1"/>';
+  s+='<line x1="180" y1="2" x2="180" y2="13" stroke="#c9a45c" stroke-width="1.5"/>';
+  for(let i=0;i<5;i++){
+    const lvl=4-i, w=W[i], h=54, y=68+i*(h+9), x=180-w/2;
+    s+='<g class="zt" data-l="'+lvl+'"><rect class="tier" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'"/>'
+      +'<text class="tn" x="180" y="'+(y+h/2)+'" dy=".35em">'+LEVELS[lvl].num+'</text></g>';
+  }
+  s+='</svg>';
+  $('#zigg-host').innerHTML=s;
+  $$('#zigg-host .zt').forEach(g=>g.addEventListener('click',()=>openLevel(+g.dataset.l)));
+}
+function openLevel(l){
+  if(!unlocked(l)){
+    toast(LEVELS[l].need===100
+      ?'Финальный экзамен откроется при 100% опыта — сейчас '+fmt(xp())+'%'
+      :'Закрыто: нужен порог '+LEVELS[l].need+'% — сейчас '+fmt(xp())+'%');
+    return;
+  }
+  startLevel(l);
+}
+
+/* ---------- главная ---------- */
+function updateChips(){
+  $('#chip-xp').textContent='Опыт '+fmt(xp())+'%';
+  $('#st-rank').textContent=rank();
+  $('#st-xp').textContent=fmt(xp())+'%';
+  $('#st-done').textContent=masteredAll()+'/'+TOTAL;
+  $('#st-acc').textContent=acc();
+  $('#railFill').style.width=xp()+'%';
+  $('#railKnob').style.left=xp()+'%';
+  $('#railXp').textContent=fmt(xp())+'%';
+  $('#railCnt').textContent=masteredAll()+' из '+TOTAL;
+  $('#zigRank').textContent=rank();
+  $$('#zigg-host .zt').forEach(g=>g.classList.toggle('on',unlocked(+g.dataset.l)));
+}
+function renderLedger(){
+  $('#ledger').innerHTML=LEVELS.map((L,i)=>{
+    const m=masteredOf(i),t=totalOf(i),pct=t?Math.round(m/t*100):0,ok=unlocked(i);
+    const needLbl=i===0?'открыт с самого начала':i===4?'финальный экзамен · 100% опыта':'открывается с '+L.need+'% опыта';
+    return '<div class="lvl '+(ok?'':'locked')+'" data-l="'+i+'">'
+      +'<div class="rn">'+L.num+'</div>'
+      +'<div><h3>'+L.title+'</h3><p>'+L.desc+'</p>'
+      +'<div class="meta"><span class="lbar"><i style="width:'+pct+'%"></i></span>'
+      +'<span class="cnt">'+m+'/'+t+'</span><span class="need">'+needLbl+'</span></div></div>'
+      +'<div class="side">'+(ok
+        ?'<button class="btn sm'+(ok?' solid':'')+'">Войти <svg class="ic"><use href="#i-arr"/></svg></button>'
+        :'<svg class="ic lock-ic" style="width:22px;height:22px"><use href="#i-lock"/></svg><span class="cnt">'+L.need+'%</span>')
+      +'</div></div>';
+  }).join('');
+  $$('#ledger .lvl').forEach(r=>r.addEventListener('click',()=>openLevel(+r.dataset.l)));
+}
+function renderHome(){renderLedger();updateChips();}
+
+/* ---------- сессия теста ---------- */
+let Sess=null;
+function startLevel(l,repeat=false){
+  const pool=Q.filter(q=>q.l===l&&(repeat||!S.m[q.id]));
+  const queue=pool.map(q=>q.id);
+  for(let i=queue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[queue[i],queue[j]]=[queue[j],queue[i]];}
+  Sess={l,queue,pos:0,ok:0,repeat,answered:false};
+  $('#quiz-live').hidden=false;$('#quiz-done').hidden=true;
+  go('quiz');
+  if(!queue.length){renderDone(true);return;}
+  renderQ();
+}
+function renderQ(){
+  if(Sess.pos>=Sess.queue.length){renderDone(false);return;}
+  Sess.answered=false;
+  const q=Q[Sess.queue[Sess.pos]];
+  $('#q-counter').textContent='Вопрос '+(Sess.pos+1)+' из '+Sess.queue.length;
+  $('#q-eyebrow').textContent='Уровень '+LEVELS[Sess.l].num+' · '+LEVELS[Sess.l].title;
+  $('#q-topic').textContent=q.t;
+  $('#q-text').innerHTML=esc(q.q);
+  $('#q-multi').hidden=q.a.length<2;
+  $('#opts').className='opts';
+  $('#opts').innerHTML=q.o.map((o,k)=>
+    '<div class="opt" data-k="'+k+'"><span class="box"></span><span>'+esc(o)+'</span></div>').join('');
+  $('#q-fb').hidden=true;$('#q-actions').hidden=false;
+  $('#btn-ans').disabled=true;
+  $$('#opts .opt').forEach(el=>el.addEventListener('click',()=>{
+    if(Sess.answered)return;
+    el.classList.toggle('sel');
+    $('#btn-ans').disabled=!$$('#opts .opt.sel').length;
+  }));
+}
+function submit(){
+  if(Sess.answered||!$$('#opts .opt.sel').length)return;
+  Sess.answered=true;
+  const q=Q[Sess.queue[Sess.pos]];
+  const sel=$$('#opts .opt.sel').map(e=>+e.dataset.k).sort((a,b)=>a-b);
+  const right=q.a.slice().sort((a,b)=>a-b).join()===sel.join();
+  const rankBefore=rank(), unlockBefore=unlockCount();
+  let fresh=false;
+  if(right){
+    Sess.ok++;S.c++;
+    if(!S.m[q.id]){S.m[q.id]=1;fresh=true;}
+  }else S.w++;
+  save();
+  $('#opts').classList.add('lock');
+  $$('#opts .opt').forEach(el=>{
+    const k=+el.dataset.k;
+    if(q.a.includes(k))el.classList.add('correct');
+    else if(sel.includes(k))el.classList.add('wrong');
+    else el.classList.add('dim');
+  });
+  const v=$('#fb-verdict');
+  v.className='verdict '+(right?'ok':'no');
+  v.innerHTML=(right?'<svg class="ic"><use href="#i-check"/></svg>Верно':'<svg class="ic"><use href="#i-x"/></svg>Неверно')
+    +(fresh?'<span class="xp">+1 к опыту</span>':'');
+  $('#fb-expl').textContent=q.e||'';
+  $('#fb-expl').style.display=q.e?'':'none';
+  $('#btn-next').innerHTML=(Sess.pos===Sess.queue.length-1?'Завершить':'Далее')+' <svg class="ic"><use href="#i-arr"/></svg>';
+  $('#q-actions').hidden=true;$('#q-fb').hidden=false;
+  updateChips();
+  const unlockAfter=unlockCount();
+  if(rankBefore!==rank())setTimeout(()=>toast('Новый ранг: '+rank()),400);
+  if(unlockAfter>unlockBefore)setTimeout(()=>showUnlock(unlockAfter-1),750);
+}
+function next(){Sess.pos++;renderQ();}
+ $('#btn-ans').addEventListener('click',submit);
+ $('#btn-next').addEventListener('click',next);
+document.addEventListener('keydown',e=>{
+  if(document.querySelector('.modal.show')||$('#view-quiz').hidden||$('#quiz-live').hidden)return;
+  if(/^[1-4]$/.test(e.key)&&!Sess.answered){
+    const o=$$('#opts .opt')[+e.key-1];if(o)o.click();
+  }else if(e.key==='Enter'){Sess.answered?next():submit();}
+});
+
+function renderDone(emptyStart){
+  $('#quiz-live').hidden=true;$('#quiz-done').hidden=false;
+  const l=Sess.l,L=LEVELS[l],m=masteredOf(l),t=totalOf(l),pct=Math.round(m/t*100);
+  const stats=Sess.repeat
+    ? 'Повторение завершено: '+Sess.ok+' из '+Sess.queue.length+' верно.'
+    : 'Освоено '+m+' из '+t+' проверок этажа ('+pct+'%).';
+  const hasNext=l<4&&unlocked(l+1);
+  $('#quiz-done').innerHTML='<div class="done">'
+    +'<div class="orn"><i></i><i></i><i></i></div>'
+    +'<h3>Уровень '+L.num+' — '+L.title+'</h3>'
+    +'<p class="dstats">'+(emptyStart?'Все проверки этого этажа уже освоены. ':stats)+stats+'</p>'
+    +'<div class="row">'
+    +'<button class="btn solid" onclick="go(\'home\')">В башню</button>'
+    +'<button class="btn" onclick="startLevel('+l+',true)">Повторить этаж</button>'
+    +(hasNext?'<button class="btn solid" onclick="startLevel('+(l+1)+')">Уровень '+LEVELS[l+1].num+' <svg class="ic"><use href="#i-arr"/></svg></button>':'')
+    +'</div></div>';
+}
+
+/* ---------- портфолио ---------- */
+ $('#pf-name').value=S.name||'';
+ $('#pf-name').addEventListener('input',e=>{S.name=e.target.value;save();});
+ $('#btn-pdf').onclick=()=>{go('portfolio');setTimeout(()=>print(),200);};
+
+function renderPortfolio(){
+  $('#pf-date').textContent='Обновлено: '+new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  $('#pf-rank').textContent=rank();
+  $('#pf-signline').textContent=S.name?S.name:'MAISON QA';
+  $('#sealNum').textContent=fmt(xp())+'%';
+  const opened=unlockCount();
+  $('#pf-sum').textContent='Освоено '+masteredAll()+' из '+TOTAL+' проверок знаний · опыт '+fmt(xp())+
+    '% · точность ответов '+acc()+' · открыто '+opened+' из 5 этажей башни. Уровень подготовки соответствует позиции «'+rank()+'».';
+  $('#pf-stats').innerHTML=
+    '<div class="cell"><b>'+fmt(xp())+'%</b><span>Опыт</span></div>'
+    +'<div class="cell"><b>'+masteredAll()+'/'+TOTAL+'</b><span>Проверок освоено</span></div>'
+    +'<div class="cell"><b>'+acc()+'</b><span>Точность</span></div>'
+    +'<div class="cell"><b>'+opened+'/5</b><span>Этажей открыто</span></div>';
+  $('#pf-map').innerHTML=GROUPS.map(([name,parts])=>{
+    const qs=Q.filter(q=>parts.includes(q.t));
+    const done=qs.filter(q=>S.m[q.id]).length;
+    const pct=qs.length?Math.round(done/qs.length*100):0;
+    return '<div class="row"><span class="kname">'+name+'</span>'
+      +'<span class="kbar"><i style="width:'+pct+'%"></i></span>'
+      +'<span class="kval">'+done+'/'+qs.length+'</span></div>';
+  }).join('');
+  $('#pf-levels').innerHTML=LEVELS.map((L,i)=>{
+    const m=masteredOf(i),t=totalOf(i),pct=Math.round(m/t*100),ok=unlocked(i);
+    const st=!ok?'закрыт':pct===100?'освоено':'в процессе';
+    return '<div class="pf-lv"><span class="rn">'+L.num+'</span><b>'+L.title+'</b>'
+      +'<span class="mut">'+m+'/'+t+'</span><span class="st '+(pct===100?'ok':'')+'">'+st+'</span></div>';
+  }).join('');
+  const strong=[],gaps=[];
+  GROUPS.forEach(([name,parts])=>{
+    const qs=Q.filter(q=>parts.includes(q.t));if(qs.length<3)return;
+    const done=qs.filter(q=>S.m[q.id]).length,pct=done/qs.length*100;
+    if(pct>=80)strong.push([name,Math.round(pct)+'%']);
+    if(pct<50)gaps.push([name,Math.round(pct)+'%']);
+  });
+  const li=a=>a.length?a.map(([n,p])=>'<li><b>'+n+'</b><span>'+p+'</span></li>').join(''):'<li>—</li>';
+  $('#pf-strong').innerHTML=li(strong);
+  $('#pf-gaps').innerHTML=li(gaps);
+}
+
+/* ---------- появление при скролле ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+ $$('.rv').forEach(el=>io.observe(el));
+
+/* ---------- старт ---------- */
+buildZigg();
+renderHome();
+go('home');
+</script>
 </body>
 </html>
