@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QA Deco — академия автоматизации тестирования</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Poiret+One&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4ecd8;--fg:#1a1610;--mut:#6a5d40;--card:#fbf6e8;--ln:#c9b078;--au:#8f6b14;--on:#fbf6e8;--ok:#1d7a4f;--er:#b3283c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#090d16;--fg:#f1e8cf;--mut:#a89c7a;--card:#0f1524;--ln:#6b5a24;--au:#d4af37;--on:#090d16;--ok:#4fd192;--er:#ff6b81}}
+:root[data-theme=dark]{--bg:#090d16;--fg:#f1e8cf;--mut:#a89c7a;--card:#0f1524;--ln:#6b5a24;--au:#d4af37;--on:#090d16;--ok:#4fd192;--er:#ff6b81}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 17px/1.65 Jost,"Segoe UI",system-ui,sans-serif}
+h1,h2,h3{font-family:"Poiret One",Jost,Georgia,serif;font-weight:400;margin:0;line-height:1.1}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--au);outline-offset:3px}
+.w{max-width:1080px;margin:0 auto;padding:0 20px}
+section{padding:72px 0}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);border-bottom:1px solid var(--ln);box-shadow:0 3px 0 -2px var(--bg),0 4px 0 -2px var(--ln)}
+nav .w{display:flex;align-items:center;gap:22px;height:62px}
+.logo{font:28px "Poiret One",serif;color:var(--au);margin-right:auto;letter-spacing:.04em}
+nav a{color:var(--mut);text-decoration:none;font-weight:500}nav a:hover{color:var(--au)}
+.btn{background:var(--au);color:var(--on);border:0;padding:13px 30px;font-weight:600;letter-spacing:.06em;text-decoration:none;display:inline-block;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%)}
+.btn.g{background:var(--ln);color:var(--fg)}
+.hero{position:relative;text-align:center;padding:96px 0 84px;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;background:repeating-conic-gradient(from -60deg at 50% 118%,var(--ln) 0 2deg,transparent 2deg 8deg);opacity:.5;-webkit-mask:radial-gradient(ellipse 70% 95% at 50% 100%,#000,transparent 75%);mask:radial-gradient(ellipse 70% 95% at 50% 100%,#000,transparent 75%)}
+.hero .w{position:relative}
+.hero h1{font-size:clamp(44px,9vw,104px);color:var(--au);letter-spacing:.06em}
+.hero .ru{font:clamp(18px,3vw,26px) "Poiret One",serif;letter-spacing:.32em;margin:14px 0 0;color:var(--fg)}
+.orn{display:flex;align-items:center;gap:14px;justify-content:center;margin:24px auto;max-width:420px;color:var(--au)}
+.orn:before,.orn:after{content:"";height:1px;flex:1;background:var(--au);box-shadow:0 4px 0 var(--ln)}
+.hero p{max-width:56ch;margin:0 auto 32px;color:var(--mut);font-size:18px}
+.facts{display:flex;justify-content:center;gap:clamp(20px,6vw,64px);margin-top:56px;flex-wrap:wrap}
+.facts b{display:block;font:44px "Poiret One",serif;color:var(--au)}.facts span{color:var(--mut);font-size:14px}
+h2{font-size:clamp(30px,5vw,46px);color:var(--au);text-align:center;letter-spacing:.05em}
+.sub{color:var(--mut);text-align:center;max-width:62ch;margin:14px auto 40px}
+.sub a{color:var(--au)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.ch{--p:polygon(16px 0,calc(100% - 16px) 0,100% 16px,100% calc(100% - 16px),calc(100% - 16px) 100%,16px 100%,0 calc(100% - 16px),0 16px);background:var(--au);padding:1.5px;clip-path:var(--p);display:block;border:0;text-align:left;width:100%}
+.ch>div{background:var(--card);clip-path:var(--p);padding:24px;height:100%}
+button.ch:hover>div{background:var(--bg)}
+.rn{font:34px "Poiret One",serif;color:var(--au)}
+.ch h3{font-size:23px;margin:6px 0 4px}.ch small{color:var(--mut)}
+.bar{height:6px;background:var(--ln);margin-top:14px;transform:skewX(-20deg)}
+.bar span{display:block;height:100%;background:var(--au);transition:width .5s}
+.pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px}
+.pill{border:1px solid var(--ln);background:transparent;padding:6px 16px;font-size:14px}
+.pill.on{background:var(--au);color:var(--on);border-color:var(--au)}
+#quiz,.xp{max-width:760px;margin:0 auto}.xp{margin-bottom:24px}.xp .bar{height:8px;margin:0 0 8px}.tk{display:grid;grid-template-columns:repeat(4,1fr);text-align:right;font-size:13px;color:var(--mut)}.tk .on{color:var(--au)}.pill:disabled{opacity:.45;cursor:not-allowed}
+.meta{color:var(--mut);font-size:14px;margin-bottom:10px}
+#quiz h3{font-size:clamp(24px,4vw,32px);margin-bottom:8px}
+.hint{color:var(--mut);font-size:14px;margin:0 0 18px}
+.opt{display:flex;gap:16px;align-items:flex-start;border:1px solid var(--ln);padding:13px 16px;margin-bottom:10px;cursor:pointer;position:relative}
+.opt:hover{border-color:var(--au)}
+.opt input{position:absolute;opacity:0}
+.dia{width:16px;height:16px;transform:rotate(45deg);border:1.5px solid var(--au);flex:none;margin:6px 4px 0}
+.opt input:checked+.dia{background:var(--au)}
+.opt input:focus-visible+.dia{outline:3px solid var(--au);outline-offset:3px}
+.opt.r{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.opt.w{border-color:var(--er);background:color-mix(in srgb,var(--er) 14%,transparent)}
+.opt.m{border-style:dashed;border-color:var(--ok)}
+.vd{margin:18px 0;padding-left:16px;border-left:3px solid var(--au)}
+.vd b{font:26px "Poiret One",serif}
+.stats{display:flex;gap:26px;justify-content:center;color:var(--mut);margin-top:22px;font-size:14px;flex-wrap:wrap}
+.tb{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center;margin-bottom:12px}
+.tb input{flex:1;max-width:340px;min-width:200px;padding:12px 14px;border:1px solid var(--ln);background:var(--card);color:var(--fg);font:inherit}
+#sheet{max-width:820px;margin:32px auto 0;background:#0a0e17;color:#f3e5ab;outline:1px solid #d4af37;outline-offset:-14px;border:1px solid #d4af37}
+#sheet .hd{position:relative;text-align:center;padding:52px 32px 30px;overflow:hidden}
+#sheet .hd:before{content:"";position:absolute;inset:0;background:repeating-conic-gradient(from -60deg at 50% 130%,rgba(212,175,55,.28) 0 2deg,transparent 2deg 8deg);opacity:.7}
+#sheet .hd>*{position:relative}
+#sheet small{color:#b8a56a;letter-spacing:.14em}
+#sheet h2{font-size:38px;color:#d4af37;margin:8px 0}
+.ring{width:118px;height:118px;border-radius:50%;display:grid;place-items:center;margin:18px auto 6px}
+.ring div{width:92px;height:92px;border-radius:50%;background:#0a0e17;display:grid;place-items:center;font:34px "Poiret One",serif;color:#f3e5ab}
+#sheet .bd{padding:10px 48px 30px}
+#sheet h3{font-size:22px;color:#d4af37;margin:26px 0 10px;text-align:center}
+#sheet h3:before{content:"◆ ";font-size:12px}#sheet h3:after{content:" ◆";font-size:12px}
+.row{display:grid;grid-template-columns:190px 1fr 46px;gap:14px;align-items:center;margin:10px 0;font-size:15px}
+.row .bar{background:#222a3d;margin:0}.row .bar span{background:linear-gradient(90deg,#8f6b14,#f3e5ab)}
+.tag{display:inline-block;border:1px solid #d4af37;color:#f3e5ab;padding:3px 14px;margin:0 6px 8px 0;font-size:14px}
+.tag.b{border-style:dashed;color:#b8a56a}
+#sheet .c{text-align:center}#sheet .hint{color:#b8a56a}
+#sheet .ft{border-top:1px solid #6b5a24;margin:0 28px;padding:14px 20px 26px;font-size:12px;color:#b8a56a;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+footer{padding:32px 0;color:var(--mut);font-size:14px;text-align:center;border-top:1px solid var(--ln)}
+@media(max-width:760px){nav a.h{display:none}.row{grid-template-columns:120px 1fr 40px}#sheet .bd{padding:10px 24px 24px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media print{.noprint{display:none!important}body{background:#0a0e17}section#portfolio{padding:0}#sheet{margin:0;max-width:none}@page{size:A4;margin:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+:root{--gl:rgba(255,255,255,.55);--gl2:rgba(255,255,255,.85);--o1:rgba(201,162,60,.35);--o2:rgba(30,140,120,.22)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--gl:rgba(255,255,255,.06);--gl2:rgba(212,175,55,.14);--o1:rgba(212,175,55,.26);--o2:rgba(20,160,140,.2)}}
+:root[data-theme=dark]{--gl:rgba(255,255,255,.06);--gl2:rgba(212,175,55,.14);--o1:rgba(212,175,55,.26);--o2:rgba(20,160,140,.2)}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(620px 420px at 10% 15%,var(--o1),transparent 70%),radial-gradient(720px 520px at 92% 42%,var(--o2),transparent 70%),radial-gradient(560px 420px at 38% 96%,var(--o1),transparent 70%)}
+nav{background:color-mix(in srgb,var(--bg) 55%,transparent);-webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%)}
+.ch{background:var(--gl);padding:0;clip-path:none;border:1px solid var(--au);outline:1px solid var(--ln);outline-offset:-7px;-webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 24px 60px -24px rgba(0,0,0,.6);transition:transform .25s,background .25s}
+.ch>div{background:none;clip-path:none;padding:28px}
+button.ch:hover{background:var(--gl2);transform:translateY(-3px)}button.ch:hover>div{background:none}
+.opt,.pill,.tb input{background:var(--gl);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.pill.on{background:var(--au)}
+.facts>div{background:var(--gl);border:1px solid var(--ln);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);padding:14px 30px;box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
+.btn{background:linear-gradient(180deg,rgba(255,255,255,.4),transparent 55%),var(--au)}
+.btn.g{background:var(--gl);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+#sheet{background:linear-gradient(135deg,rgba(24,30,52,.7),rgba(10,14,23,.88));-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 30px 80px -30px rgba(0,0,0,.7)}
+@media print{body:before{display:none}#sheet{background:#0a0e17;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}}
+</style>
+</head>
+<body>
+<nav class="noprint"><div class="w"><span class="logo">QA Deco</span><a class="h" href="#program">Программа</a><a class="h" href="#trainer">Испытание</a><a class="h" href="#portfolio">Портфолио</a><a class="btn" href="#trainer">Начать</a></div></nav>
+
+<header class="hero noprint"><div class="w">
+<h1>QA Automation</h1>
+<p class="ru">АКАДЕМИЯ АВТОМАТИЗАЦИИ ТЕСТИРОВАНИЯ</p>
+<div class="orn">◆ ◆ ◆</div>
+<p>Тесты с вариантами ответов закрепляют теорию, SQL, API, Git и автотесты. Сайт сам отмечает, что вы уже знаете, и собирает из этого портфолио для PDF.</p>
+<a class="btn" href="#trainer">Пройти испытание</a> <a class="btn g" href="#portfolio">Моё портфолио</a>
+<div class="facts"><div><b>8</b><span>модулей</span></div><div><b>5</b><span>уровней сложности</span></div><div><b id="fq">0</b><span>вопросов из 300 загружено</span></div><div><b>PDF</b><span>портфолио одним кликом</span></div></div>
+</div></header>
+
+<section id="program" class="noprint"><div class="w">
+<h2>Восемь модулей</h2>
+<p class="sub">Темы модулей построены по программе курса <a href="https://stepik.org/171826" target="_blank" rel="noopener">«Тестирование ПО с нуля» на Stepik</a> и дополнены автоматизацией на Python. Нажмите на модуль, чтобы тренировать только его.</p>
+<div class="grid" id="topics"></div>
+</div></section>
+
+<section id="trainer" class="noprint"><div class="w">
+<h2>Испытание</h2>
+<p class="sub">Отметьте все верные варианты и нажмите «Проверить». Уровень 2 открывается при 25% опыта, уровень 3 при 50%, уровень 4 при 75%. Уровень 5 необязателен и открывается при 100%. Опыт растёт, когда вы верно отвечаете на вопросы уровней 1–4.</p>
+<div class="xp" id="xp"></div>
+<div class="pills" id="pills"></div>
+<div id="quiz"></div>
+<div class="stats" id="stats"></div>
+</div></section>
+
+<section id="portfolio"><div class="w">
+<div class="noprint">
+<h2>Ваше портфолио</h2>
+<p class="sub">Лист обновляется после каждого ответа. Впишите имя и сохраните его в PDF: в окне печати выберите «Сохранить как PDF». Если окно не открылось, откройте страницу в отдельной вкладке.</p>
+<div class="tb"><input id="nm" placeholder="Имя и фамилия" aria-label="Имя и фамилия"><button class="btn" id="pdf">Скачать PDF</button><button class="btn g" id="rs">Сбросить</button></div>
+</div>
+<div id="sheet"></div>
+</div></section>
+
+<footer class="noprint">QA Deco — прогресс хранится только в вашем браузере.</footer>
+
+<script>
+const T=["Теория тестирования","Тест-дизайн","Документация","Веб и мобайл","SQL","API и Postman","Git и bash","Автоматизация"];
+const R=["I","II","III","IV","V","VI","VII","VIII"];
+const Q=[
+[0,"Что относится к принципам тестирования?",["Исчерпывающее тестирование невозможно","Тестирование показывает наличие дефектов, а не их отсутствие","Хороший тест-кейс всегда проходит","Дефекты распределены по модулям равномерно"],[0,1],"Верны первые два принципа. Дефекты обычно скапливаются в нескольких модулях, а ценный тест как раз находит дефект."],
+[0,"Какие виды тестирования нефункциональные?",["Производительность","Удобство использования (usability)","Проверка бизнес-логики оформления заказа","Безопасность"],[0,1,3],"Нефункциональные проверки отвечают на вопрос «как работает», а бизнес-логика проверяет «что делает»."],
+[1,"Какие техники относятся к чёрному ящику?",["Классы эквивалентности","Анализ граничных значений","Покрытие операторов","Таблица решений"],[0,1,3],"Покрытие операторов требует знания кода, это белый ящик."],
+[1,"Поле возраста принимает 18–65 включительно. Какие значения граничные?",["17","18","40","66"],[0,1,3],"Границы 18 и 65: проверяют 17, 18, 65, 66. Значение 40 просто представитель класса."],
+[2,"Что должно быть в хорошем баг-репорте?",["Шаги воспроизведения","Ожидаемый и фактический результат","Оценка личности разработчика","Окружение и версия сборки"],[0,1,3],"Репорт должен позволять воспроизвести дефект без вопросов автору."],
+[2,"Какие документы относятся к тестовой документации?",["Тест-план","Чек-лист","Тест-кейс","Исходный код продукта"],[0,1,2],"Исходный код — часть продукта, а не тестовая документация."],
+[3,"Что проверяют в кросс-браузерном тестировании?",["Работу в разных браузерах","Отображение на разных разрешениях","Скорость набора текста пользователем","Работу в разных версиях браузера"],[0,1,3],"Цель — одинаково корректная работа во всех целевых окружениях."],
+[3,"Что специфично для мобильных приложений?",["Прерывания (звонок, уведомление)","Смена ориентации экрана","Установка через npm","Нестабильная сеть"],[0,1,3],"Это типичные мобильные сценарии, которых нет в вебе."],
+[4,"Какие запросы вернут только строки с совпадением в обеих таблицах?",["INNER JOIN","LEFT JOIN","JOIN без уточнения","FULL OUTER JOIN"],[0,2],"JOIN по умолчанию равен INNER JOIN. LEFT и FULL сохраняют и несовпавшие строки."],
+[4,"Что верно про WHERE и HAVING?",["WHERE фильтрует строки до группировки","HAVING фильтрует группы после GROUP BY","HAVING выполняется раньше WHERE","В WHERE нельзя сравнивать значения"],[0,1],"Сначала строки отбирает WHERE, затем группы отбирает HAVING."],
+[5,"Какие HTTP-методы идемпотентны?",["GET","PUT","DELETE","POST"],[0,1,2],"Повтор POST создаёт новый ресурс, поэтому он не идемпотентен."],
+[5,"Что стоит проверить в ответе API?",["Код статуса","Структуру тела ответа","Заголовки","Цвет кнопки в интерфейсе"],[0,1,2],"Интерфейс к API-ответу не относится."],
+[6,"Какие команды относятся к работе с Git?",["git commit","git push","git branch","git compile"],[0,1,2],"Команды git compile не существует."],
+[6,"Что делает git reset --soft HEAD~1?",["Отменяет последний коммит","Оставляет изменения в индексе","Безвозвратно удаляет изменения","Создаёт новую ветку"],[0,1],"Коммит снимается, а изменения остаются готовыми к новому коммиту."],
+[7,"Что верно про фикстуры pytest?",["Готовят и очищают окружение","Подставляются по имени аргумента теста","Работают только в unittest","Имеют scope: function, module, session"],[0,1,3],"Фикстуры — часть pytest, и scope задаёт срок их жизни."],
+[7,"Как снизить flaky в UI-автотестах?",["Явные ожидания вместо sleep","Независимые данные в каждом тесте","Добавить больше sleep","Стабильные локаторы (id, data-testid)"],[0,1,3],"Sleep лишь маскирует гонки и замедляет прогон."],
+[0,"Что делает тестировщик?",["Ищет дефекты и оценивает качество продукта","Проверяет соответствие требованиям","Пишет весь код продукта","Помогает предотвращать дефекты на ранних этапах"],[0,1,3],"Тестировщик оценивает качество и предотвращает дефекты, но не пишет продукт.",1],
+[4,"Какие операторы SQL изменяют данные?",["INSERT","UPDATE","SELECT","DELETE"],[0,1,3],"SELECT только читает данные.",1],
+[5,"Какие коды относятся к клиентским ошибкам (4xx)?",["400","404","500","403"],[0,1,3],"4xx — ошибки клиента, 5xx — сервера.",2],
+[6,"Какие команды bash показывают каталог и файл?",["ls","cat","mkdir","cd"],[0,1],"ls показывает каталог, cat — содержимое файла.",2],
+[0,"Что верно про smoke и regression?",["Smoke проверяет, что сборка вообще работает","Regression проверяет, что старое не сломалось","Smoke — полный набор всех тестов","Regression запускают один раз за проект"],[0,1],"Smoke быстрый и поверхностный, regression глубокий и повторяется.",3],
+[1,"Что верно про таблицу решений и pairwise?",["Таблица решений описывает комбинации условий и результатов","Pairwise покрывает все пары значений параметров","Pairwise перебирает все возможные комбинации","Таблица решений — техника белого ящика"],[0,1],"Pairwise сокращает число комбинаций, покрывая каждую пару значений.",3],
+[2,"Что описывает тест-план?",["Объём и стратегию тестирования","Критерии входа и выхода","Ресурсы и расписание","Реализацию функций продукта"],[0,1,2],"Реализация функций — задача разработки.",3],
+[5,"Что верно про коды 401 и 403?",["401: пользователь не аутентифицирован","403: доступ запрещён известному пользователю","401 и 403 всегда означают одно и то же","403 означает, что ресурс не найден"],[0,1],"401 про аутентификацию, 403 про права.",3],
+[7,"Что даёт parametrize в pytest?",["Запуск одного теста на разных данных","Отдельный результат для каждого набора","Автоматический перевод теста на другой язык","Читаемые имена кейсов через ids"],[0,1,3],"parametrize размножает кейсы, ids даёт им понятные имена.",3],
+[7,"Что верно про Page Object?",["Локаторы и действия страницы собраны в классе","Тесты меньше зависят от деталей вёрстки","Он нужен только для API-тестов","Изменение вёрстки правят в одном месте"],[0,1,3],"Паттерн снижает стоимость поддержки UI-автотестов.",4],
+[7,"Что верно про ожидания в Selenium?",["Явные ждут конкретное условие","Неявные задают общий таймаут поиска","Явные и неявные безопасно смешивать","time.sleep надёжно заменяет ожидания"],[0,1],"Смесь ожиданий даёт непредсказуемые задержки, а sleep хрупок.",4],
+[5,"Что даёт контрактное тестирование?",["Проверку формата запросов и ответов между сервисами","Раннее обнаружение несовместимых изменений","Проверку цвета элементов интерфейса","Проверку без развёртывания всей системы"],[0,1,3],"Контракт ловит поломки интеграции заранее и дёшево.",4],
+[4,"Что ускоряет запросы к данным?",["Индексы по полям фильтрации","Выборка нужных столбцов вместо SELECT *","Замена любого JOIN подзапросом","LIMIT в разведочных запросах"],[0,1,3],"Подзапрос не всегда быстрее JOIN, а индексы и узкая выборка помогают почти всегда.",4],
+[6,"Что верно про merge и rebase?",["Merge сохраняет историю ветвления","Rebase переписывает коммиты поверх новой базы","Rebase безопасен на общих публичных ветках","Rebase даёт более линейную историю"],[0,1,3],"На публичных ветках rebase опасен: он меняет хеши коммитов.",4],
+[7,"Что верно про параллельный запуск (pytest-xdist)?",["Тесты должны быть независимыми","Общее изменяемое состояние ломает прогон","Параллельность сама лечит flaky","Запускается флагом -n"],[0,1,3],"Параллельность вскрывает скрытые зависимости, а не лечит их.",5],
+[7,"Что делает автотесты стабильнее?",["Изоляция данных и окружения","Подготовка и очистка через фикстуры","Повторный запуск как единственное лекарство","Моки нестабильных внешних сервисов"],[0,1,3],"Повторный запуск лишь маскирует причину.",5],
+[5,"Что проверяют негативные API-тесты?",["Запрос без токена","Неверный тип поля в теле","Только успешные сценарии","Слишком длинные значения полей"],[0,1,3],"Негативные тесты проверяют корректную обработку ошибок.",5],
+[0,"Что верно про риск-ориентированное тестирование?",["Приоритет у зон с высоким риском","Учитываются вероятность и влияние дефекта","Все функции тестируют одинаково глубоко","Оно помогает при нехватке времени"],[0,1,3],"Ограниченное время тратят туда, где ошибка дороже.",5],
+[1,"Какие техники опираются на опыт тестировщика?",["Исследовательское тестирование","Предугадывание ошибок","Таблица решений","Проверка по списку типичных дефектов"],[0,1,3],"Таблица решений — формальная техника.",5],
+[6,"Что верно про перенаправления в bash?",["> пишет вывод в файл","| передаёт вывод другой команде","&lt; пишет вывод в файл","| и > делают одно и то же"],[0,1],"&lt; подаёт файл на ввод команды.",5],
+[3,"Что входит в базовую проверку безопасности веб-приложения?",["Права доступа к чужим данным","Экранирование ввода (XSS)","Цвет кнопок","Защита от SQL-инъекций"],[0,1,3],"Типичные уязвимости: слабые права, XSS, SQL-инъекции.",5],
+[2,"Что входит в отчёт о тестировании?",["Что и как проверили","Найденные дефекты и их статус","Вывод о готовности к релизу","Личные оценки коллег"],[0,1,2],"Отчёт объективен и помогает решить, выпускать ли релиз.",5],
+[0,"Зачем нужно тестирование ПО?",["Находить дефекты до пользователей","Снижать риски при выпуске","Гарантировать полное отсутствие ошибок","Оценивать качество продукта"],[0,1,3],"Тестирование снижает риски и оценивает качество, но не гарантирует отсутствие ошибок.",1],
+[2,"Что верно про чек-лист?",["Это список проверок без подробных шагов","Он быстро покрывает основные сценарии","Он обязан содержать предусловия и данные для каждого шага","Это вид тестовой документации"],[0,1,3],"Подробные шаги и данные — признак тест-кейса.",1],
+[6,"Для чего нужен Git?",["Хранить историю изменений кода","Работать над проектом в команде","Проверять орфографию в тексте","Работать с ветками"],[0,1,3],"Git — система контроля версий: история, ветки, командная работа.",1],
+[1,"Что верно про класс эквивалентности?",["Это набор данных с одинаковым ожидаемым поведением","Достаточно проверить одного представителя класса","Это класс из объектно-ориентированного кода","Он помогает сократить число тест-кейсов"],[0,1,3],"Это понятие тест-дизайна, а не класс из программирования.",2],
+[3,"Что проверяют при тестировании UI веб-страницы?",["Расположение и читаемость элементов","Работу кнопок и ссылок","Структуру таблиц в базе данных","Сообщения об ошибках для пользователя"],[0,1,3],"Структура БД не относится к интерфейсу.",2],
+[4,"Какие функции агрегируют данные в SQL?",["COUNT","SUM","MAX","PRINT"],[0,1,2],"PRINT не агрегатная функция.",2],
+[3,"Что входит в тестирование совместимости?",["Разные браузеры и версии","Разные операционные системы","Разные размеры экранов","Скорость ответа сервера под нагрузкой"],[0,1,2],"Нагрузка относится к тестированию производительности.",3],
+[0,"Что верно про верификацию и валидацию?",["Верификация: строим ли продукт правильно","Валидация: строим ли правильный продукт","Это одно и то же","Валидация проверяет только код"],[0,1],"Верификация сверяет с требованиями, валидация с потребностями пользователя.",3],
+[5,"Что верно про Postman?",["Тесты пишут на JavaScript","Есть переменные окружения","Он не умеет проверять тело ответа","Запросы объединяют в коллекции"],[0,1,3],"Postman проверяет и статус, и тело ответа.",4],
+[4,"Что верно про транзакции?",["Выполняются целиком или не выполняются совсем","COMMIT фиксирует изменения","ROLLBACK навсегда применяет изменения","Нужны для целостности данных"],[0,1,3],"ROLLBACK откатывает изменения.",4],
+[7,"Что верно про Playwright?",["Умеет автоматически ждать элементы","Поддерживает несколько браузерных движков","Работает только с Firefox","Умеет перехватывать сетевые запросы"],[0,1,3],"Playwright работает с Chromium, Firefox и WebKit.",5],
+[6,"Что верно про git revert?",["Создаёт коммит, отменяющий изменения","Безопасен для опубликованных коммитов","Переписывает историю ветки","Подходит для общей ветки"],[0,1,3],"Revert не меняет историю, а добавляет отменяющий коммит.",5]
+];
+const LV=[1,1,2,2,1,1,2,2,3,3,3,2,1,4,4,4];Q.forEach((q,i)=>{if(i<16)q[5]=LV[i]});
+const $=s=>document.querySelector(s);
+let S={name:"",c:{},l:{},streak:0,best:0,ans:0};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem("qad2")||"{}"))}catch(e){}
+const save=()=>{try{localStorage.setItem("qad2",JSON.stringify(S))}catch(e){}};
+let lv=0,msg="",cur=null,flt=-1,ord=[],pick=null;
+const idx=t=>Q.map((q,i)=>q[0]===t?i:-1).filter(i=>i>=0);
+const pct=t=>{const a=idx(t);return Math.round(a.reduce((s,i)=>s+(S.c[i]||0)/3,0)/a.length*100)};
+const seen=t=>idx(t).filter(i=>i in S.c).length;
+const total=()=>Math.round(T.reduce((s,_,t)=>s+pct(t),0)/T.length);
+const lvl=p=>p<25?"Ученик":p<50?"Практикант":p<75?"Junior QA Automation":p<100?"Middle QA Automation":"Мастер автоматизации";
+const LVQ=l=>Q.map((q,i)=>q[5]===l?i:-1).filter(i=>i>=0);
+const lp=l=>{const a=LVQ(l);return a.length?a.filter(i=>S.l[i]).length/a.length:0};
+const xp=()=>Math.floor([1,2,3,4].reduce((t,l)=>t+lp(l),0)/4*100+1e-9);
+const need=[0,0,25,50,75,100];
+const isOpen=l=>xp()>=need[l];
+
+function topics(){$("#topics").innerHTML=T.map((t,i)=>`<button class="ch" onclick="setF(${i})"><div><span class="rn">${R[i]}</span><h3>${t}</h3><small>Освоено вопросов: ${seen(i)} из ${idx(i).length}</small><div class="bar"><span style="width:${pct(i)}%"></span></div></div></button>`).join("");
+$("#xp").innerHTML=`<div class="bar"><span style="width:${xp()}%"></span></div><div class="tk">${[25,50,75,100].map((n,i)=>`<span class="${xp()>=n?"on":""}">${n}% · ур. ${i+2}</span>`).join("")}</div>`;
+$("#pills").innerHTML=[0,1,2,3,4,5].map(l=>{const o=l===0||isOpen(l),a=LVQ(l),d=a.filter(i=>S.l[i]).length;return `<button class="pill ${l===lv?"on":""}" ${o?"":"disabled"} onclick="setL(${l})">${l?"Уровень "+l+" · "+(o?d+"/"+a.length:"закрыт"):"Все открытые"}</button>`}).join("")+(flt>=0?`<button class="pill on" onclick="setF(-1,1)">Модуль ${R[flt]} ✕</button>`:"")}
+function setL(l){lv=l;cur=null;next()}
+function setF(t,stay){flt=t;cur=null;next();if(!stay)$("#trainer").scrollIntoView()}
+function next(){msg="";const pool=Q.map((q,i)=>i).filter(i=>isOpen(Q[i][5])&&(!lv||Q[i][5]===lv)&&(flt<0||Q[i][0]===flt));
+if(!pool.length){$("#quiz").innerHTML='<div class="ch"><div>В этом сочетании пока нет открытых вопросов. Выберите другой уровень или модуль.</div></div>';topics();return}
+const sc=i=>(S.l[i]?100:0)+Q[i][5]*10+(S.c[i]||0),m=Math.min(...pool.map(sc));
+let c=pool.filter(i=>sc(i)===m&&i!==cur);if(!c.length)c=pool.filter(i=>i!==cur);if(!c.length)c=pool;
+cur=c[Math.floor(Math.random()*c.length)];pick=null;
+ord=Q[cur][2].map((_,k)=>k).sort(()=>Math.random()-.5);draw()}
+function draw(){const q=Q[cur],done=pick!==null;
+const ok=done&&JSON.stringify([...pick].sort())===JSON.stringify(q[3]);
+$("#quiz").innerHTML=`<div class="ch"><div><div class="meta">${R[q[0]]} · ${T[q[0]]} · уровень ${q[5]}</div><h3>${q[1]}</h3><p class="hint">Отметьте все верные варианты</p>`+
+ord.map(o=>{const c=q[3].includes(o),p=done&&pick.includes(o);
+const cl=done?(c&&p?"r":!c&&p?"w":c?"m":""):"";
+return `<label class="opt ${cl}"><input type="checkbox" ${p?"checked":""} ${done?"disabled":""}><span class="dia"></span><span>${q[2][o]}</span></label>`}).join("")+
+(done?`<div class="vd"><b style="color:var(--${ok?"ok":"er"})">${ok?"Верно":"Не совсем"}</b><br>${q[4]}${msg?`<br><b style="color:var(--au)">${msg}</b>`:""}</div><button class="btn" onclick="next()">Следующий вопрос</button>`:`<button class="btn" onclick="check()">Проверить</button>`)+`</div></div>`;
+$("#stats").innerHTML=`<span>Опыт: ${xp()}%</span><span>Серия: ${S.streak}</span><span>Лучшая серия: ${S.best}</span><span>Ответов: ${S.ans}</span>`;topics()}
+function check(){const b=[...document.querySelectorAll("#quiz input")];
+const p=ord.filter((o,k)=>b[k].checked);if(!p.length)return;
+const ok=JSON.stringify([...p].sort())===JSON.stringify(Q[cur][3]);
+const x0=xp();if(ok)S.l[cur]=1;S.c[cur]=ok?Math.min(3,(S.c[cur]||0)+1):0;S.streak=ok?S.streak+1:0;S.best=Math.max(S.best,S.streak);S.ans++;
+msg=[2,3,4,5].filter(l=>x0<need[l]&&xp()>=need[l]).map(l=>"Открыт уровень "+l+"!").join(" ");save();pick=p;sheet();draw()}
+
+function sheet(){const p=xp(),strong=T.filter((t,i)=>pct(i)>=60),weak=T.filter((t,i)=>seen(i)>0&&pct(i)<40);
+const bd=[[S.ans>=5,"Первые шаги: 5 ответов"],[S.best>=5,"Серия из 5 верных"],[T.some((t,i)=>pct(i)>=80),"Модуль освоен на 80%+"],[xp()>=100,"Открыт уровень 5"],[Object.keys(S.c).length===Q.length,"Все загруженные вопросы пройдены"]].filter(b=>b[0]);
+$("#sheet").innerHTML=`<div class="hd"><small>ПОРТФОЛИО QA-АВТОМАТИЗАТОРА</small><h2 id="sn">${S.name||"Ваше имя"}</h2><small>${lvl(p)} · ${new Date().toLocaleDateString("ru-RU")}</small><div class="ring" style="background:conic-gradient(#d4af37 ${p*3.6}deg,#222a3d 0)"><div>${p}%</div></div></div>
+<div class="bd"><h3>Уровни знаний</h3>${[1,2,3,4,5].map(l=>{const a=LVQ(l),z=Math.round(lp(l)*100);return `<div class="row"><span>Уровень ${l}${l===5?" · по желанию":""}${isOpen(l)?"":" · закрыт"}</span><div class="bar"><span style="width:${z}%"></span></div><b>${z}%</b></div>`}).join("")}<h3>Освоение модулей</h3>${T.map((t,i)=>`<div class="row"><span>${R[i]} · ${t}</span><div class="bar"><span style="width:${pct(i)}%"></span></div><b>${pct(i)}%</b></div>`).join("")}
+<div class="c"><h3>Сильные стороны</h3>${strong.length?strong.map(t=>`<span class="tag">${t}</span>`).join(""):'<span class="hint">Пока пусто: пройдите вопросы, и здесь появятся закреплённые модули.</span>'}
+<h3>Зона роста</h3>${weak.length?weak.map(t=>`<span class="tag b">${t}</span>`).join(""):'<span class="hint">Слабых модулей пока нет.</span>'}
+<h3>Достижения</h3>${bd.length?bd.map(b=>`<span class="tag">${b[1]}</span>`).join(""):'<span class="hint">Достижения откроются по мере прохождения.</span>'}</div></div>
+<div class="ft"><span>Ответов: ${S.ans} · Лучшая серия: ${S.best}</span><span>Сформировано автоматически в QA Deco</span></div>`}
+
+$("#nm").value=S.name;
+$("#nm").oninput=e=>{S.name=e.target.value;save();$("#sn").textContent=S.name||"Ваше имя"};
+$("#pdf").onclick=()=>{try{window.print()}catch(e){}};
+$("#rs").onclick=()=>{S={name:S.name,c:{},l:{},streak:0,best:0,ans:0};lv=0;flt=-1;save();sheet();next()};
+$("#fq").textContent=Q.length;sheet();next();
+</script>
+</body>
+</html>
