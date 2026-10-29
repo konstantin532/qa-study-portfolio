@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="QA Study Portfolio — локальный учебный кабинет QA-инженера: курс, конспекты, вопросы, практика и портфолио без сервера и без интернета">
-<meta name="theme-color" content="#0A1929">
+<meta name="theme-color" content="#f3f0e9">
 <title>QA Study Portfolio — Учебный кабинет QA-инженера</title>
 <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/01-base-reset-vars.css">
@@ -16,9 +16,7 @@
 <link rel="stylesheet" href="css/07-layout.css">
 <link rel="stylesheet" href="css/08-components.css">
 <link rel="stylesheet" href="css/09-print-deco.css" media="print">
-<link rel="stylesheet" href="css/theme-pro.css">
-<!-- patterns: data-URI backgrounds, last in cascade -->
-<link rel="stylesheet" href="assets/deco-patterns.css.svg">
+<link rel="stylesheet" href="css/fieldwork.css">
 </head>
 <body>
 <svg hidden aria-hidden="true" class="icon-sprite">
@@ -164,6 +162,7 @@
 <aside id="context-panel" aria-label="Контекстная панель"></aside>
 </div>
 </div>
+<button class="sidebar-backdrop" type="button" aria-label="Закрыть меню" tabindex="-1" hidden></button>
 <div id="modals">
 <div class="modal" id="onboarding-modal" hidden role="dialog" aria-modal="true" aria-labelledby="onboarding-modal-title">
 <div class="modal__overlay"></div>
@@ -214,8 +213,8 @@
 </div>
 </div>
 </div>
-<div id="toast-container" role="region" aria-label="Уведомления" aria-live="polite"></div>
-<div id="save-indicator" role="status" data-state="idle"><span class="save-indicator__text"></span><span class="visually-hidden"></span></div>
+<div id="toast-container" class="toast-container" role="region" aria-label="Уведомления" aria-live="polite"></div>
+<div id="save-indicator" class="save-indicator" role="status" data-state="idle"><span class="save-indicator__text"></span><span class="visually-hidden"></span></div>
 <script defer src="js/utils/course-data.js"></script>
 <script defer src="js/utils/utils.js"></script>
 <script defer src="js/logic/idb.js"></script>
@@ -226,6 +225,5 @@
 <script defer src="js/logic/forms.js"></script>
 <script defer src="js/logic/keyboard.js"></script>
 <script defer src="js/core/main.js"></script>
-<script src="js/utils/motion.js"></script>
 </body>
 </html>

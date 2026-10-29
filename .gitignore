@@ -1,0 +1,6 @@
+work/
+node_modules/
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/build/
+*.log
