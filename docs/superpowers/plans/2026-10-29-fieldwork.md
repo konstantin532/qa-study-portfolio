@@ -19,7 +19,7 @@ Mobile first viewport and menu focus; persisted legacy data; dark/light contrast
 - [x] Replace dashboard and Today with semantic, data-backed views and a working module index.
 - [x] Run static syntax checks and focused browser checks, then one complete route/workflow pass.
 - [x] Capture desktop/mobile, obtain independent review, fix material findings, update design record and HTML/CSV report.
-- [ ] Commit, push topic branch, create and attach draft PR with validation and limits.
+- [x] Commit, push topic branch, create and attach draft PR with validation and limits: https://github.com/konstantin532/qa-study-portfolio/pull/3.
 
 ## Verification ledger
 Final Chromium run: `node scripts/verify-ui.cjs` — 43 PASS, zero uncaught exceptions and zero external runtime requests. Includes real note body/title/conclusion persistence, rapid two-note switching, backup round trip, standalone export, search, themes, direct file launch and all 15 sections at 1440/390px.
