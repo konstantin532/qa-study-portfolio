@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-29T13:11:56.547346Z",
+  "title": "Design System: QA Study Portfolio — Fieldwork",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Warm paper"
+      },
+      "raised-paper": {
+        "role": "neutral",
+        "displayName": "Raised paper"
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite"
+      },
+      "sage": {
+        "role": "neutral",
+        "displayName": "Muted sage"
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Deep vermilion"
+      },
+      "signal-vermilion": {
+        "role": "primary",
+        "displayName": "Course signal"
+      },
+      "dark-accent": {
+        "role": "primary",
+        "displayName": "Terracotta on charcoal"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Выразительная крупная типографика; локальный Unbounded с кириллицей."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Заголовки рабочих разделов."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Основной текст; локальный Manrope с кириллицей."
+      },
+      "mono": {
+        "displayName": "Code and measurement",
+        "purpose": "Код и измеряемые значения."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-sm",
+        "value": "0 2px 8px rgba(27,34,24,.06)",
+        "purpose": "Сдержанное малое перекрытие."
+      },
+      {
+        "name": "shadow-md",
+        "value": "0 9px 26px rgba(27,34,24,.1)",
+        "purpose": "Уведомления."
+      },
+      {
+        "name": "shadow-lg",
+        "value": "0 20px 70px rgba(16,23,14,.2)",
+        "purpose": "Диалог и открытое мобильное меню."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-duration",
+        "value": "160ms",
+        "purpose": "Смена цвета интерактивного состояния."
+      },
+      {
+        "name": "drawer-duration",
+        "value": "240ms",
+        "purpose": "Открытие мобильной панели."
+      },
+      {
+        "name": "drawer-ease",
+        "value": "cubic-bezier(.16,1,.3,1)",
+        "purpose": "Замедление мобильной панели."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "none",
+        "purpose": "Анимации и переходы отключены при prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "small-phone-max",
+        "value": "440px"
+      },
+      {
+        "name": "single-column-max",
+        "value": "760px"
+      },
+      {
+        "name": "mobile-navigation-max",
+        "value": "1023px"
+      },
+      {
+        "name": "desktop-navigation-min",
+        "value": "1024px"
+      },
+      {
+        "name": "compact-desktop-max",
+        "value": "1250px"
+      },
+      {
+        "name": "wide-display-min",
+        "value": "1600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Основное действие; минимум 44px, без подъёма.",
+      "html": "<button class=\"ds-primary\">Сохранить</button>",
+      "css": ".ds-primary{min-height:44px;padding:10px 17px;border:1px solid transparent;border-radius:7px;background:var(--accent,#b74026);color:var(--text-on-accent,#fffaf4);font:700 13px/1.5 var(--font-primary,Manrope,sans-serif);cursor:pointer;transition:background-color 160ms}.ds-primary:hover{background:var(--accent-hover,#97351f)}.ds-primary:focus-visible{outline:2px solid var(--focus-ring,#b74026);outline-offset:4px}.ds-primary:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Дополнительное действие с тонкой границей.",
+      "html": "<button class=\"ds-secondary\">Назад</button>",
+      "css": ".ds-secondary{min-height:44px;padding:10px 17px;border:1px solid var(--border,#caccc1);border-radius:7px;background:transparent;color:var(--text-primary,#232521);font:700 13px/1.5 var(--font-primary,Manrope,sans-serif);cursor:pointer;transition:background-color 160ms,border-color 160ms}.ds-secondary:hover{background:var(--surface-soft,#e6e8df);border-color:var(--text-muted,#66695e)}.ds-secondary:focus-visible{outline:2px solid var(--focus-ring,#b74026);outline-offset:4px}.ds-secondary:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Danger button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Действие удаления или сброса; значение дополнительно выражено текстом.",
+      "html": "<button class=\"ds-danger\">Удалить</button>",
+      "css": ".ds-danger{min-height:44px;padding:10px 17px;border:1px solid transparent;border-radius:7px;background:var(--color-danger,#ad3424);color:var(--text-on-danger,#fffaf4);font:700 13px/1.5 var(--font-primary,Manrope,sans-serif);cursor:pointer;transition:background-color 160ms}.ds-danger:hover{background:var(--color-danger-hover,#872c20)}.ds-danger:focus-visible{outline:2px solid var(--focus-ring,#b74026);outline-offset:4px}.ds-danger:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Text field",
+      "kind": "input",
+      "refersTo": "text-field",
+      "description": "Нативное поле с видимой подписью и контуром клавиатурного фокуса.",
+      "html": "<label class=\"ds-field-label\">Название заметки<input class=\"ds-field\" type=\"text\" placeholder=\"О чём эта заметка\"></label>",
+      "css": ".ds-field-label{display:block;color:var(--text-primary,#232521);font:750 13px/1.6 var(--font-primary,Manrope,sans-serif)}.ds-field{display:block;width:100%;max-width:320px;min-height:44px;margin-top:7px;padding:0 12px;border:1px solid var(--border,#caccc1);border-radius:6px;background:var(--surface-raised,#fbfaf6);color:var(--text-primary,#232521);font:400 14px/1.6 var(--font-primary,Manrope,sans-serif);caret-color:var(--accent,#b74026)}.ds-field::placeholder{color:var(--text-muted,#66695e);opacity:1}.ds-field:focus-visible{border-color:var(--accent,#b74026);outline:2px solid var(--focus-ring,#b74026);outline-offset:4px}.ds-field:disabled{opacity:.6;cursor:not-allowed}"
+    },
+    {
+      "name": "Sidebar navigation",
+      "kind": "nav",
+      "description": "Тёмная навигация сохраняет свою палитру в обеих темах.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Разделы\"><a class=\"ds-nav-item ds-current\" href=\"#course\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4 4h7a3 3 0 0 1 3 3v14a3 3 0 0 0-3-3H4zM14 7a3 3 0 0 1 3-3h3v14h-3a3 3 0 0 0-3 3\"/></svg>Курс</a><a class=\"ds-nav-item\" href=\"#notes\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 3h14v18H5zM8 8h8M8 12h8M8 16h5\"/></svg>Заметки</a></nav>",
+      "css": ".ds-nav{width:212px;padding:16px;background:#232521;border-radius:6px;font-family:var(--font-primary,Manrope,sans-serif)}.ds-nav-item{display:flex;align-items:center;gap:12px;min-height:44px;margin:2px 0;padding:9px 12px;border-radius:6px;color:#c4c9bb;font-size:12px;font-weight:600;text-decoration:none}.ds-nav-item svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5}.ds-nav-item:hover{color:#fffaf4;background:#31362c}.ds-nav-item.ds-current{color:#fffaf4;background:#414839}.ds-current svg{color:#f3a18b}.ds-nav-item:focus-visible{outline:2px solid #f0ad96;outline-offset:4px}"
+    },
+    {
+      "name": "Tag",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "Тихая подпись категории; не замещает действие.",
+      "html": "<span class=\"ds-tag\">Тест-дизайн</span>",
+      "css": ".ds-tag{display:inline-flex;align-items:center;padding:3px 7px;border:1px solid var(--border,#caccc1);border-radius:5px;background:var(--surface-soft,#e6e8df);color:var(--text-primary,#232521);font:500 10px/1.6 var(--font-primary,Manrope,sans-serif)}"
+    },
+    {
+      "name": "Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Рабочая поверхность с границей, без тени и подъёма.",
+      "html": "<article class=\"ds-panel\"><h3>Заметки</h3><p>Сформулируй идею своими словами.</p></article>",
+      "css": ".ds-panel{max-width:340px;padding:22px;border:1px solid var(--border,#caccc1);border-radius:12px;background:var(--surface-raised,#fbfaf6);color:var(--text-primary,#232521);font:400 13px/1.75 var(--font-primary,Manrope,sans-serif)}.ds-panel h3{margin:0 0 10px;font-size:18px;font-weight:750;line-height:1.4;letter-spacing:-.025em}.ds-panel p{margin:0;color:var(--text-muted,#66695e)}"
+    },
+    {
+      "name": "Course register cell",
+      "kind": "custom",
+      "refersTo": "course-register-current",
+      "description": "Текущий модуль единого реестра; показано начальное состояние 0 из 3 тем.",
+      "html": "<a class=\"ds-module\" href=\"#course/lesson/m01-t01\" aria-label=\"Модуль 1: Введение в тестирование\"><span>01</span><span class=\"ds-module-progress\" style=\"--module-progress:0%\"></span><small>0/3</small></a>",
+      "css": ".ds-module{display:flex;flex-direction:column;justify-content:space-between;width:100px;min-height:95px;padding:14px 15px 12px;background:#c6482d;color:#fffaf4;font-family:var(--font-primary,Manrope,sans-serif);font-variant-numeric:tabular-nums;text-decoration:none}.ds-module>span:first-child{font-size:26px;line-height:1.1;font-weight:450;letter-spacing:-.04em}.ds-module small{margin-top:9px;font-size:9px}.ds-module-progress{display:block;height:2px;margin-top:12px;background:#dc8d7a}.ds-module-progress::after{content:\"\";display:block;width:var(--module-progress,0%);height:100%;background:#fffaf4}.ds-module:hover{background:#b13d24;color:#fffaf4}.ds-module:focus-visible{outline:2px solid #fffaf4;outline-offset:-4px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Fieldwork — редакционная мастерская тестировщика",
+    "overview": "Fieldwork — редакционная мастерская тестировщика: тёплая бумага, графитовый текст, чёткая типографика и небольшое число выразительных акцентов. Геометрия показывает структуру реального курса; рабочие формы остаются спокойными и читаемыми.\n\nЭто описание реализованной версии, извлечённое из `css/fieldwork.css` и текущей разметки. Направление выбрал исполнитель в рамках разрешённой обратимой переработки. Оно не записывается как подтверждённое предпочтение пользователя. Стратегия отдельных экранов и допущения проекта находятся в `docs/superpowers/specs/2026-10-29-fieldwork-design.md` и `PRODUCT.md`.",
+    "keyCharacteristics": [
+      "Локальные шрифты с кириллицей",
+      "Плоские рабочие поверхности",
+      "Реальная структура курса",
+      "Семантические формы",
+      "Светлая, тёмная и системная темы"
+    ],
+    "rules": [],
+    "dos": [
+      "**Do** брать текущие семантические значения из `css/fieldwork.css`, сохраняя режимы light/dark/system.",
+      "**Do** использовать реальные данные курса и пользовательские записи для чисел, подписей и прогресса.",
+      "**Do** сохранять нативную семантику форм, видимый фокус и клавиатурный доступ.",
+      "**Do** добавлять новые общие компоненты в существующую систему, сохраняя спокойное чтение и тонкие разделители."
+    ],
+    "donts": [
+      "**Don't** подключать `theme-pro.css`, `motion.js` и старый декоративный слой поверх Fieldwork: эти исторические файлы не участвуют в текущем runtime.",
+      "**Don't** возвращать декоративные градиенты, стеклянные фоны и повторяющиеся орнаменты в эту реализованную тему.",
+      "**Don't** выдавать проценты обучения за профессиональную квалификацию или придумывать достижения.",
+      "**Don't** трактовать выбор Fieldwork исполнителем как согласованное навсегда предпочтение пользователя."
+    ]
+  }
+}

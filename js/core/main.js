@@ -312,6 +312,9 @@
   function router() {
     var r = getRouteFromHash();
     state.currentRoute = r.name;
+    document.body.dataset.route = r.name.split('/')[0];
+    var headerTitle = document.querySelector('.header__title');
+    if (headerTitle && ROUTES[r.name]) headerTitle.textContent = ROUTES[r.name].title;
     var main = document.getElementById('main-content');
     if (!main) return;
     if (r.notFound) {
@@ -394,11 +397,23 @@
     nav.setAttribute('aria-label', 'Основная навигация');
     var ul = document.createElement('ul');
     ul.className = 'nav-list';
-    NAV_ITEMS.forEach(function (item) {
+    var groups = [
+      { title: 'Обучение', routes: ['dashboard', 'today', 'course', 'roadmap', 'mindmap', 'questions', 'repetition'] },
+      { title: 'Мастерская', routes: ['practice', 'notes', 'portfolio'] },
+      { title: 'Инструменты', routes: ['glossary', 'resources', 'pomodoro', 'stats', 'settings'] }
+    ];
+    groups.forEach(function (group) {
+      var heading = document.createElement('li');
+      heading.className = 'nav-group-title';
+      heading.textContent = group.title;
+      ul.appendChild(heading);
+      group.routes.forEach(function (routeName) {
+      var item = NAV_ITEMS.filter(function (candidate) { return candidate.route === routeName; })[0];
       var li = document.createElement('li');
       var a = document.createElement('a');
       a.className = 'nav-item';
       a.href = '#' + item.route;
+      a.title = item.label;
       a.innerHTML = item.icon
         + '<span class="nav-item__label">' + esc(item.label) + '</span>'
         + '<span class="nav-item__desc">' + esc(item.desc) + '</span>'
@@ -406,16 +421,33 @@
       a.addEventListener('click', function () { closeMobileSidebar(); });
       li.appendChild(a);
       ul.appendChild(li);
+      });
     });
     var collapseBtn = document.createElement('button');
     collapseBtn.type = 'button';
     collapseBtn.className = 'sidebar__collapse';
-    collapseBtn.setAttribute('aria-label', 'Свернуть панель');
+    collapseBtn.setAttribute('aria-label', state.sidebarCollapsed ? 'Развернуть панель' : 'Свернуть панель');
+    collapseBtn.setAttribute('aria-expanded', String(!state.sidebarCollapsed));
+    collapseBtn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-collapse"></use></svg><span>Свернуть меню</span>';
     collapseBtn.addEventListener('click', toggleCollapsed);
     nav.appendChild(ul);
-    nav.appendChild(collapseBtn);
     aside.innerHTML = '';
+    aside.innerHTML = '<a href="#dashboard" class="sidebar__brand" aria-label="QA Study Portfolio — главная">'
+      + '<span class="brand-mark" aria-hidden="true">qa</span><span class="brand-name">Study Portfolio<small>Мастерская тестировщика</small></span></a>'
+      + '<button type="button" class="sidebar__close" aria-label="Закрыть меню"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>';
     aside.appendChild(nav);
+    var footer = document.createElement('div');
+    footer.className = 'sidebar__footer';
+    footer.innerHTML = '<span class="local-status">Данные на этом устройстве</span>';
+    footer.appendChild(collapseBtn);
+    aside.appendChild(footer);
+    aside.querySelector('.sidebar__brand').addEventListener('click', closeMobileSidebar);
+    aside.querySelector('.sidebar__close').addEventListener('click', function () {
+      closeMobileSidebar();
+      var trigger = document.querySelector('.hamburger');
+      if (trigger) trigger.focus();
+    });
+    bindSidebarControls();
     if (state.sidebarCollapsed) aside.classList.add('collapsed');
     else aside.classList.remove('collapsed');
   }
@@ -460,6 +492,47 @@
   }
 
   /* ---------- 7.1 два независимых состояния сайдбара ---------- */
+  var sidebarControlsBound = false;
+  function syncSidebarAccessibility() {
+    var aside = document.getElementById('sidebar');
+    var mobile = window.matchMedia('(max-width: 1023px)').matches;
+    var open = mobile && aside.classList.contains('sidebar--open');
+    aside.inert = mobile && !open;
+    document.querySelector('.main-container').inert = open;
+    document.body.classList.toggle('menu-open', open);
+    var backdrop = document.querySelector('.sidebar-backdrop');
+    if (backdrop) backdrop.hidden = !open;
+    setHamburgerExpanded();
+  }
+  function bindSidebarControls() {
+    if (!sidebarControlsBound) {
+      var backdrop = document.querySelector('.sidebar-backdrop');
+      if (backdrop) backdrop.addEventListener('click', function () {
+        closeMobileSidebar();
+        var trigger = document.querySelector('.hamburger');
+        if (trigger) trigger.focus();
+      });
+      window.matchMedia('(max-width: 1023px)').addEventListener('change', syncSidebarAccessibility);
+      document.addEventListener('keydown', function (event) {
+        if (!document.body.classList.contains('menu-open')) return;
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          closeMobileSidebar();
+          var trigger = document.querySelector('.hamburger');
+          if (trigger) trigger.focus();
+        } else if (event.key === 'Tab') {
+          var controls = Array.prototype.filter.call(document.querySelectorAll('#sidebar a, #sidebar button'), function (node) {
+            return node.getClientRects().length && getComputedStyle(node).visibility !== 'hidden';
+          });
+          var first = controls[0], last = controls[controls.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+      });
+      sidebarControlsBound = true;
+    }
+    syncSidebarAccessibility();
+  }
   function setHamburgerExpanded() {
     var hamburger = document.querySelector('.hamburger');
     if (!hamburger) return;
@@ -471,19 +544,30 @@
     if (!aside) return;
     if (typeof open === 'boolean') aside.classList.toggle('sidebar--open', open);
     else aside.classList.toggle('sidebar--open');
-    setHamburgerExpanded();
+    syncSidebarAccessibility();
+    if (aside.classList.contains('sidebar--open')) aside.querySelector('.sidebar__close').focus();
   }
   function closeMobileSidebar() {
     var aside = document.getElementById('sidebar');
     if (!aside) return;
+    var wasOpen = aside.classList.contains('sidebar--open');
     if (aside.classList.contains('sidebar--open')) aside.classList.remove('sidebar--open');
-    setHamburgerExpanded();
+    syncSidebarAccessibility();
+    if (wasOpen) {
+      var trigger = document.querySelector('.hamburger');
+      if (trigger) trigger.focus();
+    }
   }
   function toggleCollapsed() {
     var aside = document.getElementById('sidebar');
     if (!aside) return;
     aside.classList.toggle('collapsed');
     state.sidebarCollapsed = aside.classList.contains('collapsed');
+    var button = aside.querySelector('.sidebar__collapse');
+    if (button) {
+      button.setAttribute('aria-expanded', String(!state.sidebarCollapsed));
+      button.setAttribute('aria-label', state.sidebarCollapsed ? 'Развернуть панель' : 'Свернуть панель');
+    }
     saveState('ui');
   }
 
@@ -526,9 +610,9 @@
       + '<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>'
       + '<h1 class="header__title">' + esc(title) + '</h1>'
       + '<div class="header__search"><label class="visually-hidden" for="header-search">Поиск</label>'
-      + '<input id="header-search" type="search" value="' + esc(state.searchQuery) + '" aria-label="Поиск">'
+      + '<svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg><input id="header-search" type="search" placeholder="Найти тему · Enter" value="' + esc(state.searchQuery) + '" aria-label="Поиск по курсу и заметкам. Нажмите Enter">'
       + '<button type="button" class="header__clear" aria-label="Очистить поиск" hidden>×</button></div>'
-      + '<button type="button" class="header__save" aria-label="Сохранить изменения">Сохранить</button>'
+      + '<button type="button" class="header__save" aria-label="Сохранить изменения"><svg class="icon" aria-hidden="true"><use href="#icon-save"></use></svg><span>Сохранить</span></button>'
       + '<label class="theme-switch">Тема<select class="theme-switch__select" aria-label="Выбор темы">'
       + '<option value="light" ' + (theme === 'light' ? 'selected' : '') + '>Светлая</option>'
       + '<option value="dark" ' + (theme === 'dark' ? 'selected' : '') + '>Тёмная</option>'
@@ -544,6 +628,13 @@
         if (typeof App.onSearch === 'function') App.onSearch(state.searchQuery);
       }, 200);
       search.addEventListener('input', onSearch);
+      search.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          state.searchQuery = search.value;
+          if (typeof App.openModal === 'function') App.openModal('search');
+        }
+      });
       header.querySelector('.header__clear').addEventListener('click', function () { search.value = ''; state.searchQuery = ''; this.hidden = true; onSearch(); search.focus(); });
     }
     header.querySelector('.header__save').addEventListener('click', function () {
@@ -849,7 +940,7 @@
       var best = cn >= cc ? '#0A1929' : '#F5F0E8';
       var bestContrast = Math.max(cn, cc);
       return { color: best, contrast: bestContrast, sufficient: bestContrast >= 4.5 };
-    } catch (e) { return { color: '#0A1929', contrast: 1, sufficient: false }; }
+    } catch (e) { return { color: 'var(--text-primary)', contrast: 1, sufficient: false }; }
   }
   App.getTextColor = getTextColor;
 
@@ -1245,9 +1336,9 @@
           var body = getModalBody();
           openSharingModal();
           if (body) {
-            body.innerHTML = '<label for="sharing-password">Пароль пакета</label><input id="sharing-password" type="password" style="width:100%;min-height:44px;border:1px solid #D4AF37;padding:8px;">'
+            body.innerHTML = '<label for="sharing-password">Пароль пакета</label><input id="sharing-password" type="password" style="width:100%;min-height:44px;border:1px solid var(--accent);padding:8px;">'
               + '<p style="font-size:12px;opacity:0.7;">Пароль — маркер совпадения при импорте, не шифрование. Содержимое пакета видно в текстовом редакторе.</p>'
-              + '<div style="display:flex;gap:8px;margin-top:12px;"><button type="button" id="sharing-confirm" style="min-height:44px;padding:0 14px;background:#D4AF37;">Подтвердить</button><button type="button" id="sharing-cancel" style="min-height:44px;padding:0 14px;border:1px solid #D4AF37;">Отмена</button></div>';
+              + '<div style="display:flex;gap:8px;margin-top:12px;"><button type="button" id="sharing-confirm" style="min-height:44px;padding:0 14px;background:var(--accent);color:var(--text-on-accent);">Подтвердить</button><button type="button" id="sharing-cancel" style="min-height:44px;padding:0 14px;border:1px solid var(--accent);">Отмена</button></div>';
             var conf = body.querySelector('#sharing-confirm');
             var canc = body.querySelector('#sharing-cancel');
             var inp = body.querySelector('#sharing-password');
@@ -1283,7 +1374,7 @@
         var body = getModalBody();
         openSharingModal();
         if (body) {
-          body.innerHTML = '<p>Резервная копия не создана. Продолжить импорт?</p><div style="display:flex;gap:8px;"><button type="button" id="sharing-continue" style="min-height:44px;padding:0 14px;background:#D4AF37;">Продолжить</button><button type="button" id="sharing-abort" style="min-height:44px;padding:0 14px;border:1px solid #D4AF37;">Отмена</button></div>';
+          body.innerHTML = '<p>Резервная копия не создана. Продолжить импорт?</p><div style="display:flex;gap:8px;"><button type="button" id="sharing-continue" style="min-height:44px;padding:0 14px;background:var(--accent);color:var(--text-on-accent);">Продолжить</button><button type="button" id="sharing-abort" style="min-height:44px;padding:0 14px;border:1px solid var(--accent);">Отмена</button></div>';
           var cont = body.querySelector('#sharing-continue');
           var ab = body.querySelector('#sharing-abort');
           if (cont) cont.addEventListener('click', function(){ closeSharingModal(); doBulkImport(data); });
@@ -1314,7 +1405,7 @@
       openSharingModal();
       if (body) {
         body.innerHTML = '<p>Найдены ошибки:</p><ul>' + errors.map(function(e){ return '<li>' + escapeHtml(e) + '</li>'; }).join('') + '</ul>'
-          + '<div style="display:flex;gap:8px;margin-top:12px;"><button type="button" id="sharing-valid" style="min-height:44px;padding:0 14px;background:#D4AF37;">Импортировать только валидные</button><button type="button" id="sharing-cancel2" style="min-height:44px;padding:0 14px;border:1px solid #D4AF37;">Отмена</button></div>';
+          + '<div style="display:flex;gap:8px;margin-top:12px;"><button type="button" id="sharing-valid" style="min-height:44px;padding:0 14px;background:var(--accent);color:var(--text-on-accent);">Импортировать только валидные</button><button type="button" id="sharing-cancel2" style="min-height:44px;padding:0 14px;border:1px solid var(--accent);">Отмена</button></div>';
         var v = body.querySelector('#sharing-valid');
         var c2 = body.querySelector('#sharing-cancel2');
         if (v) v.addEventListener('click', function(){ closeSharingModal(); bulkPutValid(validByStore, errors.length); });
@@ -1388,7 +1479,7 @@
       var main = document.getElementById('main-content');
       if (!main) return;
       var self = this;
-      var html = '<button type="button" id="presentation-exit" aria-label="Выйти из режима презентации" style="min-height:44px;padding:0 14px;border:1px solid #D4AF37;margin-bottom:16px;">Выйти из режима презентации</button>';
+      var html = '<button type="button" id="presentation-exit" aria-label="Выйти из режима презентации" style="min-height:44px;padding:0 14px;border:1px solid var(--accent);margin-bottom:16px;">Выйти из режима презентации</button>';
       html += '<div style="display:grid;gap:16px;">';
       items.forEach(function(p) {
         var tags = (p.tags || []).filter(function(tid){
@@ -1398,10 +1489,10 @@
         }).map(function(tid){
           var tag = null;
           for (var i=0;i<state.tags.length;i++) if (state.tags[i].id===tid) tag=state.tags[i];
-          return tag ? '<span style="display:inline-block;padding:4px 8px;background:#0A1929;color:#F5F0E8;font-size:12px;margin:2px;">' + escapeHtml(tag.name) + '</span>' : '';
+          return tag ? '<span style="display:inline-block;padding:4px 8px;background:var(--text-primary);color:var(--surface);font-size:12px;margin:2px;">' + escapeHtml(tag.name) + '</span>' : '';
         }).join('');
-        html += '<article style="border:2px solid #D4AF37;padding:16px;background:#F5F0E8;">'
-          + '<h2 style="margin:0 0 8px;color:#0A1929;">' + escapeHtml(p.title || '') + '</h2>'
+        html += '<article style="border:2px solid var(--accent);padding:16px;background:var(--surface);">'
+          + '<h2 style="margin:0 0 8px;color:var(--text-primary);">' + escapeHtml(p.title || '') + '</h2>'
           + '<div style="font-size:12px;opacity:0.7;margin-bottom:8px;">' + escapeHtml(p.type || '') + ' · ' + escapeHtml(p.date || '') + '</div>'
           + (p.description ? '<p style="margin:8px 0;">' + escapeHtml(p.description) + '</p>' : '')
           + (p.task ? '<p><strong>Задача:</strong> ' + escapeHtml(p.task) + '</p>' : '')
@@ -1412,7 +1503,7 @@
           + '</article>';
       });
       html += '</div>';
-      html += '<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;"><button type="button" id="presentation-export-html" style="min-height:44px;padding:0 14px;background:#D4AF37;">Экспорт HTML</button><button type="button" id="presentation-export-md" style="min-height:44px;padding:0 14px;border:1px solid #D4AF37;">Экспорт Markdown</button></div>';
+      html += '<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;"><button type="button" id="presentation-export-html" style="min-height:44px;padding:0 14px;background:var(--accent);color:var(--text-on-accent);">Экспорт HTML</button><button type="button" id="presentation-export-md" style="min-height:44px;padding:0 14px;border:1px solid var(--accent);">Экспорт Markdown</button></div>';
       main.innerHTML = html;
       var exitBtn = document.getElementById('presentation-exit');
       if (exitBtn) exitBtn.addEventListener('click', function(){ self.exit(); });
@@ -1424,8 +1515,8 @@
     exportHTML: function(items) {
       var list = items || this.getItems();
       var rows = list.map(function(p){
-        return '<article style="border:2px solid #D4AF37;padding:16px;margin-bottom:16px;background:#fff;">'
-          + '<h2 style="color:#0A1929;">' + escapeHtml(p.title||'') + '</h2>'
+        return '<article style="border:2px solid var(--accent);padding:16px;margin-bottom:16px;background:var(--surface-raised);">'
+          + '<h2 style="color:var(--text-primary);">' + escapeHtml(p.title||'') + '</h2>'
           + '<div style="font-size:12px;opacity:0.7;">' + escapeHtml(p.type||'') + ' · ' + escapeHtml(p.date||'') + '</div>'
           + (p.description ? '<p>' + escapeHtml(p.description) + '</p>' : '')
           + (p.task ? '<p><strong>Задача:</strong> ' + escapeHtml(p.task) + '</p>' : '')
@@ -1434,7 +1525,7 @@
           + (p.skills ? '<p><strong>Навыки:</strong> ' + escapeHtml(Array.isArray(p.skills)?p.skills.join(', '):p.skills) + '</p>' : '')
           + '</article>';
       }).join('');
-      var html = '<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Портфолио</title><style>body{font-family:system-ui,Arial,sans-serif;background:#F5F0E8;color:#0A1929;max-width:800px;margin:0 auto;padding:24px;}h1{font-family:Georgia,serif;color:#0A1929;border-bottom:3px solid #D4AF37;padding-bottom:8px;}</style></head><body><h1>Портфолио QA-инженера</h1>' + rows + '</body></html>';
+      var html = '<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Портфолио</title><style>:root{--accent:#c6482d;--surface:#f3f0e9;--surface-raised:#fffdf8;--text-primary:#232521}body{font-family:system-ui,Arial,sans-serif;background:var(--surface);color:var(--text-primary);max-width:800px;margin:0 auto;padding:24px;}h1{font-family:Georgia,serif;color:var(--text-primary);border-bottom:3px solid var(--accent);padding-bottom:8px;}</style></head><body><h1>Портфолио QA-инженера</h1>' + rows + '</body></html>';
       var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
       var url = URL.createObjectURL(blob);
       var d = new Date(); var pad=function(n){return n<10?'0'+n:''+n;};
@@ -1723,120 +1814,111 @@
     });
   }
 
-  /* ---------- 5. renderHome ---------- */
+  /* ---------- Fieldwork: a next step and an interactive course register ---------- */
+  function fieldworkArrow() {
+    return '<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  }
+  function fieldworkLink(href, title, detail) {
+    return '<a class="session-link" href="' + esc(href) + '"><span class="session-link__label"><strong>' + esc(title)
+      + '</strong><small>' + esc(detail) + '</small></span>' + fieldworkArrow() + '</a>';
+  }
   function renderHome() {
     var tp = totalProgress();
-    var streak = studyStreak();
-    var totalTime = totalStudyTime();
+    var modules = (window.CourseData.modules || []).slice().sort(function (a, b) { return a.order - b.order; });
+    var flat = flatTopics();
+    var lastRec = state.lessons[state.meta.lastLessonId];
+    if (!lastRec || lastRec.status === 'done' || flat.indexOf(lastRec.id) === -1) {
+      lastRec = null;
+      for (var i = 0; i < flat.length; i++) {
+        var candidate = state.lessons[flat[i]];
+        if (candidate && candidate.status !== 'done') { lastRec = candidate; break; }
+      }
+    }
+    var activeModule = modules.filter(function (module) { return lastRec && module.id === lastRec.moduleId; })[0];
+    var nextHref = lastRec ? '#course/lesson/' + lastRec.id : '#course';
     var dueF = dueFlashcards().length;
     var dueP = duePractice().length;
-    var pCount = portfolioCount();
-    var flat = flatTopics();
-    var lastId = state.meta.lastLessonId;
-    var lastRec = lastId ? state.lessons[lastId] : null;
-    if (!lastRec && flat.length) {
-      for (var i = 0; i < flat.length; i++) {
-        var r = state.lessons[flat[i]];
-        if (r && r.status !== 'done') { lastRec = r; break; }
-      }
-    }
-    var continueId = null;
-    var dueCards = dueFlashcards();
-    if (dueCards.length) continueId = dueCards[0].id;
-    else if (lastRec) continueId = lastRec.id;
-    else {
-      for (var j = 0; j < flat.length; j++) {
-        var rr = state.lessons[flat[j]];
-        if (!rr || rr.status !== 'done') { continueId = flat[j]; break; }
-      }
-      if (!continueId && flat.length) continueId = flat[flat.length - 1];
-    }
-    var continueHref = continueId ? '#course/lesson/' + continueId : '#course';
-    var daysSince = daysSinceLastActive();
-    var frag = document.createDocumentFragment();
+    var register = modules.map(function (module, index) {
+      var progress = moduleProgress(module.id);
+      var topics = (module.topics || []).slice().sort(function (a, b) { return a.order - b.order; });
+      var next = topics.filter(function (topic) { return !state.lessons[topic.id] || state.lessons[topic.id].status !== 'done'; })[0] || topics[0];
+      var isCurrent = activeModule && activeModule.id === module.id;
+      var description = module.title + ' · ' + progress.done + ' из ' + progress.total + ' тем завершено';
+      return '<a class="atlas-module' + (isCurrent ? ' is-current' : '') + (progress.total && progress.done === progress.total ? ' is-done' : '')
+        + '" href="' + (next ? '#course/lesson/' + esc(next.id) : '#course') + '" title="' + esc(description) + '" aria-label="Модуль '
+        + (index + 1) + ': ' + esc(description) + '" data-module-detail="' + esc(description) + '">'
+        + '<span>' + String(index + 1).padStart(2, '0') + '</span><span class="atlas-module__progress" style="--module-progress:'
+        + progress.percent + '%"></span><small>' + progress.done + '/' + progress.total + '</small></a>';
+    }).join('');
     var wrap = document.createElement('div');
-    wrap.className = 'page-home';
-    var courseTitle = (window.CourseData && window.CourseData.courseTitle) ? window.CourseData.courseTitle : 'QA Study Portfolio';
-    var alertHtml = '';
-    if (daysSince >= 3) {
-      alertHtml = '<div class="alert-info" role="status">Давно не занимались — вернитесь к текущему шагу: <a href="' + esc(continueHref) + '">продолжить обучение</a></div>';
-    }
-    var topTags = [];
-    if (App.TagsManager && typeof App.TagsManager.getTagsWithCount === 'function') topTags = App.TagsManager.getTagsWithCount().slice(0, 5);
-    var cats = state.categories || [];
-    wrap.innerHTML =
-      '<section class="card bg-chevrons" style="padding:16px;">' +
-      '<h2 style="margin:0 0 6px;">Привет, ' + esc(state.user.name || state.user.role) + '!</h2>' +
-      '<p style="margin:0 0 12px;opacity:0.8;">' + esc(courseTitle) + '</p>' +
-      progressBar(tp.percent, 'Общий прогресс') +
-      '<div style="margin-top:6px;font-size:12px;opacity:0.7;">' + tp.done + ' / ' + tp.total + ' — ' + tp.percent + '%</div>' +
-      '</section>' +
-      alertHtml +
-      '<div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:16px;">' +
-      '<div class="stat-card card bg-chevrons" style="padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;">' + tp.percent + '%</div><div style="font-size:12px;opacity:0.7;">Прогресс</div></div>' +
-      '<div class="stat-card card bg-chevrons" style="padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;">' + tp.done + '/' + tp.total + '</div><div style="font-size:12px;opacity:0.7;">Тем завершено</div></div>' +
-      '<div class="stat-card card bg-chevrons" style="padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;">' + streak + '</div><div style="font-size:12px;opacity:0.7;">Дней подряд</div></div>' +
-      '<div class="stat-card card bg-chevrons" style="padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;">' + totalTime + '</div><div style="font-size:12px;opacity:0.7;">Минут всего</div></div>' +
-      '<div class="stat-card card bg-chevrons" style="padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;">' + dueF + '</div><div style="font-size:12px;opacity:0.7;">Карточек к повторению</div></div>' +
-      '<div class="stat-card card bg-chevrons" style="padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;">' + dueP + '</div><div style="font-size:12px;opacity:0.7;">Практик к выполнению</div></div>' +
-      '<div class="stat-card card bg-chevrons" style="padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;">' + pCount + '</div><div style="font-size:12px;opacity:0.7;">В портфолио</div></div>' +
-      '</div>' +
-      '<div class="card" style="margin-top:16px;padding:16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">' +
-      '<a href="' + esc(continueHref) + '" class="btn btn--primary" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;background:#D4AF37;color:#0A1929;text-decoration:none;">Продолжить</a>' +
-      '<span style="font-size:13px;opacity:0.7;">Минимум на сегодня: 5 мин теория · 10 мин практика · 5 мин повторение</span>' +
-      '</div>' +
-      (lastRec ? '<div class="card" style="margin-top:12px;padding:12px;"><strong>Последняя тема:</strong> <a href="#course/lesson/' + esc(lastRec.id) + '">' + esc(lastRec.title) + '</a> — ' + esc(LESSON_STATUS_LABELS[lastRec.status] || lastRec.status) + '</div>' : '') +
-      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px;">' +
-      '<div class="card" style="padding:12px;"><h3 style="margin:0 0 8px;">Топ тегов</h3>' + (topTags.length ? topTags.map(function(t) { return '<span style="display:inline-block;margin:2px;padding:4px 8px;background:#0A1929;color:#F5F0E8;font-size:12px;">' + esc(t.name) + ' (' + t.count + ')</span>'; }).join('') : '<span style="font-size:12px;opacity:0.6;">Пока нет тегов</span>') + '</div>' +
-      '<div class="card" style="padding:12px;"><h3 style="margin:0 0 8px;">Категории</h3>' + (cats.length ? cats.slice(0, 5).map(function(c) { return '<div style="font-size:13px;padding:4px 0;">' + esc(c.name) + '</div>'; }).join('') : '<span style="font-size:12px;opacity:0.6;">Категорий пока нет</span>') + '</div>' +
-      '</div>';
-    frag.appendChild(wrap);
-    setMain(frag);
-    var header = document.getElementById('header');
-    if (header) header.classList.add('bg-sunburst');
+    wrap.className = 'page-home fieldwork-home';
+    wrap.innerHTML = '<div class="home-intro"><div class="home-copy"><h2><span>Замечать.</span><span>Понимать.</span><span>Проверять.</span></h2>'
+      + '<p>Теория становится навыком,<br>когда ты проверяешь её на практике.</p></div>'
+      + '<article class="next-lesson"><div class="next-lesson__meta"><span>' + (lastRec ? 'Твой следующий шаг' : 'Все темы завершены')
+      + '</span><span>' + (activeModule ? esc(activeModule.id.toUpperCase()) : 'QA') + '</span></div><h3>'
+      + esc(lastRec ? lastRec.title : 'Вернуться к изученному') + '</h3><p>'
+      + esc(lastRec && lastRec.summary ? lastRec.summary : 'Разберись в идее, сформулируй её своими словами и сохрани результат работы.')
+      + '</p><a class="btn btn--primary" href="' + esc(nextHref) + '">' + (lastRec ? 'Открыть тему' : 'Открыть курс') + fieldworkArrow() + '</a>'
+      + '<div class="next-lesson__footer"><span>' + tp.done + ' из ' + tp.total + ' тем завершено</span><span>' + tp.percent + '%</span></div>'
+      + progressBar(tp.percent, 'Общий прогресс курса') + '</article></div>'
+      + '<section class="home-course" aria-labelledby="atlas-title"><div class="section-heading"><h3 id="atlas-title">Твоя траектория</h3><a href="#roadmap">Весь маршрут ' + fieldworkArrow() + '</a></div>'
+      + '<div class="course-atlas">' + register + '</div><p class="atlas-caption"><span class="atlas-caption__detail">'
+      + esc(activeModule ? activeModule.title : 'Выбери модуль, чтобы вернуться к теме') + '</span><span>' + modules.length + ' модуля · ' + tp.total + ' тем</span></p></section>'
+      + '<div class="home-lower"><section class="session-plan"><h3>На сегодня</h3>'
+      + fieldworkLink('#today', 'Собрать учебную сессию', 'Теория, практика и закрепление в одном плане')
+      + fieldworkLink('#repetition', 'Вернуться к важному', dueF ? 'Карточек к повторению: ' + dueF : 'Повтори изученное, когда будешь готов')
+      + fieldworkLink('#practice', 'Перейти к практике', dueP ? 'Незавершённых работ: ' + dueP : 'Тест-кейс, чек-лист или первый баг-репорт')
+      + '</section><section class="home-results"><div class="section-heading"><h3>Следы работы</h3><a href="#stats">Статистика ' + fieldworkArrow() + '</a></div>'
+      + '<dl class="home-metrics"><div><dt>Тем завершено</dt><dd>' + tp.done + '<small> / ' + tp.total + '</small></dd></div>'
+      + '<div><dt>Дней подряд</dt><dd>' + studyStreak() + '</dd></div><div><dt>Минут изучения</dt><dd>' + totalStudyTime() + '</dd></div>'
+      + '<div><dt>Работ в портфолио</dt><dd>' + portfolioCount() + '</dd></div></dl><a class="portfolio-link" href="#portfolio">Открыть своё портфолио ' + fieldworkArrow() + '</a></section></div>';
+    setMain(wrap);
     applyProgressBars(wrap);
-    var bc = document.getElementById('breadcrumbs');
-    if (bc) { bc.innerHTML = '<ol><li><span aria-current="page">Главная</span></li></ol>'; }
+    var detail = wrap.querySelector('.atlas-caption__detail');
+    var initialDetail = detail.textContent;
+    wrap.querySelectorAll('.atlas-module').forEach(function (link) {
+      function show() { detail.textContent = link.dataset.moduleDetail; }
+      function reset() { detail.textContent = initialDetail; }
+      link.addEventListener('mouseenter', show);
+      link.addEventListener('focus', show);
+      link.addEventListener('mouseleave', reset);
+      link.addEventListener('blur', reset);
+    });
   }
 
-  /* ---------- 6. renderToday ---------- */
+  /* ---------- Today: real tasks, without a fabricated daily completion score ---------- */
   function renderToday() {
     var flat = flatTopics();
     var dueF = dueFlashcards();
     var dueP = duePractice();
-    var planned = flat.filter(function(id) {
-      var r = state.lessons[id];
-      return r && (r.status === 'planned' || r.status === 'studying');
+    var planned = flat.filter(function (id) {
+      var record = state.lessons[id];
+      return record && (record.status === 'planned' || record.status === 'studying');
     }).slice(0, 2);
     if (planned.length < 2) {
-      var extra = flat.filter(function(id) {
-        var r = state.lessons[id];
-        return !r || r.status === 'new';
-      }).slice(0, 2 - planned.length);
-      planned = planned.concat(extra);
+      planned = planned.concat(flat.filter(function (id) {
+        var record = state.lessons[id];
+        return planned.indexOf(id) === -1 && (!record || record.status === 'new');
+      }).slice(0, 2 - planned.length));
     }
-    var totalToday = planned.length + dueF.length + dueP.length;
-    var doneToday = 0;
-    var pomodoroState = (App.pomodoroState && typeof App.pomodoroState === 'object') ? App.pomodoroState : null;
-    var frag = document.createDocumentFragment();
+    var taskCount = planned.length + dueF.length + dueP.length;
     var wrap = document.createElement('div');
-    wrap.innerHTML =
-      '<h2 style="margin:0 0 12px;">Сегодня</h2>' +
-      '<div class="progress-gold" role="progressbar" aria-valuenow="' + (totalToday ? Math.round(doneToday / totalToday * 100) : 0) + '" aria-valuemin="0" aria-valuemax="100" aria-label="Прогресс дня"><div class="progress-fill" style="transform:scaleX(' + (totalToday ? doneToday / totalToday : 0) + ')"></div></div>' +
-      '<div style="font-size:12px;opacity:0.7;margin-top:6px;">Задач на сегодня: ' + totalToday + '</div>' +
-      '<div style="display:grid;gap:12px;margin-top:16px;">' +
-      '<div class="card" style="padding:12px;"><h3>План изучения — 2 топика</h3>' + (planned.length ? planned.map(function(id) {
-        var r = state.lessons[id];
-        var title = r ? r.title : id;
-        return '<div style="padding:8px 0;border-bottom:1px solid #E8E0D0;display:flex;justify-content:space-between;align-items:center;"><a href="#course/lesson/' + esc(id) + '">' + esc(title) + '</a><span style="font-size:12px;opacity:0.6;">' + esc(r ? (LESSON_STATUS_LABELS[r.status] || r.status) : 'Новый') + '</span></div>';
-      }).join('') : '<p style="font-size:13px;opacity:0.6;">Все темы изучены</p>') + '</div>' +
-      '<div class="card" style="padding:12px;"><h3>Карточки к повторению (' + dueF.length + ')</h3>' + (dueF.length ? dueF.slice(0, 5).map(function(c) { return '<div style="padding:6px 0;font-size:13px;"><a href="#repetition">' + esc(c.front || c.question || c.id) + '</a></div>'; }).join('') : '<p style="font-size:13px;opacity:0.6;">Карточек нет</p>') + '</div>' +
-      '<div class="card" style="padding:12px;"><h3>Практика к выполнению (' + dueP.length + ')</h3>' + (dueP.length ? dueP.slice(0, 5).map(function(p) { return '<div style="padding:6px 0;font-size:13px;"><a href="#practice">' + esc(p.title || p.id) + '</a></div>'; }).join('') : '<p style="font-size:13px;opacity:0.6;">Практик нет</p>') + '</div>' +
-      (pomodoroState ? '<div class="card" style="padding:12px;"><h3>Pomodoro</h3><div style="font-size:13px;">Статус: ' + esc(pomodoroState.status || 'остановлен') + ' · ' + esc(String(pomodoroState.remaining || 0)) + ' сек</div></div>' : '<div class="card" style="padding:12px;opacity:0.6;font-size:13px;">Pomodoro остановлен</div>') +
-      '</div>';
-    frag.appendChild(wrap);
-    setMain(frag);
-    applyProgressBars(wrap);
+    wrap.className = 'fieldwork-today';
+    wrap.innerHTML = '<div class="today-intro"><h2>Хороший день,<br>чтобы разобраться.</h2><p>'
+      + (taskCount ? 'В твоём плане — ' + taskCount + '. Выбери задачу и начни с одного понятного шага.' : 'На сегодня всё спокойно. Можно вернуться к курсу или начать новую практику.')
+      + '</p></div><div class="today-layout"><section class="today-lessons"><h3>Следующий шаг</h3>'
+      + (planned.length ? planned.map(function (id, index) {
+        var record = state.lessons[id];
+        return '<a class="today-lesson" href="#course/lesson/' + esc(id) + '"><span>' + String(index + 1).padStart(2, '0')
+          + '</span><div><h4>' + esc(record ? record.title : id) + '</h4><small>'
+          + esc(record ? LESSON_STATUS_LABELS[record.status] || record.status : 'Новый') + '</small></div>' + fieldworkArrow() + '</a>';
+      }).join('') : '<p>Запланированные и новые темы закончились. Продолжи тему в курсе или выбери материал для повторения.</p><a class="btn" href="#course">Открыть курс</a>')
+      + '</section><section class="today-review"><h3>Закрепить</h3>'
+      + fieldworkLink('#repetition', 'Повторение', dueF.length ? 'Карточек на сегодня: ' + dueF.length : 'Сейчас нет карточек к повторению')
+      + fieldworkLink('#practice', 'Практическая работа', dueP.length ? 'Ждут завершения: ' + dueP.length : 'Выбери шаблон и примени изученное')
+      + '</section></div><div class="today-focus"><div><h3>Время сосредоточиться</h3><p>Одна тема. Одна сессия. Меньше переключений.</p></div>'
+      + '<a class="btn" href="#pomodoro">Открыть таймер ' + fieldworkArrow() + '</a></div>';
+    setMain(wrap);
   }
 
   /* ---------- 7. renderRoadmap ---------- */
@@ -1855,20 +1937,20 @@
       var mp = moduleProgress(m.id);
       var label = LESSON_STATUS_LABELS[mp.status] || mp.status;
       olHtml += '<li class="roadmap-item" style="position:relative;padding-left:40px;margin-bottom:20px;">' +
-        '<div class="roadmap-dot" style="position:absolute;left:8px;top:6px;width:14px;height:14px;background:#D4AF37;transform:rotate(45deg);border:2px solid #0A1929;"></div>' +
-        '<div style="position:absolute;left:14px;top:20px;bottom:-20px;width:2px;background:#D4AF37;opacity:0.4;"></div>' +
+        '<div class="roadmap-dot" style="position:absolute;left:8px;top:6px;width:14px;height:14px;background:var(--accent);color:var(--text-on-accent);transform:rotate(45deg);border:2px solid var(--text-primary);"></div>' +
+        '<div style="position:absolute;left:14px;top:20px;bottom:-20px;width:2px;background:var(--accent);color:var(--text-on-accent);opacity:0.4;"></div>' +
         '<div class="card" style="padding:12px;">' +
-        '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;"><a href="#course" style="font-weight:700;color:#0A1929;">' + esc(m.title) + '</a><span style="font-size:12px;opacity:0.7;">' + esc(label) + ' · ' + mp.done + '/' + mp.total + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;"><a href="#course" style="font-weight:700;color:var(--text-primary);">' + esc(m.title) + '</a><span style="font-size:12px;opacity:0.7;">' + esc(label) + ' · ' + mp.done + '/' + mp.total + '</span></div>' +
         progressBar(mp.percent, m.title) +
         '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">' + (m.topics || []).map(function(t) {
           var r = state.lessons[t.id];
           var st = r ? (LESSON_STATUS_LABELS[r.status] || r.status) : 'Новый';
-          return '<a href="#course/lesson/' + esc(t.id) + '" style="font-size:12px;padding:4px 8px;border:1px solid #D4AF37;text-decoration:none;color:#0A1929;">' + esc(t.title) + ' — ' + esc(st) + '</a>';
+          return '<a href="#course/lesson/' + esc(t.id) + '" style="font-size:12px;padding:4px 8px;border:1px solid var(--accent);text-decoration:none;color:var(--text-primary);">' + esc(t.title) + ' — ' + esc(st) + '</a>';
         }).join('') + '</div>' +
         '</div></li>';
     });
     olHtml += '</ol>';
-    var btnHtml = firstUnfinished ? '<a href="#course/lesson/' + esc(firstUnfinished) + '" class="btn" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;background:#D4AF37;color:#0A1929;text-decoration:none;margin-top:12px;">К первому незавершённому</a>' : '';
+    var btnHtml = firstUnfinished ? '<a href="#course/lesson/' + esc(firstUnfinished) + '" class="btn" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;background:var(--accent);color:var(--text-on-accent);text-decoration:none;margin-top:12px;">К первому незавершённому</a>' : '';
     wrap.innerHTML = '<h2 style="margin:0 0 12px;">Учебный маршрут</h2>' + olHtml + btnHtml;
     frag.appendChild(wrap);
     setMain(frag);
@@ -1905,20 +1987,20 @@
       if (a.group === b.group) svgLines += '<line x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y + '" stroke="#D4AF37" stroke-width="1.5" opacity="0.5"/>';
     }
     var html = '<h2 style="margin:0 0 12px;">Карта знаний</h2>';
-    html += '<div style="position:relative;border:2px solid #D4AF37;background:#F5F0E8;min-height:420px;overflow:auto;">';
+    html += '<div style="position:relative;border:2px solid var(--accent);background:var(--surface);min-height:420px;overflow:auto;">';
     html += '<svg width="700" height="420" style="position:absolute;inset:0;" aria-hidden="true">' + svgLines + '</svg>';
     Object.keys(groups).forEach(function(gName) {
       var collapsed = mindmapCollapsed.has(gName);
       html += '<div style="position:relative;margin:8px;">' +
-        '<button type="button" class="mindmap-group" data-group="' + esc(gName) + '" aria-expanded="' + (collapsed ? 'false' : 'true') + '" style="min-height:44px;padding:6px 12px;background:#0A1929;color:#F5F0E8;border:1px solid #D4AF37;">' + esc(gName) + '</button>' +
+        '<button type="button" class="mindmap-group" data-group="' + esc(gName) + '" aria-expanded="' + (collapsed ? 'false' : 'true') + '" style="min-height:44px;padding:6px 12px;background:var(--text-primary);color:var(--surface);border:1px solid var(--accent);">' + esc(gName) + '</button>' +
         '<div class="mindmap-group-nodes" ' + (collapsed ? 'hidden' : '') + ' style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;">';
       groups[gName].forEach(function(node) {
         var mod = modsById[node.moduleId];
         if (!mod) {
-          html += '<div class="mindmap-node mindmap-node--disabled" style="min-width:140px;min-height:44px;padding:10px;border:1px dashed #8B6F47;background:#fff;opacity:0.6;display:flex;align-items:center;justify-content:center;">Модуль недоступен</div>';
+          html += '<div class="mindmap-node mindmap-node--disabled" style="min-width:140px;min-height:44px;padding:10px;border:1px dashed #8B6F47;background:var(--surface-raised);opacity:0.6;display:flex;align-items:center;justify-content:center;">Модуль недоступен</div>';
         } else {
           var mp = moduleProgress(node.moduleId);
-          html += '<div class="mindmap-node" tabindex="0" role="button" data-module="' + esc(node.moduleId) + '" data-group="' + esc(gName) + '" style="min-width:140px;min-height:44px;padding:10px;background:#fff;border:2px solid #D4AF37;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">' +
+          html += '<div class="mindmap-node" tabindex="0" role="button" data-module="' + esc(node.moduleId) + '" data-group="' + esc(gName) + '" style="min-width:140px;min-height:44px;padding:10px;background:var(--surface-raised);border:2px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">' +
             '<span style="font-weight:700;font-size:13px;">' + esc(mod.title) + '</span>' +
             '<span style="font-size:11px;opacity:0.7;">' + mp.percent + '% · ' + mp.done + '/' + mp.total + '</span>' +
             '</div>';
@@ -1969,8 +2051,8 @@
     var frag = document.createDocumentFragment();
     var wrap = document.createElement('div');
     var controls = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">' +
-      '<label>Фильтр <select id="course-filter" style="min-height:44px;border:1px solid #D4AF37;padding:0 8px;"><option value="all"' + (courseFilter === 'all' ? ' selected' : '') + '>Все</option><option value="not-started"' + (courseFilter === 'not-started' ? ' selected' : '') + '>Не начато</option><option value="in-progress"' + (courseFilter === 'in-progress' ? ' selected' : '') + '>В процессе</option><option value="completed"' + (courseFilter === 'completed' ? ' selected' : '') + '>Завершено</option></select></label>' +
-      '<label style="flex:1;min-width:180px;">Поиск <input id="course-search" type="search" value="' + esc(courseSearch) + '" placeholder="Поиск по темам" style="width:100%;min-height:44px;border:1px solid #D4AF37;padding:0 8px;"></label>' +
+      '<label>Фильтр <select id="course-filter" style="min-height:44px;border:1px solid var(--accent);padding:0 8px;"><option value="all"' + (courseFilter === 'all' ? ' selected' : '') + '>Все</option><option value="not-started"' + (courseFilter === 'not-started' ? ' selected' : '') + '>Не начато</option><option value="in-progress"' + (courseFilter === 'in-progress' ? ' selected' : '') + '>В процессе</option><option value="completed"' + (courseFilter === 'completed' ? ' selected' : '') + '>Завершено</option></select></label>' +
+      '<label style="flex:1;min-width:180px;">Поиск <input id="course-search" type="search" value="' + esc(courseSearch) + '" placeholder="Поиск по темам" style="width:100%;min-height:44px;border:1px solid var(--accent);padding:0 8px;"></label>' +
       '</div>';
     var q = courseSearch.toLowerCase();
     var allowedStatuses = FILTER_MAP[courseFilter] || FILTER_MAP.all;
@@ -1998,7 +2080,7 @@
       var expanded = courseExpandedModules.has(m.id);
       var shortGoal = m.shortGoal || m.summary || '';
       html += '<div class="card" style="margin-bottom:12px;padding:0;overflow:hidden;">' +
-        '<button type="button" data-expand="' + esc(m.id) + '" aria-expanded="' + (expanded ? 'true' : 'false') + '" style="width:100%;text-align:left;padding:12px;display:flex;justify-content:space-between;align-items:center;background:#fff;border:none;cursor:pointer;min-height:44px;">' +
+        '<button type="button" data-expand="' + esc(m.id) + '" aria-expanded="' + (expanded ? 'true' : 'false') + '" style="width:100%;text-align:left;padding:12px;display:flex;justify-content:space-between;align-items:center;background:var(--surface-raised);border:none;cursor:pointer;min-height:44px;">' +
         '<span><strong>' + esc(m.title) + '</strong> <span style="font-size:12px;opacity:0.6;">' + esc(shortGoal) + '</span></span>' +
         '<span style="font-size:12px;white-space:nowrap;">' + esc(LESSON_STATUS_LABELS[mp.status] || mp.status) + ' · ' + mp.done + '/' + mp.total + '</span>' +
         '</button>' +
@@ -2009,11 +2091,11 @@
         if (window.CourseData && Array.isArray(window.CourseData.controlTests)) {
           for (var ci = 0; ci < window.CourseData.controlTests.length; ci++) if (window.CourseData.controlTests[ci].moduleId === m.id) { hasTest = true; break; }
         }
-        if (hasTest) html += '<a href="#questions?module=' + esc(m.id) + '" class="btn" style="min-height:44px;display:inline-flex;align-items:center;padding:0 12px;background:#D4AF37;color:#0A1929;text-decoration:none;margin-bottom:8px;">Контрольный тест</a>';
+        if (hasTest) html += '<a href="#questions?module=' + esc(m.id) + '" class="btn" style="min-height:44px;display:inline-flex;align-items:center;padding:0 12px;background:var(--accent);color:var(--text-on-accent);text-decoration:none;margin-bottom:8px;">Контрольный тест</a>';
         html += '<div style="display:grid;gap:6px;">' + filtered.map(function(t) {
           var rec = state.lessons[t.id];
           var st2 = rec ? (LESSON_STATUS_LABELS[rec.status] || rec.status) : 'Новый';
-          return '<a href="#course/lesson/' + esc(t.id) + '" style="display:flex;justify-content:space-between;gap:8px;padding:8px;border:1px solid #E8E0D0;text-decoration:none;color:#0A1929;min-height:44px;align-items:center;">' + esc(t.title) + '<span style="font-size:11px;opacity:0.6;">' + esc(st2) + '</span></a>';
+          return '<a href="#course/lesson/' + esc(t.id) + '" style="display:flex;justify-content:space-between;gap:8px;padding:8px;border:1px solid var(--border);text-decoration:none;color:var(--text-primary);min-height:44px;align-items:center;">' + esc(t.title) + '<span style="font-size:11px;opacity:0.6;">' + esc(st2) + '</span></a>';
         }).join('') + '</div></div>';
       }
       html += '</div>';
@@ -2096,18 +2178,18 @@
     var frag = document.createDocumentFragment();
     var wrap = document.createElement('div');
     var html = '<nav aria-label="Хлебные крошки" style="font-size:12px;margin-bottom:8px;"><ol style="display:flex;gap:6px;list-style:none;padding:0;margin:0;"><li><a href="#course">Курс</a></li><li>›</li><li><a href="#course">' + esc(moduleTitle || record.moduleId) + '</a></li><li>›</li><li><span aria-current="page">' + esc(record.title) + '</span></li></ol></nav>';
-    html += '<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;"><h2 style="margin:0;">' + esc(record.title) + '</h2><span style="padding:4px 8px;background:#D4AF37;font-size:12px;">' + esc(LESSON_STATUS_LABELS[record.status] || record.status) + '</span></div>';
+    html += '<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;"><h2 style="margin:0;">' + esc(record.title) + '</h2><span style="padding:4px 8px;background:var(--accent);color:var(--text-on-accent);font-size:12px;">' + esc(LESSON_STATUS_LABELS[record.status] || record.status) + '</span></div>';
     if (record.goal) html += '<p style="margin:8px 0;font-size:13px;"><strong>Цель:</strong> ' + esc(record.goal) + '</p>';
     if (record.expectedResult) html += '<p style="margin:4px 0;font-size:13px;"><strong>Ожидаемый результат:</strong> ' + esc(record.expectedResult) + '</p>';
     if (record.summary) html += '<div class="card" style="padding:12px;margin-top:8px;"><p style="margin:0;font-size:13px;">' + esc(record.summary) + '</p></div>';
-    if (record.terms && record.terms.length) html += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">' + record.terms.map(function(t) { return '<span style="padding:4px 8px;background:#0A1929;color:#F5F0E8;font-size:11px;">' + esc(t) + '</span>'; }).join('') + '</div>';
+    if (record.terms && record.terms.length) html += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">' + record.terms.map(function(t) { return '<span style="padding:4px 8px;background:var(--text-primary);color:var(--surface);font-size:11px;">' + esc(t) + '</span>'; }).join('') + '</div>';
 
     html += '<div style="display:grid;gap:12px;margin-top:16px;">';
-    html += '<label>Заметки<textarea id="lesson-notes" rows="4" style="width:100%;min-height:44px;border:1px solid #D4AF37;padding:8px;word-break:break-word;">' + '</textarea></label>';
-    html += '<label>Ключевая мысль<textarea id="lesson-keyPoint" rows="3" style="width:100%;min-height:44px;border:1px solid #D4AF37;padding:8px;word-break:break-word;">' + '</textarea></label>';
-    html += '<label>Своими словами<textarea id="lesson-ownWords" rows="3" style="width:100%;min-height:44px;border:1px solid #D4AF37;padding:8px;word-break:break-word;">' + '</textarea></label>';
-    html += '<label>Неясно<textarea id="lesson-unclear" rows="3" style="width:100%;min-height:44px;border:1px solid #D4AF37;padding:8px;word-break:break-word;">' + '</textarea></label>';
-    html += '<label>Вывод<textarea id="lesson-conclusion" rows="3" style="width:100%;min-height:44px;border:1px solid #D4AF37;padding:8px;word-break:break-word;">' + '</textarea></label>';
+    html += '<label>Заметки<textarea id="lesson-notes" rows="4" style="width:100%;min-height:44px;border:1px solid var(--accent);padding:8px;word-break:break-word;">' + '</textarea></label>';
+    html += '<label>Ключевая мысль<textarea id="lesson-keyPoint" rows="3" style="width:100%;min-height:44px;border:1px solid var(--accent);padding:8px;word-break:break-word;">' + '</textarea></label>';
+    html += '<label>Своими словами<textarea id="lesson-ownWords" rows="3" style="width:100%;min-height:44px;border:1px solid var(--accent);padding:8px;word-break:break-word;">' + '</textarea></label>';
+    html += '<label>Неясно<textarea id="lesson-unclear" rows="3" style="width:100%;min-height:44px;border:1px solid var(--accent);padding:8px;word-break:break-word;">' + '</textarea></label>';
+    html += '<label>Вывод<textarea id="lesson-conclusion" rows="3" style="width:100%;min-height:44px;border:1px solid var(--accent);padding:8px;word-break:break-word;">' + '</textarea></label>';
     html += '</div>';
 
     if (questions.length) {
@@ -2116,47 +2198,47 @@
         var ans = (record.answers && record.answers[q.id]) ? record.answers[q.id] : '';
         html += '<div class="card" style="padding:12px;margin-bottom:8px;">' +
           '<div style="font-weight:600;font-size:13px;">' + esc(q.text) + '</div>' +
-          '<label style="display:block;margin-top:8px;">Ответ<textarea data-answer="' + esc(q.id) + '" rows="2" style="width:100%;min-height:44px;border:1px solid #D4AF37;padding:8px;word-break:break-word;">' + '</textarea></label>' +
-          '<button type="button" data-show="' + esc(q.id) + '" aria-expanded="false" style="min-height:44px;margin-top:8px;padding:0 12px;border:1px solid #D4AF37;background:#fff;">Показать эталон</button>' +
-          '<div data-ref="' + esc(q.id) + '" hidden style="margin-top:8px;padding:8px;background:#F5F0E8;font-size:13px;">' + esc(q.answerRef || '') + '</div>' +
+          '<label style="display:block;margin-top:8px;">Ответ<textarea data-answer="' + esc(q.id) + '" rows="2" style="width:100%;min-height:44px;border:1px solid var(--accent);padding:8px;word-break:break-word;">' + '</textarea></label>' +
+          '<button type="button" data-show="' + esc(q.id) + '" aria-expanded="false" style="min-height:44px;margin-top:8px;padding:0 12px;border:1px solid var(--accent);background:var(--surface-raised);">Показать эталон</button>' +
+          '<div data-ref="' + esc(q.id) + '" hidden style="margin-top:8px;padding:8px;background:var(--surface);font-size:13px;">' + esc(q.answerRef || '') + '</div>' +
           '</div>';
       });
       html += '</div>';
     }
 
     html += '<div class="card" style="padding:12px;margin-top:16px;">' +
-      '<label>Практика<textarea id="lesson-practice" rows="3" style="width:100%;min-height:44px;border:1px solid #D4AF37;padding:8px;word-break:break-word;">' + '</textarea></label>' +
+      '<label>Практика<textarea id="lesson-practice" rows="3" style="width:100%;min-height:44px;border:1px solid var(--accent);padding:8px;word-break:break-word;">' + '</textarea></label>' +
       '<label style="display:flex;align-items:center;gap:8px;margin-top:8px;min-height:44px;"><input type="checkbox" id="lesson-skipped"' + (record.practiceSkipped ? ' checked' : '') + '> Пропустить практику</label>' +
-      '<div style="margin-top:8px;"><label>Найденные баги (через запятую)<input id="lesson-bugs" type="text" style="width:100%;min-height:44px;border:1px solid #D4AF37;padding:0 8px;"></label></div>' +
-      '<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><label>Время (мин)<input id="lesson-time" type="number" min="0" style="min-height:44px;width:100px;border:1px solid #D4AF37;padding:0 8px;"></label>' +
+      '<div style="margin-top:8px;"><label>Найденные баги (через запятую)<input id="lesson-bugs" type="text" style="width:100%;min-height:44px;border:1px solid var(--accent);padding:0 8px;"></label></div>' +
+      '<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><label>Время (мин)<input id="lesson-time" type="number" min="0" style="min-height:44px;width:100px;border:1px solid var(--accent);padding:0 8px;"></label>' +
       '<span>Понимание:</span><span role="radiogroup" aria-label="Оценка понимания" id="lesson-understanding" style="display:flex;gap:4px;">' +
-      [0, 1, 2, 3, 4, 5].map(function(n) { return '<button type="button" role="radio" aria-checked="' + (record.understanding === n ? 'true' : 'false') + '" data-score="' + n + '" style="min-width:44px;min-height:44px;border:1px solid #D4AF37;background:' + (record.understanding === n ? '#D4AF37' : '#fff') + ';">' + n + '</button>'; }).join('') +
+      [0, 1, 2, 3, 4, 5].map(function(n) { return '<button type="button" role="radio" aria-checked="' + (record.understanding === n ? 'true' : 'false') + '" data-score="' + n + '" style="min-width:44px;min-height:44px;border:1px solid var(--accent);background:' + (record.understanding === n ? 'var(--accent)' : 'var(--surface-raised)') + ';">' + n + '</button>'; }).join('') +
       '</span></div>' +
       '<div style="margin-top:8px;font-size:12px;opacity:0.7;">Изучено: ' + esc(fmtDate(record.studyDate)) + ' · Повтор: ' + esc(fmtDate(record.nextReview)) + '</div>' +
-      '<button type="button" id="lesson-portfolio" ' + (record.inPortfolio ? 'disabled' : '') + ' style="min-height:44px;margin-top:12px;padding:0 16px;background:' + (record.inPortfolio ? '#E8E0D0' : '#D4AF37') + ';border:1px solid #D4AF37;">' + (record.inPortfolio ? 'В портфолио добавлено' : 'Добавить в портфолио') + '</button>' +
+      '<button type="button" id="lesson-portfolio" ' + (record.inPortfolio ? 'disabled' : '') + ' style="min-height:44px;margin-top:12px;padding:0 16px;background:' + (record.inPortfolio ? 'var(--border)' : 'var(--accent)') + ';border:1px solid var(--accent);">' + (record.inPortfolio ? 'В портфолио добавлено' : 'Добавить в портфолио') + '</button>' +
       '</div>';
 
     var tagOptions = state.tags.map(function(t) { return '<option value="' + esc(t.id) + '">' + esc(t.name) + '</option>'; }).join('');
     var flatCats = (App.CategoriesManager && typeof App.CategoriesManager.getFlat === 'function') ? App.CategoriesManager.getFlat() : [];
     var catOptions = '<option value="">— без категории —</option>' + flatCats.map(function(c) { return '<option value="' + esc(c.id) + '"' + (record.category === c.id ? ' selected' : '') + '>' + esc(c.path) + '</option>'; }).join('');
     html += '<div class="card" style="padding:12px;margin-top:12px;">' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><select id="lesson-tag-select" style="min-height:44px;border:1px solid #D4AF37;padding:0 8px;"><option value="">— тег —</option>' + tagOptions + '</select><button type="button" id="lesson-tag-add" style="min-height:44px;padding:0 12px;border:1px solid #D4AF37;">Добавить тег</button><span style="font-size:12px;opacity:0.6;">Лимит 10</span></div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><select id="lesson-tag-select" style="min-height:44px;border:1px solid var(--accent);padding:0 8px;"><option value="">— тег —</option>' + tagOptions + '</select><button type="button" id="lesson-tag-add" style="min-height:44px;padding:0 12px;border:1px solid var(--accent);">Добавить тег</button><span style="font-size:12px;opacity:0.6;">Лимит 10</span></div>' +
       '<div id="lesson-tags" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">' + (record.tags || []).map(function(tid) {
         var tg = findById(state.tags, tid);
-        return '<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px;background:#0A1929;color:#F5F0E8;font-size:12px;">' + esc(tg ? tg.name : tid) + '<button type="button" data-removetag="' + esc(tid) + '" aria-label="Удалить тег" style="background:none;border:none;color:inherit;cursor:pointer;">×</button></span>';
+        return '<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px;background:var(--text-primary);color:var(--surface);font-size:12px;">' + esc(tg ? tg.name : tid) + '<button type="button" data-removetag="' + esc(tid) + '" aria-label="Удалить тег" style="background:none;border:none;color:inherit;cursor:pointer;">×</button></span>';
       }).join('') + '</div>' +
-      '<label style="display:block;margin-top:12px;">Категория<select id="lesson-category" style="width:100%;min-height:44px;border:1px solid #D4AF37;padding:0 8px;margin-top:4px;">' + catOptions + '</select></label>' +
+      '<label style="display:block;margin-top:12px;">Категория<select id="lesson-category" style="width:100%;min-height:44px;border:1px solid var(--accent);padding:0 8px;margin-top:4px;">' + catOptions + '</select></label>' +
       '</div>';
 
     var showNav = true;
     html += '<div style="display:flex;justify-content:space-between;gap:8px;margin-top:16px;">' +
-      (prevId ? '<a href="#course/lesson/' + esc(prevId) + '" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border:1px solid #D4AF37;text-decoration:none;color:#0A1929;">← Назад</a>' : '<span aria-disabled="true" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border:1px solid #E8E0D0;opacity:0.4;">← Назад</span>') +
-      (nextId ? '<a href="#course/lesson/' + esc(nextId) + '" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;background:#D4AF37;color:#0A1929;text-decoration:none;">Далее →</a>' : '<span aria-disabled="true" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border:1px solid #E8E0D0;opacity:0.4;">Далее →</span>') +
+      (prevId ? '<a href="#course/lesson/' + esc(prevId) + '" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border:1px solid var(--accent);text-decoration:none;color:var(--text-primary);">← Назад</a>' : '<span aria-disabled="true" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border:1px solid var(--border);opacity:0.4;">← Назад</span>') +
+      (nextId ? '<a href="#course/lesson/' + esc(nextId) + '" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;background:var(--accent);color:var(--text-on-accent);text-decoration:none;">Далее →</a>' : '<span aria-disabled="true" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border:1px solid var(--border);opacity:0.4;">Далее →</span>') +
       '</div>';
 
     var isFirstOpen = !record.notes && !record.keyPoint && !record.ownWords;
     if (isFirstOpen) {
-      html += '<div class="lesson-hints" style="margin-top:12px;padding:12px;background:#FFFEFB;border:1px dashed #D4AF37;font-size:12px;">Подсказка: заполните заметки своими словами, затем сформулируйте ключевую мысль и вывод. Это поможет закрепить материал.</div>';
+      html += '<div class="lesson-hints" style="margin-top:12px;padding:12px;background:#FFFEFB;border:1px dashed var(--accent);font-size:12px;">Подсказка: заполните заметки своими словами, затем сформулируйте ключевую мысль и вывод. Это поможет закрепить материал.</div>';
     }
 
     wrap.innerHTML = html;
@@ -2473,8 +2555,8 @@
   var prevSaveState = App.saveState;
   var P4_SCOPES = {
     notes: function () {
-      var arr = dirtyArray('notes');
-      if (!arr.length) arr = toArray(state.notes);
+      // autoSave has one timer per store: retain all pending note edits when it resets.
+      var arr = toArray(state.notes);
       if (arr.length) window.IDB.autoSave('notes', arr, 300);
       App.dirtyByScope.notes.clear();
     },
@@ -3203,15 +3285,15 @@
       '<button type="button" data-act="export-all" class="btn" style="min-height:44px;" aria-label="Экспорт всех заметок в Markdown">MD</button>' +
       '</div>' +
       '<label class="visually-hidden" for="notes-search">Поиск по заметкам</label>' +
-      '<input id="notes-search" type="search" placeholder="Поиск" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;">' +
+      '<input id="notes-search" type="search" placeholder="Поиск" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);">' +
       '<div style="display:grid;gap:6px;margin-top:8px;">' +
-      '<label>Тип<select data-filter="type" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="all">Все</option>' +
+      '<label>Тип<select data-filter="type" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="all">Все</option>' +
       NOTE_TYPES.map(function (t) { return '<option value="' + t + '"' + (notesUi.type === t ? ' selected' : '') + '>' + esc(NOTE_TYPE_LABELS[t]) + '</option>'; }).join('') +
       '</select></label>' +
-      '<label>Важность<select data-filter="importance" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="all">Любая</option><option value="1"' + (notesUi.importance === '1' ? ' selected' : '') + '>1</option><option value="2"' + (notesUi.importance === '2' ? ' selected' : '') + '>2</option><option value="3"' + (notesUi.importance === '3' ? ' selected' : '') + '>3</option></select></label>' +
-      '<label>Категория<select data-filter="category" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' + catOpts + '</select></label>' +
-      (state.tags.length ? '<label>Теги<select data-filter="tags" multiple size="4" style="width:100%;border:1px solid #D4AF37;">' + tagOpts + '</select></label>' : '') +
-      '<label>Сортировка<select data-filter="sort" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' +
+      '<label>Важность<select data-filter="importance" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="all">Любая</option><option value="1"' + (notesUi.importance === '1' ? ' selected' : '') + '>1</option><option value="2"' + (notesUi.importance === '2' ? ' selected' : '') + '>2</option><option value="3"' + (notesUi.importance === '3' ? ' selected' : '') + '>3</option></select></label>' +
+      '<label>Категория<select data-filter="category" style="width:100%;min-height:44px;border:1px solid var(--accent);">' + catOpts + '</select></label>' +
+      (state.tags.length ? '<label>Теги<select data-filter="tags" multiple size="4" style="width:100%;border:1px solid var(--accent);">' + tagOpts + '</select></label>' : '') +
+      '<label>Сортировка<select data-filter="sort" style="width:100%;min-height:44px;border:1px solid var(--accent);">' +
       '<option value="updatedAt"' + (notesUi.sort === 'updatedAt' ? ' selected' : '') + '>По изменению</option>' +
       '<option value="createdAt"' + (notesUi.sort === 'createdAt' ? ' selected' : '') + '>По созданию</option>' +
       '<option value="title"' + (notesUi.sort === 'title' ? ' selected' : '') + '>По названию</option>' +
@@ -3235,7 +3317,7 @@
       btn.type = 'button';
       btn.setAttribute('data-select', n.id);
       btn.setAttribute('aria-current', n.id === notesUi.selectedId ? 'true' : 'false');
-      btn.style.cssText = 'width:100%;text-align:left;min-height:44px;padding:8px;border:1px solid ' + (n.id === notesUi.selectedId ? '#D4AF37' : '#E8E0D0') + ';background:' + (n.id === notesUi.selectedId ? 'rgba(212,175,55,.12)' : '#fff') + ';cursor:pointer;';
+      btn.style.cssText = 'width:100%;text-align:left;min-height:44px;padding:8px;border:1px solid ' + (n.id === notesUi.selectedId ? 'var(--accent)' : 'var(--border)') + ';background:' + (n.id === notesUi.selectedId ? 'rgba(212,175,55,.12)' : 'var(--surface-raised)') + ';cursor:pointer;';
       var titleSpan = document.createElement('span');
       titleSpan.style.cssText = 'display:block;font-weight:600;font-size:13px;';
       titleSpan.textContent = (n.pinned ? '★ ' : '') + (n.title || 'Без названия');
@@ -3254,8 +3336,8 @@
     right.style.padding = '12px';
     var tagChips = (current.tags || []).map(function (tid) {
       var t = findById(state.tags, tid);
-      var marker = t && t.color ? t.color : '#D4AF37';
-      return '<span class="tag-chip" style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px;background:#0A1929;color:#D4AF37;font-size:12px;border-left:3px solid ' + esc(marker) + ';">' +
+      var marker = t && t.color ? t.color : 'var(--accent)';
+      return '<span class="tag-chip" style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px;background:var(--text-primary);color:var(--accent);font-size:12px;border-left:3px solid ' + esc(marker) + ';">' +
         esc(t ? t.name : tid) +
         '<button type="button" data-untag="' + esc(tid) + '" aria-label="Убрать тег" style="background:none;border:none;color:inherit;cursor:pointer;min-width:24px;">×</button></span>';
     }).join('');
@@ -3275,23 +3357,23 @@
       '<button type="button" data-act="copy" class="btn" style="min-height:44px;">Копировать</button>' +
       '<button type="button" data-act="delete" class="btn btn--danger" style="min-height:44px;">Удалить</button>' +
       '</div></div>' +
-      '<label style="display:block;margin-top:12px;">Название<input data-field="title" type="text" maxlength="' + NOTE_LIMITS.title + '" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
+      '<label style="display:block;margin-top:12px;">Название<input data-field="title" type="text" maxlength="' + NOTE_LIMITS.title + '" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
       '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:8px;">' +
-      '<label>Тип<select data-field="type" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' +
+      '<label>Тип<select data-field="type" style="width:100%;min-height:44px;border:1px solid var(--accent);">' +
       NOTE_TYPES.map(function (t) { return '<option value="' + t + '"' + (current.type === t ? ' selected' : '') + '>' + esc(NOTE_TYPE_LABELS[t]) + '</option>'; }).join('') +
       '</select></label>' +
-      '<label>Важность<select data-field="importance" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' +
+      '<label>Важность<select data-field="importance" style="width:100%;min-height:44px;border:1px solid var(--accent);">' +
       [1, 2, 3].map(function (n) { return '<option value="' + n + '"' + (Number(current.importance) === n ? ' selected' : '') + '>' + n + '</option>'; }).join('') +
       '</select></label>' +
-      '<label>Категория<select data-field="category" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' + catSelectOpts + '</select></label>' +
+      '<label>Категория<select data-field="category" style="width:100%;min-height:44px;border:1px solid var(--accent);">' + catSelectOpts + '</select></label>' +
       '</div>' +
       '<div style="margin-top:12px;"><span style="font-weight:600;font-size:13px;">Содержание</span>' +
       '<div data-role="editor-host" style="margin-top:4px;"></div>' +
       '<div data-role="counter" class="counter" aria-live="polite" style="font-size:12px;margin-top:4px;opacity:0.7;"></div></div>' +
-      '<label style="display:block;margin-top:12px;">Вывод<textarea data-field="conclusion" rows="3" maxlength="' + NOTE_LIMITS.conclusion + '" style="width:100%;min-height:44px;padding:8px;border:1px solid #D4AF37;word-break:break-word;"></textarea></label>' +
-      '<label style="display:block;margin-top:8px;">Источник<input data-field="source" type="text" maxlength="' + NOTE_LIMITS.source + '" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
+      '<label style="display:block;margin-top:12px;">Вывод<textarea data-field="conclusion" rows="3" maxlength="' + NOTE_LIMITS.conclusion + '" style="width:100%;min-height:44px;padding:8px;border:1px solid var(--accent);word-break:break-word;"></textarea></label>' +
+      '<label style="display:block;margin-top:8px;">Источник<input data-field="source" type="text" maxlength="' + NOTE_LIMITS.source + '" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
       '<div style="margin-top:12px;"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
-      '<select data-role="tag-select" style="min-height:44px;border:1px solid #D4AF37;"><option value="">— тег —</option>' + tagSelectOpts + '</select>' +
+      '<select data-role="tag-select" style="min-height:44px;border:1px solid var(--accent);"><option value="">— тег —</option>' + tagSelectOpts + '</select>' +
       '<button type="button" data-act="add-tag" class="btn" style="min-height:44px;">Добавить тег</button>' +
       '<span style="font-size:12px;opacity:0.65;">Лимит ' + NOTE_LIMITS.tags + '</span></div>' +
       '<div data-role="tag-chips" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">' + tagChips + '</div></div>' +
@@ -3317,8 +3399,11 @@
       if (len >= max) counter.classList.add('counter-danger');
       else if (len >= max * 0.9) counter.classList.add('counter-warn');
     }
-    var saveNote = debounce(function () {
-      var note = state.notes[notesUi.selectedId];
+    var editorForNote = null;
+    var persistNote = debounce(function () { saveState('notes'); }, 300);
+    function saveNote() {
+      // Snapshot this render's note before switching/destroying its editor.
+      var note = state.notes[current.id];
       if (!note) return;
       note.title = right.querySelector('[data-field="title"]').value.slice(0, NOTE_LIMITS.title);
       note.type = right.querySelector('[data-field="type"]').value;
@@ -3326,11 +3411,11 @@
       note.category = right.querySelector('[data-field="category"]').value || null;
       note.conclusion = right.querySelector('[data-field="conclusion"]').value.slice(0, NOTE_LIMITS.conclusion);
       note.source = right.querySelector('[data-field="source"]').value.slice(0, NOTE_LIMITS.source);
-      note.content = notesEditorInstance ? String(notesEditorInstance.getValue() || '').slice(0, NOTE_LIMITS.content) : note.content;
+      note.content = editorForNote ? String(editorForNote.getValue() || '').slice(0, NOTE_LIMITS.content) : note.content;
       note.updatedAt = nowIso();
       markDirty('notes', note.id);
-      saveState('notes');
-    }, 300);
+      persistNote();
+    }
 
     if (notesEditorInstance && typeof notesEditorInstance.destroy === 'function') {
       try { notesEditorInstance.destroy(); } catch (e) {}
@@ -3338,12 +3423,19 @@
     }
     if (typeof Editor !== 'undefined' && typeof Editor.create === 'function') {
       try {
-        notesEditorInstance = Editor.create(host, {
+        var editorDescriptor = Editor.create(host, {
           value: current.content || '',
           maxLength: NOTE_LIMITS.content,
           placeholder: 'Пишите своими словами',
           onChange: function (val) { updateCounter(String(val || '').length); saveNote(); }
         });
+        // Editor returns DOM references; adapt its public API to the textarea interface.
+        notesEditorInstance = editorDescriptor ? {
+          getValue: function () { return Editor.getContent(host); },
+          setValue: function (value) { return Editor.setContent(host, value); },
+          focus: function () { editorDescriptor.editable.focus(); },
+          destroy: function () { Editor.destroy(host); }
+        } : null;
       } catch (e) { notesEditorInstance = null; }
     }
     if (!notesEditorInstance) {
@@ -3351,7 +3443,7 @@
       ta.rows = 12;
       ta.maxLength = NOTE_LIMITS.content;
       ta.placeholder = 'Пишите своими словами';
-      ta.style.cssText = 'width:100%;min-height:200px;padding:8px;border:1px solid #D4AF37;word-break:break-word;';
+      ta.style.cssText = 'width:100%;min-height:200px;padding:8px;border:1px solid var(--accent);word-break:break-word;';
       ta.value = current.content || '';
       host.appendChild(ta);
       notesEditorInstance = {
@@ -3362,6 +3454,7 @@
       };
       ta.addEventListener('input', function () { updateCounter(ta.value.length); saveNote(); });
     }
+    editorForNote = notesEditorInstance;
     updateCounter((current.content || '').length);
 
     /* делегирование: левая колонка */
@@ -3400,7 +3493,7 @@
 
     /* делегирование: редактор */
     right.addEventListener('input', function (e) {
-      if (e.target.getAttribute && e.target.getAttribute('data-field')) saveNote();
+      if (e.target.getAttribute && (e.target.getAttribute('data-field') || e.target.closest('[contenteditable="true"]'))) saveNote();
     });
     right.addEventListener('change', function (e) {
       if (e.target.getAttribute && e.target.getAttribute('data-field')) saveNote();
@@ -3534,16 +3627,16 @@
     wrap.innerHTML =
       '<h2 style="margin:0 0 12px;">Вопросы — самопроверка</h2>' +
       '<div class="card" style="padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;">' +
-      '<label>Тип<select data-qf="type" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="all">Все</option>' +
+      '<label>Тип<select data-qf="type" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="all">Все</option>' +
       QUESTION_TYPES.map(function (t) { return '<option value="' + t + '"' + (questionsUi.type === t ? ' selected' : '') + '>' + esc(QUESTION_TYPE_LABELS[t]) + '</option>'; }).join('') +
       '</select></label>' +
-      '<label>Модуль<select data-qf="module" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="all">Все</option>' +
+      '<label>Модуль<select data-qf="module" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="all">Все</option>' +
       modules.map(function (m) { return '<option value="' + esc(m.id) + '"' + (questionsUi.moduleId === m.id ? ' selected' : '') + '>' + esc(m.title) + '</option>'; }).join('') +
       '</select></label>' +
-      '<label>Тема<select data-qf="topic" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="all">Все</option>' +
+      '<label>Тема<select data-qf="topic" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="all">Все</option>' +
       topicsForModule.map(function (t) { return '<option value="' + esc(t.id) + '"' + (questionsUi.topicId === t.id ? ' selected' : '') + '>' + esc(t.title) + '</option>'; }).join('') +
       '</select></label>' +
-      '<label>Поиск<input data-qf="search" type="search" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
+      '<label>Поиск<input data-qf="search" type="search" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
       '<div style="display:flex;align-items:flex-end;"><button type="button" data-qact="create" class="btn btn--primary" style="min-height:44px;width:100%;">Свой вопрос</button></div>' +
       '</div>' +
       '<div data-role="q-list" style="display:grid;gap:10px;margin-top:12px;"></div>';
@@ -3564,15 +3657,15 @@
       card.innerHTML =
         '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;">' +
         '<strong style="font-size:14px;">' + esc(q.text) + '</strong>' +
-        '<span style="font-size:11px;padding:3px 6px;border:1px solid #D4AF37;white-space:nowrap;">' + esc(QUESTION_TYPE_LABELS[q.type] || q.type) + '</span>' +
+        '<span style="font-size:11px;padding:3px 6px;border:1px solid var(--accent);white-space:nowrap;">' + esc(QUESTION_TYPE_LABELS[q.type] || q.type) + '</span>' +
         '</div>' +
         (q.hint ? '<p style="font-size:12px;opacity:0.7;margin:6px 0 0;">Подсказка: ' + esc(q.hint) + '</p>' : '') +
-        '<label style="display:block;margin-top:8px;">Ваш ответ<textarea data-answer="' + esc(q.id) + '" rows="3" maxlength="5000" style="width:100%;min-height:44px;padding:8px;border:1px solid #D4AF37;word-break:break-word;"></textarea></label>' +
+        '<label style="display:block;margin-top:8px;">Ваш ответ<textarea data-answer="' + esc(q.id) + '" rows="3" maxlength="5000" style="width:100%;min-height:44px;padding:8px;border:1px solid var(--accent);word-break:break-word;"></textarea></label>' +
         '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">' +
         '<button type="button" data-reveal="' + esc(q.id) + '" aria-expanded="' + (revealed ? 'true' : 'false') + '" class="btn" style="min-height:44px;">' + (revealed ? 'Скрыть эталон' : 'Показать эталон') + '</button>' +
         (q.isUserCreated ? '<button type="button" data-qedit="' + esc(q.id) + '" class="btn" style="min-height:44px;">Изменить</button><button type="button" data-qdel="' + esc(q.id) + '" class="btn btn--danger" style="min-height:44px;">Удалить</button>' : '') +
         '</div>' +
-        '<div data-ref="' + esc(q.id) + '"' + (revealed ? '' : ' hidden') + ' style="margin-top:8px;padding:8px;background:rgba(212,175,55,.08);border-left:3px solid #D4AF37;font-size:13px;">' +
+        '<div data-ref="' + esc(q.id) + '"' + (revealed ? '' : ' hidden') + ' style="margin-top:8px;padding:8px;background:rgba(212,175,55,.08);border-left:3px solid var(--accent);font-size:13px;">' +
         '<div><strong>Эталон:</strong> ' + esc(q.answerRef || 'Эталон не задан — сверьтесь с конспектом.') + '</div>' +
         '<div style="margin-top:6px;"><strong>Ваш ответ:</strong> ' + esc(savedAnswer || '—') + '</div>' +
         '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">' +
@@ -3708,15 +3801,15 @@
         var topics = [];
         modules.forEach(function (m) { (m.topics || []).forEach(function (t) { topics.push({ id: t.id, title: m.title + ' / ' + t.title }); }); });
         body.innerHTML =
-          '<label style="display:block;">Текст вопроса<textarea data-qfield="text" rows="3" maxlength="1000" style="width:100%;min-height:44px;padding:8px;border:1px solid #D4AF37;"></textarea></label>' +
-          '<label style="display:block;margin-top:8px;">Тип<select data-qfield="type" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' +
+          '<label style="display:block;">Текст вопроса<textarea data-qfield="text" rows="3" maxlength="1000" style="width:100%;min-height:44px;padding:8px;border:1px solid var(--accent);"></textarea></label>' +
+          '<label style="display:block;margin-top:8px;">Тип<select data-qfield="type" style="width:100%;min-height:44px;border:1px solid var(--accent);">' +
           QUESTION_TYPES.map(function (t) { return '<option value="' + t + '">' + esc(QUESTION_TYPE_LABELS[t]) + '</option>'; }).join('') +
           '</select></label>' +
-          '<label style="display:block;margin-top:8px;">Тема<select data-qfield="topicId" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="">— без темы —</option>' +
+          '<label style="display:block;margin-top:8px;">Тема<select data-qfield="topicId" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="">— без темы —</option>' +
           topics.map(function (t) { return '<option value="' + esc(t.id) + '">' + esc(t.title) + '</option>'; }).join('') +
           '</select></label>' +
-          '<label style="display:block;margin-top:8px;">Подсказка<input data-qfield="hint" type="text" maxlength="300" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-          '<label style="display:block;margin-top:8px;">Эталонный ответ<textarea data-qfield="answerRef" rows="3" maxlength="3000" style="width:100%;min-height:44px;padding:8px;border:1px solid #D4AF37;"></textarea></label>' +
+          '<label style="display:block;margin-top:8px;">Подсказка<input data-qfield="hint" type="text" maxlength="300" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+          '<label style="display:block;margin-top:8px;">Эталонный ответ<textarea data-qfield="answerRef" rows="3" maxlength="3000" style="width:100%;min-height:44px;padding:8px;border:1px solid var(--accent);"></textarea></label>' +
           '<div class="modal__actions" style="margin-top:12px;display:flex;gap:8px;"><button type="button" data-qsave class="btn btn--primary" style="min-height:44px;">Сохранить</button></div>';
         if (existing) {
           body.querySelector('[data-qfield="text"]').value = existing.text || '';
@@ -3801,7 +3894,7 @@
     wrap.innerHTML =
       '<h2 style="margin:0 0 12px;">Повторение</h2>' +
       '<div class="card" style="padding:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">' +
-      (state.tags.length ? '<label>Теги<select data-rf="tags" multiple size="3" style="min-width:180px;border:1px solid #D4AF37;">' + tagOpts + '</select></label>' : '') +
+      (state.tags.length ? '<label>Теги<select data-rf="tags" multiple size="3" style="min-width:180px;border:1px solid var(--accent);">' + tagOpts + '</select></label>' : '') +
       '<div data-role="rep-counts" style="font-size:13px;">' +
       'Просрочено: <strong data-count="overdue">' + groups.overdue.length + '</strong> · ' +
       'На сегодня: <strong data-count="today">' + groups.today.length + '</strong> · ' +
@@ -3829,7 +3922,7 @@
       groups[key].forEach(function (c) {
         var revealed = !!repetitionUi.revealed[c.id];
         var item = document.createElement('div');
-        item.style.cssText = 'border:1px solid #E8E0D0;padding:10px;margin-top:8px;';
+        item.style.cssText = 'border:1px solid var(--border);padding:10px;margin-top:8px;';
         var tagNames = (c.tags || []).map(function (tid) {
           var t = findById(state.tags, tid);
           return t ? t.name : tid;
@@ -3840,7 +3933,7 @@
           esc(c.moduleId || '—') + ' · сложность ' + esc(c.difficulty) + ' · попыток ' + (c.attempts || 0) + ' · успехов ' + (c.successes || 0) +
           ' · повтор ' + esc(fmtDate(c.nextReview)) + (tagNames ? ' · теги ' + esc(tagNames) : '') + '</div>' +
           '<button type="button" data-rep-reveal="' + esc(c.id) + '" aria-expanded="' + (revealed ? 'true' : 'false') + '" class="btn" style="min-height:44px;margin-top:8px;">' + (revealed ? 'Скрыть ответ' : 'Показать ответ') + '</button>' +
-          '<div data-rep-answer="' + esc(c.id) + '"' + (revealed ? '' : ' hidden') + ' style="margin-top:8px;padding:8px;background:rgba(212,175,55,.08);border-left:3px solid #D4AF37;font-size:13px;">' +
+          '<div data-rep-answer="' + esc(c.id) + '"' + (revealed ? '' : ' hidden') + ' style="margin-top:8px;padding:8px;background:rgba(212,175,55,.08);border-left:3px solid var(--accent);font-size:13px;">' +
           esc(c.answer || 'Ответ не задан — сверьтесь с конспектом урока.') +
           '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">' +
           Object.keys(GRADE_LABELS).map(function (g) {
@@ -3947,9 +4040,9 @@
     var box = document.createElement('div');
     box.className = res.ok ? 'quality-block' : 'quality-block warning-block';
     if (!res.ok) {
-      box.style.cssText = 'border-left:3px solid #D4AF37;background:rgba(212,175,55,.08);padding:10px;margin-top:12px;';
+      box.style.cssText = 'border-left:3px solid var(--accent);background:rgba(212,175,55,.08);padding:10px;margin-top:12px;';
     } else {
-      box.style.cssText = 'border-left:3px solid #D4AF37;padding:10px;margin-top:12px;';
+      box.style.cssText = 'border-left:3px solid var(--accent);padding:10px;margin-top:12px;';
     }
     var ul = document.createElement('ul');
     ul.style.cssText = 'list-style:none;padding:0;margin:0;display:grid;gap:4px;';
@@ -4098,12 +4191,12 @@
     left.className = 'card';
     left.style.padding = '12px';
     left.innerHTML =
-      '<label>Статус<select data-pf="status" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' +
+      '<label>Статус<select data-pf="status" style="width:100%;min-height:44px;border:1px solid var(--accent);">' +
       '<option value="all"' + (practiceUi.statusFilter === 'all' ? ' selected' : '') + '>Все</option>' +
       '<option value="draft"' + (practiceUi.statusFilter === 'draft' ? ' selected' : '') + '>Черновик</option>' +
       '<option value="ready"' + (practiceUi.statusFilter === 'ready' ? ' selected' : '') + '>Готов</option>' +
       '</select></label>' +
-      '<label style="display:block;margin-top:8px;">Категория<select data-pf="category" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' +
+      '<label style="display:block;margin-top:8px;">Категория<select data-pf="category" style="width:100%;min-height:44px;border:1px solid var(--accent);">' +
       '<option value="">Все</option>' + flatCats.map(function (c) { return '<option value="' + esc(c.id) + '"' + (practiceUi.categoryFilter === c.id ? ' selected' : '') + '>' + esc(c.path) + '</option>'; }).join('') +
       '</select></label>' +
       '<ul data-role="practice-items" style="list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px;max-height:520px;overflow:auto;"></ul>';
@@ -4114,7 +4207,7 @@
       b.type = 'button';
       b.setAttribute('data-psel', p.id);
       b.setAttribute('aria-current', p.id === practiceUi.selectedId ? 'true' : 'false');
-      b.style.cssText = 'width:100%;text-align:left;min-height:44px;padding:8px;border:1px solid ' + (p.id === practiceUi.selectedId ? '#D4AF37' : '#E8E0D0') + ';background:' + (p.id === practiceUi.selectedId ? 'rgba(212,175,55,.12)' : '#fff') + ';cursor:pointer;';
+      b.style.cssText = 'width:100%;text-align:left;min-height:44px;padding:8px;border:1px solid ' + (p.id === practiceUi.selectedId ? 'var(--accent)' : 'var(--border)') + ';background:' + (p.id === practiceUi.selectedId ? 'rgba(212,175,55,.12)' : 'var(--surface-raised)') + ';cursor:pointer;';
       var t1 = document.createElement('span');
       t1.style.cssText = 'display:block;font-weight:600;font-size:13px;';
       t1.textContent = p.title || 'Без названия';
@@ -4149,17 +4242,17 @@
       '<button type="button" data-pact="portfolio" class="btn btn--primary" style="min-height:44px;"' + (current.inPortfolio ? ' disabled' : '') + '>' + (current.inPortfolio ? 'В портфолио' : 'Добавить в портфолио') + '</button>' +
       '<button type="button" data-pact="delete" class="btn btn--danger" style="min-height:44px;">Удалить</button>' +
       '</div></div>' +
-      '<label style="display:block;margin-top:12px;">Название<input data-pfield="title" type="text" maxlength="200" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
+      '<label style="display:block;margin-top:12px;">Название<input data-pfield="title" type="text" maxlength="200" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
       '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-top:8px;">' +
-      '<label>Модуль<select data-pfield="moduleId" required style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="">— модуль —</option>' +
+      '<label>Модуль<select data-pfield="moduleId" required style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="">— модуль —</option>' +
       modules.map(function (m) { return '<option value="' + esc(m.id) + '"' + (current.moduleId === m.id ? ' selected' : '') + '>' + esc(m.title) + '</option>'; }).join('') +
       '</select></label>' +
-      '<label>Тема<select data-pfield="topicId" required style="width:100%;min-height:44px;border:1px solid #D4AF37;">' + topicOptions + '</select></label>' +
-      '<label>Статус<select data-pfield="status" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' +
+      '<label>Тема<select data-pfield="topicId" required style="width:100%;min-height:44px;border:1px solid var(--accent);">' + topicOptions + '</select></label>' +
+      '<label>Статус<select data-pfield="status" style="width:100%;min-height:44px;border:1px solid var(--accent);">' +
       '<option value="draft"' + (current.status === 'draft' ? ' selected' : '') + '>Черновик</option>' +
       '<option value="ready"' + (current.status === 'ready' ? ' selected' : '') + '>Готов</option>' +
       '</select></label>' +
-      '<label>Категория<select data-pfield="category" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="">—</option>' +
+      '<label>Категория<select data-pfield="category" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="">—</option>' +
       flatCats.map(function (c) { return '<option value="' + esc(c.id) + '"' + (current.category === c.id ? ' selected' : '') + '>' + esc(c.path) + '</option>'; }).join('') +
       '</select></label>' +
       '</div>' +
@@ -4332,10 +4425,10 @@
       if (f.type === 'textarea') {
         input = document.createElement('textarea');
         input.rows = 4;
-        input.style.cssText = 'width:100%;min-height:44px;padding:8px;border:1px solid #D4AF37;word-break:break-word;';
+        input.style.cssText = 'width:100%;min-height:44px;padding:8px;border:1px solid var(--accent);word-break:break-word;';
       } else if (f.type === 'select') {
         input = document.createElement('select');
-        input.style.cssText = 'width:100%;min-height:44px;border:1px solid #D4AF37;';
+        input.style.cssText = 'width:100%;min-height:44px;border:1px solid var(--accent);';
         (f.options || []).forEach(function (o) {
           var opt = document.createElement('option');
           opt.value = o;
@@ -4345,7 +4438,7 @@
       } else {
         input = document.createElement('input');
         input.type = f.type === 'number' ? 'number' : 'text';
-        input.style.cssText = 'width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;';
+        input.style.cssText = 'width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);';
       }
       input.name = f.name;
       if (f.maxLength) input.maxLength = f.maxLength;
@@ -4381,8 +4474,8 @@
       '<button type="button" data-tact="del" class="btn btn--danger" style="min-height:44px;">Удалить</button>' +
       '<button type="button" data-tact="up" class="btn" style="min-height:44px;" aria-label="Переместить строку вверх">↑</button>' +
       '<button type="button" data-tact="down" class="btn" style="min-height:44px;" aria-label="Переместить строку вниз">↓</button>' +
-      '<label>Поиск<input data-tsearch type="search" style="min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-      (statusCol !== -1 ? '<label>Статус<select data-tstatus style="min-height:44px;border:1px solid #D4AF37;"><option value="all">Все</option>' +
+      '<label>Поиск<input data-tsearch type="search" style="min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+      (statusCol !== -1 ? '<label>Статус<select data-tstatus style="min-height:44px;border:1px solid var(--accent);"><option value="all">Все</option>' +
         ROW_STATUSES.map(function (s) { return '<option value="' + s + '">' + esc(ROW_STATUS_LABELS[s]) + '</option>'; }).join('') + '</select></label>' : '') +
       '<span data-trows style="font-size:12px;opacity:0.7;"></span>';
     container.appendChild(toolbar);
@@ -4391,7 +4484,7 @@
     grid.setAttribute('role', 'grid');
     grid.setAttribute('aria-label', 'Табличный редактор ' + (rec.title || ''));
     grid.tabIndex = 0;
-    grid.style.cssText = 'border:1px solid #D4AF37;overflow:auto;max-height:480px;outline-offset:2px;';
+    grid.style.cssText = 'border:1px solid var(--accent);overflow:auto;max-height:480px;outline-offset:2px;';
     container.appendChild(grid);
     host.replaceChildren(container);
 
@@ -4419,11 +4512,11 @@
       table.style.cssText = 'display:table;width:100%;border-collapse:collapse;';
       var headRow = document.createElement('div');
       headRow.setAttribute('role', 'row');
-      headRow.style.cssText = 'display:table-row;background:#0A1929;color:#F5F0E8;';
+      headRow.style.cssText = 'display:table-row;background:var(--text-primary);color:var(--surface);';
       cols.forEach(function (c) {
         var th = document.createElement('div');
         th.setAttribute('role', 'columnheader');
-        th.style.cssText = 'display:table-cell;padding:8px;font-size:12px;font-weight:600;border:1px solid #D4AF37;';
+        th.style.cssText = 'display:table-cell;padding:8px;font-size:12px;font-weight:600;border:1px solid var(--accent);';
         th.textContent = c;
         headRow.appendChild(th);
       });
@@ -4435,7 +4528,7 @@
         emptyRow.style.cssText = 'display:table-row;';
         var td0 = document.createElement('div');
         td0.setAttribute('role', 'gridcell');
-        td0.style.cssText = 'display:table-cell;padding:12px;font-size:13px;opacity:0.65;border:1px solid #E8E0D0;';
+        td0.style.cssText = 'display:table-cell;padding:12px;font-size:13px;opacity:0.65;border:1px solid var(--border);';
         td0.setAttribute('colspan', String(cols.length));
         td0.textContent = 'Строк по фильтру нет';
         emptyRow.appendChild(td0);
@@ -4447,7 +4540,7 @@
         var tr = document.createElement('div');
         tr.setAttribute('role', 'row');
         tr.setAttribute('data-row', String(realIdx));
-        tr.style.cssText = 'display:table-row;background:' + (visIdx % 2 ? 'rgba(212,175,55,.04)' : '#fff') + ';';
+        tr.style.cssText = 'display:table-row;background:' + (visIdx % 2 ? 'rgba(212,175,55,.04)' : 'var(--surface-raised)') + ';';
         cols.forEach(function (colName, ci) {
           var td = document.createElement('div');
           td.setAttribute('role', 'gridcell');
@@ -4456,12 +4549,12 @@
           td.tabIndex = -1;
           var isActive = tableCursor.row === realIdx && tableCursor.col === ci;
           td.setAttribute('aria-selected', isActive ? 'true' : 'false');
-          td.style.cssText = 'display:table-cell;padding:6px;border:1px solid #E8E0D0;font-size:13px;vertical-align:top;' +
+          td.style.cssText = 'display:table-cell;padding:6px;border:1px solid var(--border);font-size:13px;vertical-align:top;' +
             (isActive ? 'outline:2px solid #D4AF37;outline-offset:-2px;' : '');
           if (isActive) td.classList.add('cell-active');
           if (colName === 'Статус') {
             var sel = document.createElement('select');
-            sel.style.cssText = 'width:100%;min-height:36px;border:1px solid #D4AF37;';
+            sel.style.cssText = 'width:100%;min-height:36px;border:1px solid var(--accent);';
             ROW_STATUSES.forEach(function (s) {
               var o = document.createElement('option');
               o.value = s;
@@ -4479,7 +4572,7 @@
             var inp = document.createElement('input');
             inp.type = 'text';
             inp.value = r[ci] || '';
-            inp.style.cssText = 'width:100%;min-height:36px;padding:0 6px;border:1px solid #D4AF37;';
+            inp.style.cssText = 'width:100%;min-height:36px;padding:0 6px;border:1px solid var(--accent);';
             inp.addEventListener('keydown', function (e) {
               if (e.key === 'Enter') { r[ci] = inp.value; tableCursor.editing = false; rec.updatedAt = nowIso(); onSave(); paint(); focusActive(); }
               else if (e.key === 'Escape') { e.stopPropagation(); tableCursor.editing = false; paint(); focusActive(); }
@@ -4691,16 +4784,16 @@
       '<a href="#portfolio/presentation" class="btn btn--primary" style="min-height:44px;display:inline-flex;align-items:center;padding:0 14px;text-decoration:none;">Режим презентации</a>' +
       '</div></div>' +
       '<div class="card" style="padding:12px;margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;">' +
-      '<label>Статус<select data-ff="status" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="all">Все</option>' +
+      '<label>Статус<select data-ff="status" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="all">Все</option>' +
       PORTFOLIO_STATUS.map(function (s) { return '<option value="' + s + '"' + (portfolioUi.statusFilter === s ? ' selected' : '') + '>' + esc(PORTFOLIO_STATUS_LABELS[s]) + '</option>'; }).join('') +
       '</select></label>' +
-      '<label>Тип<select data-ff="type" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="all">Все</option>' +
+      '<label>Тип<select data-ff="type" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="all">Все</option>' +
       Object.keys(types).map(function (t) { return '<option value="' + esc(t) + '"' + (portfolioUi.typeFilter === t ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('') +
       '</select></label>' +
-      '<label>Видимость<select data-ff="visibility" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="all">Все</option>' +
+      '<label>Видимость<select data-ff="visibility" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="all">Все</option>' +
       '<option value="private"' + (portfolioUi.visibilityFilter === 'private' ? ' selected' : '') + '>Приватно</option>' +
       '<option value="shareable"' + (portfolioUi.visibilityFilter === 'shareable' ? ' selected' : '') + '>Можно делиться</option></select></label>' +
-      '<label>Категория<select data-ff="category" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="">Все</option>' +
+      '<label>Категория<select data-ff="category" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="">Все</option>' +
       flatCats.map(function (c) { return '<option value="' + esc(c.id) + '"' + (portfolioUi.categoryFilter === c.id ? ' selected' : '') + '>' + esc(c.path) + '</option>'; }).join('') +
       '</select></label>' +
       '<label style="display:flex;align-items:center;gap:8px;min-height:44px;"><input type="checkbox" data-ff="ready"' + (portfolioUi.readyOnly ? ' checked' : '') + '> Только для презентации</label>' +
@@ -4712,7 +4805,7 @@
     list.forEach(function (p) {
       var card = document.createElement('article');
       card.className = 'card' + (p.sourceDeleted ? ' source-deleted' : '');
-      card.style.cssText = 'padding:12px;border:2px solid #D4AF37;' + (p.sourceDeleted ? 'opacity:0.75;' : '');
+      card.style.cssText = 'padding:12px;border:2px solid var(--accent);' + (p.sourceDeleted ? 'opacity:0.75;' : '');
       var tagNames = (p.tags || []).map(function (tid) {
         var t = findById(state.tags, tid);
         return t ? t.name : tid;
@@ -4720,13 +4813,13 @@
       card.innerHTML =
         '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;">' +
         '<h3 style="margin:0;font-size:15px;">' + esc(p.title || 'Без названия') + '</h3>' +
-        '<span style="font-size:11px;padding:3px 6px;background:#0A1929;color:#D4AF37;white-space:nowrap;">' + esc(PORTFOLIO_STATUS_LABELS[p.status] || p.status) + '</span>' +
+        '<span style="font-size:11px;padding:3px 6px;background:var(--text-primary);color:var(--accent);white-space:nowrap;">' + esc(PORTFOLIO_STATUS_LABELS[p.status] || p.status) + '</span>' +
         '</div>' +
         '<div style="font-size:11px;opacity:0.65;margin-top:4px;">' + esc(p.type || '—') + ' · ' + esc(fmtDate(p.date)) + (p.sourceDeleted ? ' · источник удалён' : '') + '</div>' +
         (p.task ? '<p style="font-size:13px;margin:8px 0 0;"><strong>Задача:</strong> ' + esc(String(p.task).slice(0, 200)) + '</p>' : '') +
         (p.solution ? '<p style="font-size:13px;margin:4px 0 0;"><strong>Решение:</strong> ' + esc(String(p.solution).slice(0, 200)) + '</p>' : '') +
         (p.link ? '<p style="font-size:12px;margin:4px 0 0;word-break:break-all;">Ссылка: ' + esc(p.link) + '</p>' : '') +
-        (tagNames.length ? '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">' + tagNames.map(function (n) { return '<span style="font-size:11px;padding:3px 6px;background:#0A1929;color:#D4AF37;">' + esc(n) + '</span>'; }).join('') + '</div>' : '') +
+        (tagNames.length ? '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">' + tagNames.map(function (n) { return '<span style="font-size:11px;padding:3px 6px;background:var(--text-primary);color:var(--accent);">' + esc(n) + '</span>'; }).join('') + '</div>' : '') +
         '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;">' +
         '<button type="button" data-pfedit="' + esc(p.id) + '" class="btn" style="min-height:44px;">Изменить</button>' +
         '<button type="button" data-pfready="' + esc(p.id) + '" class="btn" aria-pressed="' + (p.presentationReady ? 'true' : 'false') + '" style="min-height:44px;">' + (p.presentationReady ? 'В презентации' : 'Для презентации') + '</button>' +
@@ -4801,18 +4894,18 @@
       build: function (body) {
         var flatCats = (App.CategoriesManager && typeof App.CategoriesManager.getFlat === 'function') ? App.CategoriesManager.getFlat() : [];
         body.innerHTML =
-          '<label style="display:block;">Название<input data-pe="title" type="text" maxlength="200" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-          '<label style="display:block;margin-top:8px;">Описание<textarea data-pe="description" rows="3" maxlength="2000" style="width:100%;min-height:44px;padding:8px;border:1px solid #D4AF37;"></textarea></label>' +
-          '<label style="display:block;margin-top:8px;">Задача<textarea data-pe="task" rows="2" maxlength="1000" style="width:100%;min-height:44px;padding:8px;border:1px solid #D4AF37;"></textarea></label>' +
-          '<label style="display:block;margin-top:8px;">Решение<textarea data-pe="solution" rows="3" maxlength="2000" style="width:100%;min-height:44px;padding:8px;border:1px solid #D4AF37;"></textarea></label>' +
-          '<label style="display:block;margin-top:8px;">Инструменты, через запятую<input data-pe="tools" type="text" maxlength="300" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-          '<label style="display:block;margin-top:8px;">Навыки, через запятую<input data-pe="skills" type="text" maxlength="300" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-          '<label style="display:block;margin-top:8px;">Ссылка<input data-pe="link" type="url" maxlength="500" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
+          '<label style="display:block;">Название<input data-pe="title" type="text" maxlength="200" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+          '<label style="display:block;margin-top:8px;">Описание<textarea data-pe="description" rows="3" maxlength="2000" style="width:100%;min-height:44px;padding:8px;border:1px solid var(--accent);"></textarea></label>' +
+          '<label style="display:block;margin-top:8px;">Задача<textarea data-pe="task" rows="2" maxlength="1000" style="width:100%;min-height:44px;padding:8px;border:1px solid var(--accent);"></textarea></label>' +
+          '<label style="display:block;margin-top:8px;">Решение<textarea data-pe="solution" rows="3" maxlength="2000" style="width:100%;min-height:44px;padding:8px;border:1px solid var(--accent);"></textarea></label>' +
+          '<label style="display:block;margin-top:8px;">Инструменты, через запятую<input data-pe="tools" type="text" maxlength="300" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+          '<label style="display:block;margin-top:8px;">Навыки, через запятую<input data-pe="skills" type="text" maxlength="300" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+          '<label style="display:block;margin-top:8px;">Ссылка<input data-pe="link" type="url" maxlength="500" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
           '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px;">' +
-          '<label>Статус<select data-pe="status" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' +
+          '<label>Статус<select data-pe="status" style="width:100%;min-height:44px;border:1px solid var(--accent);">' +
           PORTFOLIO_STATUS.map(function (s) { return '<option value="' + s + '">' + esc(PORTFOLIO_STATUS_LABELS[s]) + '</option>'; }).join('') + '</select></label>' +
-          '<label>Видимость<select data-pe="visibility" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="private">Приватно</option><option value="shareable">Можно делиться</option></select></label>' +
-          '<label>Категория<select data-pe="category" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="">—</option>' +
+          '<label>Видимость<select data-pe="visibility" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="private">Приватно</option><option value="shareable">Можно делиться</option></select></label>' +
+          '<label>Категория<select data-pe="category" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="">—</option>' +
           flatCats.map(function (c) { return '<option value="' + esc(c.id) + '">' + esc(c.path) + '</option>'; }).join('') + '</select></label>' +
           '</div>' +
           '<label style="display:flex;align-items:center;gap:8px;margin-top:8px;min-height:44px;"><input type="checkbox" data-pe="presentationReady"> Для презентации</label>' +
@@ -4869,7 +4962,7 @@
     var wrap = document.createElement('div');
     wrap.innerHTML = '<h2>Презентация портфолио</h2>' +
       '<div style="display:grid;gap:12px;">' + items.map(function (p) {
-        return '<article class="card" style="padding:12px;border:2px solid #D4AF37;"><h3 style="margin:0 0 6px;">' + esc(p.title || '') + '</h3>' +
+        return '<article class="card" style="padding:12px;border:2px solid var(--accent);"><h3 style="margin:0 0 6px;">' + esc(p.title || '') + '</h3>' +
           '<div style="font-size:12px;opacity:0.7;">' + esc(p.type || '') + ' · ' + esc(fmtDate(p.date)) + '</div>' +
           (p.task ? '<p><strong>Задача:</strong> ' + esc(p.task) + '</p>' : '') +
           (p.solution ? '<p><strong>Решение:</strong> ' + esc(p.solution) + '</p>' : '') +
@@ -4926,7 +5019,7 @@
       return '<button type="button" class="glossary-letter-btn" data-letter="' + esc(l) + '"' +
         (disabled ? ' disabled aria-disabled="true"' : '') +
         ' aria-pressed="' + (active ? 'true' : 'false') + '"' +
-        ' style="min-width:44px;min-height:44px;border:1px solid ' + (active ? '#0A1929' : '#D4AF37') + ';background:' + (active ? '#D4AF37' : '#fff') + ';opacity:' + (disabled ? '0.4' : '1') + ';cursor:' + (disabled ? 'default' : 'pointer') + ';">' +
+        ' style="min-width:44px;min-height:44px;border:1px solid ' + (active ? 'var(--text-primary)' : 'var(--accent)') + ';background:' + (active ? 'var(--accent)' : 'var(--surface-raised)') + ';opacity:' + (disabled ? '0.4' : '1') + ';cursor:' + (disabled ? 'default' : 'pointer') + ';">' +
         (isAll ? 'Все' : esc(l)) + '</button>';
     }).join('');
 
@@ -4936,7 +5029,7 @@
       '<button type="button" data-gact="create" class="btn btn--primary" style="min-height:44px;">Добавить термин</button>' +
       '</div>' +
       '<label style="display:block;margin-top:12px;"><span class="visually-hidden">Поиск по словарю</span>' +
-      '<input data-gsearch type="search" placeholder="Поиск термина" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
+      '<input data-gsearch type="search" placeholder="Поиск термина" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
       '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:12px;">' + lettersHtml + '</div>' +
       '<div data-role="g-list" style="display:grid;gap:8px;margin-top:12px;"></div>';
 
@@ -4951,7 +5044,7 @@
       card.innerHTML =
         '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;">' +
         '<strong style="font-size:14px;">' + esc(g.term) + '</strong>' +
-        (g.isUser ? '<span style="font-size:11px;padding:3px 6px;background:#D4AF37;">свой</span>' : '') +
+        (g.isUser ? '<span style="font-size:11px;padding:3px 6px;background:var(--accent);color:var(--text-on-accent);">свой</span>' : '') +
         '</div>' +
         '<p style="margin:6px 0 0;font-size:13px;">' + esc(g.definition) + '</p>' +
         (g.isUser ? '<div style="display:flex;gap:6px;margin-top:8px;">' +
@@ -4999,8 +5092,8 @@
       title: existing ? 'Изменить термин' : 'Новый термин',
       build: function (body) {
         body.innerHTML =
-          '<label style="display:block;">Термин<input data-ge="term" type="text" maxlength="100" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-          '<label style="display:block;margin-top:8px;">Определение<textarea data-ge="definition" rows="4" maxlength="1000" style="width:100%;min-height:44px;padding:8px;border:1px solid #D4AF37;"></textarea></label>' +
+          '<label style="display:block;">Термин<input data-ge="term" type="text" maxlength="100" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+          '<label style="display:block;margin-top:8px;">Определение<textarea data-ge="definition" rows="4" maxlength="1000" style="width:100%;min-height:44px;padding:8px;border:1px solid var(--accent);"></textarea></label>' +
           '<div class="modal__actions" style="margin-top:12px;"><button type="button" data-gesave class="btn btn--primary" style="min-height:44px;">Сохранить</button></div>';
         if (existing) {
           body.querySelector('[data-ge="term"]').value = existing.term || '';
@@ -5436,13 +5529,13 @@
       '<button type="button" data-pom="skip" class="btn" style="min-height:44px;padding:0 16px;">Пропустить фазу</button>' +
       '</div></div>' +
       '<div class="card" style="padding:12px;margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;align-items:end;">' +
-      '<label>Режим<select data-pom="mode" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' +
+      '<label>Режим<select data-pom="mode" style="width:100%;min-height:44px;border:1px solid var(--accent);">' +
       Object.keys(POMODORO_MODES).map(function (k) {
         return '<option value="' + k + '"' + (ps.mode === k ? ' selected' : '') + '>' + esc(POMODORO_MODES[k].label) + '</option>';
       }).join('') +
       '</select></label>' +
-      '<label>Работа, мин<input data-pom="work" type="number" min="5" max="120" value="' + ps.workMinutes + '"' + (ps.mode === 'custom' ? '' : ' disabled') + ' style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-      '<label>Перерыв, мин<input data-pom="break" type="number" min="1" max="30" value="' + ps.breakMinutes + '"' + (ps.mode === 'custom' ? '' : ' disabled') + ' style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
+      '<label>Работа, мин<input data-pom="work" type="number" min="5" max="120" value="' + ps.workMinutes + '"' + (ps.mode === 'custom' ? '' : ' disabled') + ' style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+      '<label>Перерыв, мин<input data-pom="break" type="number" min="1" max="30" value="' + ps.breakMinutes + '"' + (ps.mode === 'custom' ? '' : ' disabled') + ' style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
       '<label style="display:flex;align-items:center;gap:8px;min-height:44px;"><input type="checkbox" data-pom="sound"' + (ps.soundEnabled ? ' checked' : '') + '> Звук сигнала</label>' +
       '</div>' +
       '<p style="font-size:12px;opacity:0.7;margin-top:12px;">Сессии сохраняются автоматически и учитываются в статистике активности.</p>';
@@ -5527,11 +5620,11 @@
       var table = document.createElement('table');
       table.style.cssText = 'width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;';
       table.innerHTML = '<caption class="visually-hidden">' + esc(title) + '</caption>' +
-        '<thead><tr><th scope="col" style="text-align:left;border-bottom:1px solid #D4AF37;padding:4px;">Значение</th>' +
-        '<th scope="col" style="text-align:right;border-bottom:1px solid #D4AF37;padding:4px;">Количество</th></tr></thead><tbody>' +
+        '<thead><tr><th scope="col" style="text-align:left;border-bottom:1px solid var(--accent);padding:4px;">Значение</th>' +
+        '<th scope="col" style="text-align:right;border-bottom:1px solid var(--accent);padding:4px;">Количество</th></tr></thead><tbody>' +
         data.map(function (d) {
-          return '<tr><td style="padding:4px;border-bottom:1px solid #E8E0D0;">' + esc(d.label) + '</td>' +
-            '<td style="padding:4px;text-align:right;border-bottom:1px solid #E8E0D0;">' + esc(String(d.value)) + '</td></tr>';
+          return '<tr><td style="padding:4px;border-bottom:1px solid var(--border);">' + esc(d.label) + '</td>' +
+            '<td style="padding:4px;text-align:right;border-bottom:1px solid var(--border);">' + esc(String(d.value)) + '</td></tr>';
         }).join('') + '</tbody>';
       host.appendChild(table);
     }
@@ -5608,7 +5701,7 @@
       (Object.keys(timeByModule).length
         ? '<ul style="list-style:none;padding:0;margin:0;display:grid;gap:4px;font-size:13px;">' +
           Object.keys(timeByModule).map(function (mid) {
-            return '<li style="display:flex;justify-content:space-between;border-bottom:1px solid #E8E0D0;padding:4px 0;">' +
+            return '<li style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding:4px 0;">' +
               '<span>' + esc(moduleTitle[mid] || mid) + '</span><span>' + timeByModule[mid] + ' мин</span></li>';
           }).join('') + '</ul>'
         : '<p style="font-size:13px;opacity:0.7;margin:0;">Время пока не отмечено</p>') +
@@ -5652,18 +5745,18 @@
       table.innerHTML =
         '<thead><tr>' +
         ['Тема', 'Баги', 'Кейсы', 'Чек-листы', 'Всего'].map(function (h, i) {
-          return '<th scope="col" style="text-align:' + (i ? 'right' : 'left') + ';border-bottom:1px solid #D4AF37;padding:6px;">' + h + '</th>';
+          return '<th scope="col" style="text-align:' + (i ? 'right' : 'left') + ';border-bottom:1px solid var(--accent);padding:6px;">' + h + '</th>';
         }).join('') + '</tr></thead><tbody>' +
         rowsData.map(function (l) {
           var g = practiceByTopic[l.id] || { bug: 0, testcase: 0, checklist: 0, total: 0 };
           var warn = isLessonDone(l) && g.total === 0;
           return '<tr class="' + (warn ? 'row-warn' : '') + '"' +
             (warn ? ' style="background:rgba(212,175,55,.15);" aria-label="Тема без артефактов"' : '') + '>' +
-            '<td style="padding:6px;border-bottom:1px solid #E8E0D0;">' + esc(l.title || l.id) + '</td>' +
-            '<td style="padding:6px;text-align:right;border-bottom:1px solid #E8E0D0;">' + g.bug + '</td>' +
-            '<td style="padding:6px;text-align:right;border-bottom:1px solid #E8E0D0;">' + g.testcase + '</td>' +
-            '<td style="padding:6px;text-align:right;border-bottom:1px solid #E8E0D0;">' + g.checklist + '</td>' +
-            '<td style="padding:6px;text-align:right;border-bottom:1px solid #E8E0D0;">' + g.total + '</td></tr>';
+            '<td style="padding:6px;border-bottom:1px solid var(--border);">' + esc(l.title || l.id) + '</td>' +
+            '<td style="padding:6px;text-align:right;border-bottom:1px solid var(--border);">' + g.bug + '</td>' +
+            '<td style="padding:6px;text-align:right;border-bottom:1px solid var(--border);">' + g.testcase + '</td>' +
+            '<td style="padding:6px;text-align:right;border-bottom:1px solid var(--border);">' + g.checklist + '</td>' +
+            '<td style="padding:6px;text-align:right;border-bottom:1px solid var(--border);">' + g.total + '</td></tr>';
         }).join('') + '</tbody>';
       tableHost.appendChild(table);
     }
@@ -5706,7 +5799,7 @@
         catKeys.map(function (cid) {
           var path = (App.CategoriesManager && typeof App.CategoriesManager.getPath === 'function')
             ? App.CategoriesManager.getPath(cid).join(' / ') : cid;
-          return '<li style="display:flex;justify-content:space-between;border-bottom:1px solid #E8E0D0;padding:4px 0;">' +
+          return '<li style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding:4px 0;">' +
             '<span>' + esc(path || cid) + '</span><span>' + catCounts[cid] + '</span></li>';
         }).join('') + '</ul>';
     }
@@ -5738,9 +5831,9 @@
       }
       recoHost.innerHTML = '<ul style="list-style:none;padding:0;margin:0;display:grid;gap:8px;">' +
         reco.map(function (r) {
-          return '<li style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;border-left:3px solid #D4AF37;padding:8px;background:rgba(212,175,55,.08);">' +
+          return '<li style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;border-left:3px solid var(--accent);padding:8px;background:rgba(212,175,55,.08);">' +
             '<span style="font-size:13px;">' + esc(r.text) + '</span>' +
-            '<a href="' + esc(r.href) + '" style="min-height:44px;display:inline-flex;align-items:center;padding:0 12px;border:1px solid #D4AF37;text-decoration:none;color:#0A1929;">' + esc(r.label) + '</a></li>';
+            '<a href="' + esc(r.href) + '" style="min-height:44px;display:inline-flex;align-items:center;padding:0 12px;border:1px solid var(--accent);text-decoration:none;color:var(--text-primary);">' + esc(r.label) + '</a></li>';
         }).join('') + '</ul>';
     }
     paintReco(0);
@@ -5808,7 +5901,7 @@
         var pid = 'res-panel-' + i;
         return '<div class="card" style="padding:0;overflow:hidden;">' +
           '<button type="button" data-acc="' + i + '" aria-expanded="false" aria-controls="' + pid + '" ' +
-          'style="width:100%;text-align:left;min-height:44px;padding:12px;background:#fff;border:none;cursor:pointer;font-weight:600;display:flex;justify-content:space-between;gap:8px;align-items:center;">' +
+          'style="width:100%;text-align:left;min-height:44px;padding:12px;background:var(--surface-raised);border:none;cursor:pointer;font-weight:600;display:flex;justify-content:space-between;gap:8px;align-items:center;">' +
           '<span>' + esc(r.title || '') + '</span><span data-acc-icon aria-hidden="true">+</span></button>' +
           '<div id="' + pid + '" hidden class="res-body">' + mdToHtml(r.content || r.body || r.text || '') + '</div>' +
           '</div>';
@@ -5851,13 +5944,13 @@
 
       '<section class="card" style="padding:12px;"><h3 style="margin:0 0 8px;">Профиль</h3>' +
       '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;">' +
-      '<label>Имя<input data-sf="name" type="text" maxlength="60" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-      '<label>Роль<select data-sf="role" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' +
+      '<label>Имя<input data-sf="name" type="text" maxlength="60" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+      '<label>Роль<select data-sf="role" style="width:100%;min-height:44px;border:1px solid var(--accent);">' +
       ROLE_OPTIONS.map(function (r) { return '<option value="' + esc(r) + '"' + (u.role === r ? ' selected' : '') + '>' + esc(r) + '</option>'; }).join('') +
       '</select></label>' +
-      '<label>Недельная цель, часов<input data-sf="weeklyGoal" type="number" min="1" max="14" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-      '<label>Дневной лимит, минут<input data-sf="dailyLimit" type="number" min="15" max="240" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-      '<label>Тема<select data-sf="theme" style="width:100%;min-height:44px;border:1px solid #D4AF37;">' +
+      '<label>Недельная цель, часов<input data-sf="weeklyGoal" type="number" min="1" max="14" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+      '<label>Дневной лимит, минут<input data-sf="dailyLimit" type="number" min="15" max="240" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+      '<label>Тема<select data-sf="theme" style="width:100%;min-height:44px;border:1px solid var(--accent);">' +
       '<option value="light"' + (u.theme === 'light' ? ' selected' : '') + '>Светлая</option>' +
       '<option value="dark"' + (u.theme === 'dark' ? ' selected' : '') + '>Тёмная</option>' +
       '<option value="system"' + (u.theme === 'system' ? ' selected' : '') + '>Системная</option></select></label>' +
@@ -5870,8 +5963,8 @@
 
       '<section class="card" style="padding:12px;margin-top:12px;"><h3 style="margin:0 0 8px;">Организация данных</h3>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-      '<a href="#settings/tags" style="min-height:44px;display:inline-flex;align-items:center;padding:0 14px;border:1px solid #D4AF37;text-decoration:none;color:#0A1929;">Теги и категории</a>' +
-      '<a href="#settings/sharing" style="min-height:44px;display:inline-flex;align-items:center;padding:0 14px;border:1px solid #D4AF37;text-decoration:none;color:#0A1929;">Обмен данными</a>' +
+      '<a href="#settings/tags" style="min-height:44px;display:inline-flex;align-items:center;padding:0 14px;border:1px solid var(--accent);text-decoration:none;color:var(--text-primary);">Теги и категории</a>' +
+      '<a href="#settings/sharing" style="min-height:44px;display:inline-flex;align-items:center;padding:0 14px;border:1px solid var(--accent);text-decoration:none;color:var(--text-primary);">Обмен данными</a>' +
       '</div></section>' +
 
       '<section class="card" style="padding:12px;margin-top:12px;"><h3 style="margin:0 0 8px;">Резервная копия</h3>' +
@@ -6055,7 +6148,7 @@
         body.innerHTML =
           '<p style="font-size:13px;">Будут удалены все уроки, заметки, вопросы, карточки, практика и портфолио. Перед сбросом автоматически выгрузится копия.</p>' +
           '<label style="display:block;margin-top:8px;">Для подтверждения введите слово СБРОС' +
-          '<input data-reset-word type="text" maxlength="20" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;margin-top:4px;"></label>' +
+          '<input data-reset-word type="text" maxlength="20" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);margin-top:4px;"></label>' +
           '<div class="modal__actions" style="margin-top:12px;display:flex;gap:8px;">' +
           '<button type="button" data-reset-go class="btn btn--danger" style="min-height:44px;">Сбросить всё</button></div>';
         body.querySelector('[data-reset-go]').addEventListener('click', function () {
@@ -6096,7 +6189,7 @@
       '<h2 style="margin:0 0 12px;">Теги и категории</h2>' +
       '<section class="card" style="padding:12px;"><h3 style="margin:0 0 8px;">Теги (' + tags.length + ')</h3>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">' +
-      '<label style="flex:1;min-width:180px;">Новый тег<input data-tg="new" type="text" maxlength="30" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
+      '<label style="flex:1;min-width:180px;">Новый тег<input data-tg="new" type="text" maxlength="30" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
       '<button type="button" data-tgact="create" class="btn btn--primary" style="min-height:44px;">Создать</button>' +
       '<button type="button" data-tgact="manager" class="btn" style="min-height:44px;">Объединить теги</button>' +
       '</div>' +
@@ -6104,8 +6197,8 @@
 
       '<section class="card" style="padding:12px;margin-top:12px;"><h3 style="margin:0 0 8px;">Категории (' + flatCats.length + ')</h3>' +
       '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;align-items:end;">' +
-      '<label>Название<input data-ct="new" type="text" maxlength="50" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-      '<label>Родитель<select data-ct="parent" style="width:100%;min-height:44px;border:1px solid #D4AF37;"><option value="">— корневая —</option>' +
+      '<label>Название<input data-ct="new" type="text" maxlength="50" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+      '<label>Родитель<select data-ct="parent" style="width:100%;min-height:44px;border:1px solid var(--accent);"><option value="">— корневая —</option>' +
       flatCats.map(function (c) { return '<option value="' + esc(c.id) + '">' + esc(c.path) + '</option>'; }).join('') +
       '</select></label>' +
       '<button type="button" data-ctact="create" class="btn btn--primary" style="min-height:44px;">Создать категорию</button>' +
@@ -6118,9 +6211,9 @@
     } else {
       tags.forEach(function (t) {
         var li = document.createElement('li');
-        li.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1px solid #E8E0D0;padding:8px;';
+        li.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1px solid var(--border);padding:8px;';
         li.innerHTML =
-          '<span style="display:inline-block;width:10px;height:10px;background:' + esc(t.color || '#D4AF37') + ';flex:0 0 10px;" aria-hidden="true"></span>' +
+          '<span style="display:inline-block;width:10px;height:10px;background:' + esc(t.color || 'var(--accent)') + ';flex:0 0 10px;" aria-hidden="true"></span>' +
           '<span style="flex:1;font-size:13px;">' + esc(t.name) + ' <span style="opacity:0.6;">· ' + (t.count || 0) + '</span></span>' +
           '<button type="button" data-tgrename="' + esc(t.id) + '" class="btn" style="min-height:44px;">Переименовать</button>' +
           '<button type="button" data-tgdel="' + esc(t.id) + '" class="btn btn--danger" style="min-height:44px;">Удалить</button>';
@@ -6134,7 +6227,7 @@
     } else {
       flatCats.forEach(function (c) {
         var li = document.createElement('li');
-        li.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1px solid #E8E0D0;padding:8px;';
+        li.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1px solid var(--border);padding:8px;';
         li.innerHTML =
           '<span style="flex:1;font-size:13px;padding-left:' + ((c.depth - 1) * 12) + 'px;">' + esc(c.name) +
           ' <span style="opacity:0.6;">· уровень ' + c.depth + '</span></span>' +
@@ -6201,7 +6294,7 @@
       title: isTag ? 'Переименовать тег' : 'Переименовать категорию',
       build: function (body) {
         body.innerHTML =
-          '<label style="display:block;">Новое название<input data-rn type="text" maxlength="' + (isTag ? 30 : 50) + '" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;margin-top:4px;"></label>' +
+          '<label style="display:block;">Новое название<input data-rn type="text" maxlength="' + (isTag ? 30 : 50) + '" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);margin-top:4px;"></label>' +
           '<div class="modal__actions" style="margin-top:12px;"><button type="button" data-rnsave class="btn btn--primary" style="min-height:44px;">Сохранить</button></div>';
         body.querySelector('[data-rn]').value = rec.name || '';
         body.querySelector('[data-rnsave]').addEventListener('click', function () {
@@ -6235,12 +6328,12 @@
     wrap.innerHTML =
       '<h2 style="margin:0 0 12px;">Обмен данными</h2>' +
       '<section class="card" style="padding:12px;"><h3 style="margin:0 0 8px;">Экспорт пакета</h3>' +
-      '<label style="display:block;">Название пакета<input data-sh="name" type="text" maxlength="100" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-      '<label style="display:block;margin-top:8px;">Описание<textarea data-sh="description" rows="2" maxlength="500" style="width:100%;min-height:44px;padding:8px;border:1px solid #D4AF37;"></textarea></label>' +
-      '<label style="display:block;margin-top:8px;">Отправитель<input data-sh="sender" type="text" maxlength="60" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
-      '<label style="display:block;margin-top:8px;">Пароль-маркер<input data-sh="password" type="text" maxlength="32" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
+      '<label style="display:block;">Название пакета<input data-sh="name" type="text" maxlength="100" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+      '<label style="display:block;margin-top:8px;">Описание<textarea data-sh="description" rows="2" maxlength="500" style="width:100%;min-height:44px;padding:8px;border:1px solid var(--accent);"></textarea></label>' +
+      '<label style="display:block;margin-top:8px;">Отправитель<input data-sh="sender" type="text" maxlength="60" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
+      '<label style="display:block;margin-top:8px;">Пароль-маркер<input data-sh="password" type="text" maxlength="32" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
       '<p style="font-size:12px;opacity:0.75;margin:4px 0 0;">Пароль — маркер совпадения при импорте, не шифрование: содержимое пакета читается в любом текстовом редакторе.</p>' +
-      '<fieldset style="margin-top:12px;border:1px solid #D4AF37;padding:8px;"><legend style="font-size:13px;">Что включить</legend>' +
+      '<fieldset style="margin-top:12px;border:1px solid var(--accent);padding:8px;"><legend style="font-size:13px;">Что включить</legend>' +
       '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px;">' +
       shareTypes.map(function (t) {
         return '<label style="display:flex;align-items:center;gap:6px;min-height:44px;">' +
@@ -6257,7 +6350,7 @@
       (journal.length
         ? '<ul style="list-style:none;padding:0;margin:0;display:grid;gap:6px;font-size:13px;">' +
           journal.map(function (j) {
-            return '<li style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;border-bottom:1px solid #E8E0D0;padding:6px 0;">' +
+            return '<li style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding:6px 0;">' +
               '<span>' + esc(j.type === 'export' ? 'Экспорт' : 'Импорт') + ' · ' + esc(j.packageName || '—') + '</span>' +
               '<span style="opacity:0.7;">' + esc(fmtDate(j.date)) + ' · ' + (j.itemsCount || 0) + ' элем.' +
               (j.skipped ? ', пропущено ' + j.skipped : '') + '</span></li>';
@@ -6366,24 +6459,24 @@
       if (d.step === 1) {
         stepHtml =
           '<label style="display:block;">Как к вам обращаться' +
-          '<input data-ob="name" type="text" maxlength="60" value="' + esc(d.name) + '" placeholder="Студент" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;margin-top:4px;"></label>' +
+          '<input data-ob="name" type="text" maxlength="60" value="' + esc(d.name) + '" placeholder="Студент" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);margin-top:4px;"></label>' +
           '<p style="font-size:12px;opacity:0.75;">Допустимы буквы, цифры, пробел и дефис. Пустое поле — «Студент».</p>';
       } else if (d.step === 2) {
         stepHtml =
-          '<label style="display:block;">Ваша роль<select data-ob="role" style="width:100%;min-height:44px;border:1px solid #D4AF37;margin-top:4px;">' +
+          '<label style="display:block;">Ваша роль<select data-ob="role" style="width:100%;min-height:44px;border:1px solid var(--accent);margin-top:4px;">' +
           ['Junior QA', 'Middle QA', 'Тестировщик-стажёр', 'Другое'].map(function (r) {
             return '<option value="' + esc(r) + '"' + (d.role === r ? ' selected' : '') + '>' + esc(r) + '</option>';
           }).join('') + '</select></label>' +
           '<label style="display:block;margin-top:8px;"' + (d.role === 'Другое' ? '' : ' hidden') + ' data-ob-otherwrap>Уточните роль' +
-          '<input data-ob="roleOther" type="text" maxlength="40" value="' + esc(d.roleOther) + '" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;margin-top:4px;"></label>';
+          '<input data-ob="roleOther" type="text" maxlength="40" value="' + esc(d.roleOther) + '" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);margin-top:4px;"></label>';
       } else if (d.step === 3) {
         stepHtml =
-          '<label style="display:block;">Недельная цель, часов<input data-ob="weeklyGoal" type="number" min="1" max="14" value="' + d.weeklyGoal + '" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;margin-top:4px;"></label>' +
-          '<label style="display:block;margin-top:8px;">Дневной лимит, минут<input data-ob="dailyLimit" type="number" min="15" max="240" value="' + d.dailyLimit + '" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;margin-top:4px;"></label>' +
+          '<label style="display:block;">Недельная цель, часов<input data-ob="weeklyGoal" type="number" min="1" max="14" value="' + d.weeklyGoal + '" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);margin-top:4px;"></label>' +
+          '<label style="display:block;margin-top:8px;">Дневной лимит, минут<input data-ob="dailyLimit" type="number" min="15" max="240" value="' + d.dailyLimit + '" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);margin-top:4px;"></label>' +
           '<p style="font-size:12px;opacity:0.75;">Цель от 1 до 14 часов в неделю, лимит от 15 до 240 минут в день.</p>';
       } else if (d.step === 4) {
         stepHtml =
-          '<fieldset style="border:1px solid #D4AF37;padding:8px;"><legend style="font-size:13px;">Оформление</legend>' +
+          '<fieldset style="border:1px solid var(--accent);padding:8px;"><legend style="font-size:13px;">Оформление</legend>' +
           ['system', 'light', 'dark'].map(function (t) {
             var label = t === 'system' ? 'Системная' : t === 'light' ? 'Светлая' : 'Тёмная';
             return '<label style="display:flex;align-items:center;gap:8px;min-height:44px;">' +
@@ -6483,7 +6576,7 @@
   function buildSearchModal(body) {
     body.innerHTML =
       '<label style="display:block;"><span class="visually-hidden">Поисковый запрос</span>' +
-      '<input data-sq type="search" placeholder="Заметки, вопросы, практика, портфолио" style="width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;"></label>' +
+      '<input data-sq type="search" placeholder="Заметки, вопросы, практика, портфолио" style="width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);"></label>' +
       '<div data-role="search-results" style="margin-top:12px;display:grid;gap:6px;max-height:320px;overflow:auto;"></div>';
     var input = body.querySelector('[data-sq]');
     var host = body.querySelector('[data-role="search-results"]');
@@ -6510,7 +6603,7 @@
       results = results.slice(0, 30);
       if (!results.length) { host.innerHTML = '<p style="font-size:13px;opacity:0.7;margin:0;">Ничего не найдено</p>'; return; }
       host.innerHTML = results.map(function (r) {
-        return '<a href="' + esc(r.href) + '" style="display:flex;justify-content:space-between;gap:8px;min-height:44px;align-items:center;padding:8px;border:1px solid #E8E0D0;text-decoration:none;color:#0A1929;">' +
+        return '<a href="' + esc(r.href) + '" style="display:flex;justify-content:space-between;gap:8px;min-height:44px;align-items:center;padding:8px;border:1px solid var(--border);text-decoration:none;color:var(--text-primary);">' +
           '<span style="font-size:13px;">' + esc(r.label) + '</span><span style="font-size:11px;opacity:0.65;">' + esc(r.kind) + '</span></a>';
       }).join('');
     }
@@ -6530,8 +6623,8 @@
     }
     var opts = tags.map(function (t) { return '<option value="' + esc(t.id) + '">' + esc(t.name) + ' · ' + (t.count || 0) + '</option>'; }).join('');
     body.innerHTML =
-      '<label style="display:block;">Объединить тег<select data-mg="source" style="width:100%;min-height:44px;border:1px solid #D4AF37;margin-top:4px;">' + opts + '</select></label>' +
-      '<label style="display:block;margin-top:8px;">В тег<select data-mg="target" style="width:100%;min-height:44px;border:1px solid #D4AF37;margin-top:4px;">' + opts + '</select></label>' +
+      '<label style="display:block;">Объединить тег<select data-mg="source" style="width:100%;min-height:44px;border:1px solid var(--accent);margin-top:4px;">' + opts + '</select></label>' +
+      '<label style="display:block;margin-top:8px;">В тег<select data-mg="target" style="width:100%;min-height:44px;border:1px solid var(--accent);margin-top:4px;">' + opts + '</select></label>' +
       '<p style="font-size:12px;opacity:0.75;">Исходный тег будет удалён, все записи получат целевой тег.</p>' +
       '<div class="modal__actions" style="margin-top:12px;"><button type="button" data-mgsave class="btn btn--primary" style="min-height:44px;">Объединить</button></div>';
     body.querySelector('[data-mgsave]').addEventListener('click', function () {
@@ -6715,7 +6808,7 @@
     ta.rows = 10;
     ta.maxLength = 20000;
     ta.value = value || '';
-    ta.style.cssText = 'width:100%;min-height:44px;padding:8px;border:1px solid #D4AF37;word-break:break-word;';
+    ta.style.cssText = 'width:100%;min-height:44px;padding:8px;border:1px solid var(--accent);word-break:break-word;';
     container.replaceChildren(ta);
     ta.addEventListener('input', function () { if (typeof onChange === 'function') onChange(ta.value); });
     return {
@@ -6752,10 +6845,10 @@
       if (f.type === 'textarea') {
         input = document.createElement('textarea');
         input.rows = 4;
-        input.style.cssText = 'width:100%;min-height:44px;padding:8px;border:1px solid #D4AF37;word-break:break-word;';
+        input.style.cssText = 'width:100%;min-height:44px;padding:8px;border:1px solid var(--accent);word-break:break-word;';
       } else if (f.type === 'select') {
         input = document.createElement('select');
-        input.style.cssText = 'width:100%;min-height:44px;border:1px solid #D4AF37;';
+        input.style.cssText = 'width:100%;min-height:44px;border:1px solid var(--accent);';
         (f.options || []).forEach(function (o) {
           var opt = document.createElement('option');
           opt.value = o;
@@ -6765,7 +6858,7 @@
       } else {
         input = document.createElement('input');
         input.type = f.type === 'number' ? 'number' : f.type === 'date' ? 'date' : 'text';
-        input.style.cssText = 'width:100%;min-height:44px;padding:0 8px;border:1px solid #D4AF37;';
+        input.style.cssText = 'width:100%;min-height:44px;padding:0 8px;border:1px solid var(--accent);';
       }
       input.name = f.name;
       if (f.maxLength) input.maxLength = f.maxLength;
